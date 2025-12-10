@@ -1,0 +1,22 @@
+/**
+ * Colors variables
+ */
+@use 'sass:map';
+
+$theme-colors: (
+  default: (primary: #8b5cf6,
+    /* Violet Accent */
+    secondary: #000000,
+    /* Black Bg */
+    shadow: #4c1d95,
+    /* Dark Violet Shadow */
+    white: #ddd6fe,
+    /* Light Violet Text */
+  ),
+
+  contrasted: (primary: #a78bfa,
+    secondary: #000000,
+    shadow: #4c1d95,
+    white: #ede9fe,
+  ),
+);
