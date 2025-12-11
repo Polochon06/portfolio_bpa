@@ -9,17 +9,80 @@ import logo from '../assets/logo.png'
     <title>MT-CONGÉS | Paul Blanc</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/png" href="/icons/favicon-48x48.png" />
+    <link
+      rel="preload"
+      href="/fonts/PPEditorialNew-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="/fonts/PPFraktionMono-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="/fonts/Bigger-Display.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
     <style lang="scss">
+      @font-face {
+        font-family: 'Bigger Display';
+        src: url('/fonts/Bigger-Display.woff2') format('woff2');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: 'PP Fraktion Mono';
+        src: url('/fonts/PPFraktionMono-Regular.woff2') format('woff2');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
       body {
         margin: 0;
-        background-color: #0b0b0b;
+        background-color: #050505;
         color: #e0e0e0;
-        font-family: 'Inter', sans-serif;
+        font-family: 'PP Fraktion Mono', monospace;
         overflow-x: hidden;
       }
 
+      #bg-3d {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        opacity: 0.6;
+      }
+
+      .ambient-light {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 80vw;
+        height: 80vw;
+        background: radial-gradient(
+          circle,
+          rgba(138, 43, 226, 0.15) 0%,
+          rgba(0, 0, 0, 0) 70%
+        );
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: -1;
+        filter: blur(50px);
+      }
+
       .container {
-        max-width: 1200px;
+        max-width: 1400px;
         margin: 0 auto;
         padding: 0 2rem;
       }
@@ -34,108 +97,156 @@ import logo from '../assets/logo.png'
         justify-content: space-between;
         align-items: center;
         z-index: 100;
-        mix-blend-mode: difference;
+        mix-blend-mode: exclusion;
 
         a {
           text-decoration: none;
           color: white;
           font-weight: bold;
           text-transform: uppercase;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.05em;
+          font-size: 0.9rem;
         }
       }
 
       .hero {
-        height: 100vh;
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        align-items: center;
         position: relative;
-        overflow: hidden;
-
-        &__bg {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: radial-gradient(
-            circle at 50% 50%,
-            #2a2a2a 0%,
-            #0b0b0b 70%
-          );
-          z-index: -1;
-          opacity: 0.5;
-        }
+        text-align: center;
+        padding-top: 4rem;
 
         h1 {
-          font-size: clamp(3rem, 10vw, 8rem);
-          line-height: 0.9;
+          font-family: 'Bigger Display', sans-serif;
+          font-size: clamp(4rem, 18vw, 15rem);
+          line-height: 0.8;
           margin: 0;
           text-transform: uppercase;
-          font-weight: 800;
-          letter-spacing: -0.02em;
-          background: linear-gradient(to right, #fff, #888);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          color: #fff;
+          text-shadow: 0 0 30px rgba(138, 43, 226, 0.3);
+
           opacity: 0;
-          transform: translateY(30px);
+          transform: translateY(50px);
+          animation: heroReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .tags {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 2rem;
+          opacity: 0;
           animation: fadeUp 1s ease-out forwards 0.5s;
+
+          span {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+          }
         }
 
         .subtitle {
           font-size: clamp(1rem, 2vw, 1.5rem);
-          margin-top: 2rem;
-          color: #888;
+          margin-top: 3rem;
+          color: #ccc;
           max-width: 600px;
+          font-family: 'Helvetica', sans-serif; /* Contrast font */
+          font-weight: 300;
           opacity: 0;
           transform: translateY(20px);
           animation: fadeUp 1s ease-out forwards 0.8s;
         }
       }
 
-      .section {
-        padding: 8rem 0;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      .showcase {
+        position: relative;
+        margin: -10vh auto 5rem;
+        width: 100%;
+        max-width: 1200px;
+        perspective: 1000px;
 
-        h2 {
-          font-size: 2.5rem;
-          margin-bottom: 3rem;
-          color: #fff;
-          text-transform: uppercase;
+        &__img {
+          width: 100%;
+          height: auto;
+          border-radius: 12px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 20px 80px rgba(0, 0, 0, 0.5);
+          transform: rotateX(5deg);
+          transition: transform 0.5s ease;
+
+          &:hover {
+            transform: rotateX(0deg);
+          }
         }
       }
 
-      .grid {
+      .section {
+        padding: 10rem 0;
+
+        h2 {
+          font-family: 'Bigger Display', sans-serif;
+          font-size: clamp(3rem, 8vw, 6rem);
+          margin-bottom: 4rem;
+          color: #fff;
+          text-transform: uppercase;
+          line-height: 0.9;
+        }
+      }
+
+      .grid-cols-2 {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 3rem;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+        }
+
+        p {
+          font-size: 1.1rem;
+          line-height: 1.6;
+          color: #bbb;
+          margin-bottom: 2rem;
+        }
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
 
         .card {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.05);
-          padding: 2rem;
-          border-radius: 8px;
-          transition:
-            transform 0.3s ease,
-            background 0.3s ease;
+          background: rgba(20, 20, 20, 0.6);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          padding: 2.5rem;
+          border-radius: 16px;
+          transition: all 0.3s ease;
 
           &:hover {
+            background: rgba(40, 40, 40, 0.6);
+            border-color: rgba(138, 43, 226, 0.5);
             transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.05);
           }
 
           h3 {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             margin-top: 0;
             margin-bottom: 1rem;
             color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
           }
 
           p {
-            color: #aaa;
-            line-height: 1.6;
             font-size: 0.95rem;
+            color: #888;
+            line-height: 1.6;
           }
         }
       }
@@ -146,41 +257,80 @@ import logo from '../assets/logo.png'
         gap: 1rem;
 
         span {
-          padding: 0.5rem 1rem;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 50px;
+          background: rgba(255, 255, 255, 0.05);
+          padding: 0.8rem 1.5rem;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 4px;
           font-size: 0.9rem;
           color: #ccc;
+          text-transform: uppercase;
           transition: all 0.3s ease;
 
           &:hover {
-            border-color: #fff;
-            color: #fff;
+            background: #fff;
+            color: #000;
           }
         }
       }
 
-      .back-btn {
-        display: inline-block;
-        margin-top: 2rem;
-        padding: 1rem 2rem;
-        background: #fff;
-        color: #000;
-        text-decoration: none;
-        font-weight: bold;
-        border-radius: 4px;
-        transition: transform 0.2s;
+      .dual-images {
+        display: flex;
+        gap: 2rem;
+        margin: 5rem 0;
+        align-items: center;
 
-        &:hover {
-          transform: scale(1.05);
+        @media (max-width: 768px) {
+          flex-direction: column;
+        }
+
+        img {
+          width: 50%;
+          height: auto;
+          border-radius: 8px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+
+          @media (max-width: 768px) {
+            width: 100%;
+          }
+        }
+      }
+
+      .cta-footer {
+        text-align: center;
+        padding: 8rem 0;
+
+        a.main-btn {
+          display: inline-block;
+          font-size: 2rem;
+          color: #fff;
+          text-decoration: none;
+          padding-bottom: 5px;
+          border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+          transition: all 0.3s ease;
+          font-family: 'Bigger Display', sans-serif;
+          text-transform: uppercase;
+
+          &:hover {
+            border-color: #fff;
+            text-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+          }
         }
       }
 
       footer {
-        padding: 4rem 0;
+        padding: 2rem;
         text-align: center;
-        color: #555;
-        font-size: 0.9rem;
+        color: #444;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      @keyframes heroReveal {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       @keyframes fadeUp {
@@ -189,224 +339,201 @@ import logo from '../assets/logo.png'
           transform: translateY(0);
         }
       }
-
-      /* Image styling if needed */
-      .project-image {
-        width: 100%;
-        height: auto;
-        border-radius: 8px;
-        margin-bottom: 4rem;
-        opacity: 0;
-        animation: fadeUp 1s ease-out forwards 1.2s;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      #bg-3d {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-      }
     </style>
   </head>
-  <body>
-    <canvas id="bg-3d"></canvas>
+  <canvas id="bg-3d"></canvas>
+  <div class="ambient-light"></div>
 
-    <header>
-      <a href="/portfolio_bpa/">Paul Blanc</a>
-      <a href="https://github.com/Paul-B-06/mt-conges" target="_blank">
-        GitHub
-      </a>
-    </header>
+  <header>
+    <a href="/portfolio_bpa/">Paul Blanc ©24</a>
+    <a href="https://github.com/Paul-B-06/mt-conges" target="_blank">
+      GitHub Repository ↗
+    </a>
+  </header>
 
-    <main>
-      <div class="container">
-        <section class="hero">
-          <h1>MT-Congés</h1>
-          <div class="subtitle">
-            Platforme de gestion des temps et congés avec architecture
-            hiérarchisée et sécurisée.
-          </div>
-        </section>
+  <main>
+    <div class="container">
+      <section class="hero">
+        <div class="tags">
+          <span>2024</span>
+          <span>Java Architecture</span>
+          <span>School Project</span>
+        </div>
+        <h1>MT-Congés</h1>
+        <div class="subtitle">
+          Une plateforme moderne de gestion RH.<br />Architecture stricte.
+          Sécurité maximale.
+        </div>
+      </section>
 
+      <div class="showcase">
         <img
           src="/portfolio_bpa/images/works/mt-conges-dashboard.png"
           alt="Dashboard"
-          class="project-image"
+          class="showcase__img"
         />
-
-        <section class="section">
-          <h2>Le Projet</h2>
-          <div class="grid">
-            <div>
-              <p>
-                MT-CONGÉS est une application de gestion des ressources humaines
-                conçue pour simplifier et sécuriser le processus de demande et
-                de validation des congés. Développée en Java avec une
-                architecture stricte MVC, elle répond aux besoins des
-                entreprises modernes par sa robustesse et sa hiérarchie des
-                rôles.
-              </p>
-              <p>
-                Le projet a été réalisé sur une période de 3 mois dans un cadre
-                académique, mettant l'accent sur les bonnes pratiques de
-                développement, la sécurité des données et l'expérience
-                utilisateur.
-              </p>
-            </div>
-            <div>
-              <h3>Objectifs Clés</h3>
-              <ul style="color: #aaa; line-height: 1.8;">
-                <li>Digitaliser les demandes de congés papiers.</li>
-                <li>Assurer une traçabilité complète des actions.</li>
-                <li>Sécuriser l'accès aux données sensibles.</li>
-                <li>Offrir une interface fluide et intuitive.</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <section class="section">
-          <h2>Stack Technique</h2>
-          <div class="tech-stack">
-            <span>Java 17</span>
-            <span>Swing UI</span>
-            <span>MySQL</span>
-            <span>MVC Pattern</span>
-            <span>DAO Pattern</span>
-            <span>Git / GitHub</span>
-            <span>BCrypt (Sécurité)</span>
-          </div>
-        </section>
-
-        <img
-          src="/portfolio_bpa/images/works/mt-conges-login-screen.png"
-          alt="Ecran de Connexion"
-          class="project-image"
-        />
-
-        <section class="section">
-          <h2>Fonctionnalités</h2>
-          <div class="grid">
-            <div class="card">
-              <h3>Hiérarchie des Rôles</h3>
-              <p>
-                Système complet de gestion des droits : Employés pour les
-                demandes, Managers pour la validation d'équipe, et
-                Administrateurs pour la configuration globale.
-              </p>
-            </div>
-            <div class="card">
-              <h3>Sécurité Avancée</h3>
-              <p>
-                Protection contre les injections SQL via DAO, hachage des mots
-                de passe, et sessions sécurisées pour prévenir les accès non
-                autorisés.
-              </p>
-            </div>
-            <div class="card">
-              <h3>Logging & Audit</h3>
-              <p>
-                Traçabilité de toutes les actions critiques (connexions,
-                validations, suppressions) pour assurer la conformité et le
-                débogage.
-              </p>
-            </div>
-            <div class="card">
-              <h3>Interface Responsive</h3>
-              <p>
-                Interface utilisateur développée en Java Swing avec un design
-                moderne et intuitif, facilitant l'adoption par les utilisateurs
-                finaux.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section class="section" style="text-align: center;">
-          <h2>Prêt à en voir plus ?</h2>
-          <p style="color: #aaa; max-width: 600px; margin: 0 auto 2rem auto;">
-            Explorez le code source complet sur GitHub pour découvrir
-            l'architecture et les détails d'implémentation.
-          </p>
-          <a
-            href="https://github.com/Paul-B-06/mt-conges"
-            target="_blank"
-            class="back-btn"
-          >
-            Voir sur GitHub
-          </a>
-          <br /><br />
-          <a
-            href="/portfolio_bpa/"
-            style="color: #888; text-decoration: none; font-size: 0.9rem;"
-          >
-            Retour au Portfolio
-          </a>
-        </section>
       </div>
-    </main>
 
-    <footer>© 2024 Paul Blanc. Tous droits réservés.</footer>
+      <section class="section">
+        <div class="grid-cols-2">
+          <div>
+            <h2>Le Projet</h2>
+          </div>
+          <div>
+            <p>
+              <b>MT-CONGÉS</b> redéfinit la gestion des temps en entreprise. Conçue
+              pour remplacer les processus papiers obsolètes, cette application Java
+              offre une expérience fluide et sécurisée pour la gestion des demandes
+              de congés.
+            </p>
+            <p>
+              Développée avec une rigueur architecturale (MVC, DAO), elle
+              garantit une maintenabilité exemplaire et une séparation nette des
+              responsabilités, répondant aux standards industriels les plus
+              exigeants.
+            </p>
+          </div>
+        </div>
+      </section>
 
-    <script>
-      const canvas = document.getElementById('bg-3d')
-      const ctx = canvas.getContext('2d')
+      <section class="section">
+        <h2>Stack Technique</h2>
+        <div class="tech-stack">
+          <span>Java 17</span>
+          <span>Swing (FlatLaf)</span>
+          <span>MySQL 8.0</span>
+          <span>MVC Pattern</span>
+          <span>DAO Pattern</span>
+          <span>BCrypt</span>
+        </div>
+      </section>
 
-      let width = (canvas.width = window.innerWidth)
-      let height = (canvas.height = window.innerHeight)
+      <section class="section">
+        <div class="dual-images">
+          <div style="flex: 1;">
+            <h2 style="font-size: 3rem; margin-bottom: 2rem;">
+              Interface<br />Utilisateur
+            </h2>
+            <p style="color:#aaa; margin-bottom: 2rem;">
+              Une interface graphique soignée utilisant la librairie Swing, avec
+              un thème "Purple" cohérent pour une expérience utilisateur
+              premium.
+            </p>
+          </div>
+          <img
+            src="/portfolio_bpa/images/works/mt-conges-login-screen.png"
+            alt="Ecran de Connexion"
+            style="flex: 1.5;"
+          />
+        </div>
+      </section>
 
-      window.addEventListener('resize', () => {
-        width = canvas.width = window.innerWidth
-        height = canvas.height = window.innerHeight
+      <section class="section">
+        <h2>Fonctionnalités Clés</h2>
+        <div class="feature-grid">
+          <div class="card">
+            <h3>01. Hiérarchie RBAC</h3>
+            <p>
+              Système de contrôle d'accès basé sur les rôles (RBAC). Les
+              permissions sont strictement cloisonnées entre Employés, Managers
+              et Admins.
+            </p>
+          </div>
+          <div class="card">
+            <h3>02. Sécurité Core</h3>
+            <p>
+              Hachage des mots de passe avec BCrypt et prévention des injections
+              SQL via l'utilisation systématique de PreparedStatements dans la
+              couche DAO.
+            </p>
+          </div>
+          <div class="card">
+            <h3>03. Audit Logs</h3>
+            <p>
+              Traçabilité complète via un système de logging intégré. Chaque
+              action critique laisse une empreinte numérique inaltérable pour
+              l'audit.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta-footer">
+        <p
+          style="color: #666; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.1em;"
+        >
+          Code Source
+        </p>
+        <a
+          href="https://github.com/Paul-B-06/mt-conges"
+          target="_blank"
+          class="main-btn"
+        >
+          Explorer le Repository
+        </a>
+      </section>
+    </div>
+  </main>
+
+  <footer>Designed & Developed by Paul Blanc</footer>
+
+  <script>
+    const canvas = document.getElementById('bg-3d')
+    const ctx = canvas.getContext('2d')
+
+    let width = (canvas.width = window.innerWidth)
+    let height = (canvas.height = window.innerHeight)
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth
+      height = canvas.height = window.innerHeight
+    })
+
+    const stars = []
+    const numStars = 800
+    const centerX = width / 2
+    const centerY = height / 2
+
+    for (let i = 0; i < numStars; i++) {
+      stars.push({
+        x: Math.random() * width - centerX,
+        y: Math.random() * height - centerY,
+        z: Math.random() * width,
       })
+    }
 
-      const stars = []
-      const numStars = 800
-      const centerX = width / 2
-      const centerY = height / 2
+    function animate() {
+      ctx.fillStyle = '#0b0b0b'
+      ctx.fillRect(0, 0, width, height)
 
       for (let i = 0; i < numStars; i++) {
-        stars.push({
-          x: Math.random() * width - centerX,
-          y: Math.random() * height - centerY,
-          z: Math.random() * width,
-        })
-      }
+        const star = stars[i]
+        star.z -= 2 // Speed
 
-      function animate() {
-        ctx.fillStyle = '#0b0b0b'
-        ctx.fillRect(0, 0, width, height)
-
-        for (let i = 0; i < numStars; i++) {
-          const star = stars[i]
-          star.z -= 2 // Speed
-
-          if (star.z <= 0) {
-            star.x = Math.random() * width - centerX
-            star.y = Math.random() * height - centerY
-            star.z = width
-          }
-
-          const x = (star.x / star.z) * width + centerX
-          const y = (star.y / star.z) * height + centerY
-          const size = (1 - star.z / width) * 3
-
-          if (x >= 0 && x < width && y >= 0 && y < height) {
-            const alpha = 1 - star.z / width
-            ctx.fillStyle = 'rgba(255, 255, 255, ' + alpha + ')'
-            ctx.beginPath()
-            ctx.arc(x, y, size, 0, Math.PI * 2)
-            ctx.fill()
-          }
+        if (star.z <= 0) {
+          star.x = Math.random() * width - centerX
+          star.y = Math.random() * height - centerY
+          star.z = width
         }
 
-        requestAnimationFrame(animate)
+        const x = (star.x / star.z) * width + centerX
+        const y = (star.y / star.z) * height + centerY
+        const size = (1 - star.z / width) * 3
+
+        if (x >= 0 && x < width && y >= 0 && y < height) {
+          const alpha = 1 - star.z / width
+          ctx.fillStyle = 'rgba(255, 255, 255, ' + alpha + ')'
+          ctx.beginPath()
+          ctx.arc(x, y, size, 0, Math.PI * 2)
+          ctx.fill()
+        }
       }
 
-      animate()
-    </script>
-  </body>
+      requestAnimationFrame(animate)
+    }
+
+    animate()
+  </script>
+
+
 </html>
