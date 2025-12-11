@@ -200,9 +200,20 @@ import logo from '../assets/logo.png'
         animation: fadeUp 1s ease-out forwards 1.2s;
         border: 1px solid rgba(255, 255, 255, 0.1);
       }
+
+      #bg-3d {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
     </style>
   </head>
   <body>
+    <canvas id="bg-3d"></canvas>
+
     <header>
       <a href="/portfolio_bpa/">Paul Blanc</a>
       <a href="https://github.com/Paul-B-06/mt-conges" target="_blank">
@@ -213,7 +224,6 @@ import logo from '../assets/logo.png'
     <main>
       <div class="container">
         <section class="hero">
-          <div class="hero__bg"></div>
           <h1>MT-Congés</h1>
           <div class="subtitle">
             Platforme de gestion des temps et congés avec architecture
@@ -270,6 +280,12 @@ import logo from '../assets/logo.png'
             <span>BCrypt (Sécurité)</span>
           </div>
         </section>
+
+        <img
+          src="/portfolio_bpa/images/works/mt-conges-login-screen.png"
+          alt="Ecran de Connexion"
+          class="project-image"
+        />
 
         <section class="section">
           <h2>Fonctionnalités</h2>
@@ -334,5 +350,63 @@ import logo from '../assets/logo.png'
     </main>
 
     <footer>© 2024 Paul Blanc. Tous droits réservés.</footer>
+
+    <script>
+      const canvas = document.getElementById('bg-3d')
+      const ctx = canvas.getContext('2d')
+
+      let width = (canvas.width = window.innerWidth)
+      let height = (canvas.height = window.innerHeight)
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth
+        height = canvas.height = window.innerHeight
+      })
+
+      const stars = []
+      const numStars = 800
+      const centerX = width / 2
+      const centerY = height / 2
+
+      for (let i = 0; i < numStars; i++) {
+        stars.push({
+          x: Math.random() * width - centerX,
+          y: Math.random() * height - centerY,
+          z: Math.random() * width,
+        })
+      }
+
+      function animate() {
+        ctx.fillStyle = '#0b0b0b'
+        ctx.fillRect(0, 0, width, height)
+
+        for (let i = 0; i < numStars; i++) {
+          const star = stars[i]
+          star.z -= 2 // Speed
+
+          if (star.z <= 0) {
+            star.x = Math.random() * width - centerX
+            star.y = Math.random() * height - centerY
+            star.z = width
+          }
+
+          const x = (star.x / star.z) * width + centerX
+          const y = (star.y / star.z) * height + centerY
+          const size = (1 - star.z / width) * 3
+
+          if (x >= 0 && x < width && y >= 0 && y < height) {
+            const alpha = 1 - star.z / width
+            ctx.fillStyle = 'rgba(255, 255, 255, ' + alpha + ')'
+            ctx.beginPath()
+            ctx.arc(x, y, size, 0, Math.PI * 2)
+            ctx.fill()
+          }
+        }
+
+        requestAnimationFrame(animate)
+      }
+
+      animate()
+    </script>
   </body>
 </html>
