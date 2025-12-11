@@ -1,4 +1,6 @@
 ---
+import logo from '../assets/logo.png'
+
 const menu = [
   {
     id: 'about',
@@ -19,24 +21,15 @@ const menu = [
   <div class="site-head__container">
     <div class="sb-logo">
       <a href="/">
-        <svg
+        <img
+          src={logo.src}
+          alt="Paul Blanc"
           class="js-logo"
           width="280"
           height="280"
-          viewBox="0 0 280 280"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M240.245 0v263.2h-19.894V0h-39.756v263.2h-19.861V0h-39.755v280H280V0h-39.755Z"
-            fill="#160000"
-          >
-          </path>
-          <path d="M0 0v280h39.755V16.8H59.65V280h39.756V0H0Z" fill="#160000">
-          </path>
-        </svg>
+        />
 
-        <span class="u-sr-only">Antoine Wodniack</span>
+        <span class="u-sr-only">Paul Blanc</span>
       </a>
     </div><!-- .sb-logo -->
 
@@ -58,8 +51,6 @@ const menu = [
         }
       </ul>
     </nav><!-- .sb-menu -->
-
-
 
     <button class="sb-contrast js-contrast" type="button">
       <span
@@ -84,8 +75,6 @@ const menu = [
         </span>
       </p>
     </aside><!-- .sb-availability -->
-
-
   </div><!-- .site-head__container -->
 </header>
 
@@ -217,7 +206,7 @@ const menu = [
       this.contrastButton.addEventListener(
         'click',
         this.toggleContrast.bind(this),
-        { passive: true }
+        { passive: true },
       )
 
       this.links.forEach((link) => {
@@ -265,7 +254,7 @@ const menu = [
           duration: 1.5,
           ease: 'expo.inOut',
         },
-        1
+        1,
       )
 
       tl.from(
@@ -276,17 +265,15 @@ const menu = [
           ease: 'expo.out',
           stagger: 0.1,
         },
-        1.5
+        1.5,
       )
-
-
 
       tl.call(
         () => {
           this.canWrite = true
         },
         null,
-        1.5
+        1.5,
       )
     }
 
@@ -324,10 +311,10 @@ const menu = [
               'contrastchange',
               document.documentElement.classList.contains('theme-contrasted')
                 ? 'contrasted'
-                : 'default'
+                : 'default',
             )
           },
-        }
+        },
       )
 
       if (toX !== '0') {
@@ -458,7 +445,7 @@ const menu = [
         height: 4rem;
       }
 
-      svg {
+      img {
         width: 3rem;
         height: 3rem;
 

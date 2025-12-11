@@ -8,6 +8,7 @@ import SWork from '../components/SWork.astro'
 import SMyWay from '../components/SMyWay.astro'
 import SCTA from '../components/SCTA.astro'
 import ASeparator from '../components/ASeparator.astro'
+import logo from '../assets/logo.png'
 
 import '../styles/global.scss'
 ---
@@ -20,7 +21,8 @@ import '../styles/global.scss'
 
     <meta
       name="description"
-      content="Take a peek behind the scenes of a senior dev’s awarded portfolio. Clone it, learn from it, build your own. But don’t just steal it—the community will call you out, and you’ll doom yourself to eternal mediocrity." />
+      content="Take a peek behind the scenes of a senior dev’s awarded portfolio. Clone it, learn from it, build your own. But don’t just steal it—the community will call you out, and you’ll doom yourself to eternal mediocrity."
+    />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
 
@@ -48,15 +50,30 @@ import '../styles/global.scss'
 
     <meta property="og:locale" content="en_GB" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Antoine Wodniack 2025 Portfolio – Open Source Edition" />
-    <meta property="og:description" content="Take a peek behind the scenes of a senior dev’s awarded portfolio. Clone it, learn from it, build your own. But don’t just steal it—the community will call you out, and you’ll doom yourself to eternal mediocrity." />
+    <meta
+      property="og:title"
+      content="Antoine Wodniack 2025 Portfolio – Open Source Edition"
+    />
+    <meta
+      property="og:description"
+      content="Take a peek behind the scenes of a senior dev’s awarded portfolio. Clone it, learn from it, build your own. But don’t just steal it—the community will call you out, and you’ll doom yourself to eternal mediocrity."
+    />
     <meta property="og:url" content="https://public.wodniack.dev/" />
-    <meta property="og:site_name" content="Antoine Wodniack 2025 Portfolio – Open Source Edition" />
-    <meta property="og:image" content="https://public.wodniack.dev/images/aw-creative-developer.png" />
+    <meta
+      property="og:site_name"
+      content="Antoine Wodniack 2025 Portfolio – Open Source Edition"
+    />
+    <meta
+      property="og:image"
+      content="https://public.wodniack.dev/images/aw-creative-developer.png"
+    />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="675" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content="https://public.wodniack.dev/images/aw-creative-developer.png" />
+    <meta
+      name="twitter:image"
+      content="https://public.wodniack.dev/images/aw-creative-developer.png"
+    />
 
     <link
       rel="preload"
@@ -121,14 +138,12 @@ import '../styles/global.scss'
       style="opacity: 1; position: fixed; top: 0; left: 0; z-index: 50; width: 100%; height: 100%; background: #F40C3F;"
     >
       <div class="sb-logo js-logo">
-        <div class="sb__path sb__path--v sb__path--v-1 js-logo-line-v"></div>
-        <div class="sb__path sb__path--h sb__path--h-1 js-logo-line-h"></div>
-        <div class="sb__path sb__path--v sb__path--v-2 js-logo-line-v"></div>
-        <div class="sb__path sb__path--v sb__path--v-3 js-logo-line-v"></div>
-        <div class="sb__path sb__path--h sb__path--h-2 js-logo-line-h"></div>
-        <div class="sb__path sb__path--v sb__path--v-4 js-logo-line-v"></div>
-        <div class="sb__path sb__path--h sb__path--h-3 js-logo-line-h"></div>
-        <div class="sb__path sb__path--v sb__path--v-5 js-logo-line-v"></div>
+        <img
+          src={logo.src}
+          alt="Paul Blanc"
+          class="js-intro-logo"
+          style="width: 100%; height: 100%; object-fit: contain;"
+        />
       </div><!-- .sb-logo -->
 
       <div class="site-intro__border site-intro__border--top js-border-top">
@@ -242,7 +257,7 @@ import '../styles/global.scss'
               entry.target.dispatchEvent(
                 new CustomEvent('intersect', {
                   detail: { isIntersecting: entry.isIntersecting },
-                })
+                }),
               )
 
               if (entry.isIntersecting) {
@@ -250,7 +265,7 @@ import '../styles/global.scss'
                 entry.target.classList.remove(
                   'is-out-of-view',
                   'is-out-of-view-top',
-                  'is-out-of-view-bottom'
+                  'is-out-of-view-bottom',
                 )
               } else {
                 entry.target.classList.remove('is-in-view')
@@ -258,18 +273,18 @@ import '../styles/global.scss'
 
                 entry.target.classList.toggle(
                   'is-out-of-view-top',
-                  entry.boundingClientRect.top < 0
+                  entry.boundingClientRect.top < 0,
                 )
                 entry.target.classList.toggle(
                   'is-out-of-view-bottom',
-                  entry.boundingClientRect.top > 0
+                  entry.boundingClientRect.top > 0,
                 )
               }
             })
           },
           {
             threshold: 0,
-          }
+          },
         )
 
         document.querySelectorAll('[data-intersect]').forEach((el) => {
@@ -393,8 +408,7 @@ import '../styles/global.scss'
         const wrapper: HTMLElement = document.querySelector('.js-site-wrapper')
         const intro: HTMLElement = document.querySelector('.js-intro')
         const mount: HTMLElement = document.querySelector('.js-mount')
-        const logoLinesV: NodeList = intro.querySelectorAll('.js-logo-line-v')
-        const logoLinesH: NodeList = intro.querySelectorAll('.js-logo-line-h')
+        const introLogo: HTMLElement = intro.querySelector('.js-intro-logo')
         const borderTop: HTMLElement = intro.querySelector('.js-border-top')
         const borderLeft: HTMLElement = intro.querySelector('.js-border-left')
         const borderRight: HTMLElement = intro.querySelector('.js-border-right')
@@ -411,65 +425,29 @@ import '../styles/global.scss'
         })
 
         tl.fromTo(
-          logoLinesV,
+          introLogo,
           {
-            scaleY: 0,
+            scale: 0.8,
+            opacity: 0,
           },
           {
-            scaleY: 1,
-            duration: 1,
-            ease: 'power4.inOut',
-            stagger: 0.15,
+            scale: 1,
+            opacity: 1,
+            duration: 1.5,
+            ease: 'expo.out',
           },
-          0
+          0,
         )
 
-        tl.fromTo(
-          logoLinesH,
+        tl.to(
+          introLogo,
           {
-            scaleX: 0,
+            opacity: 0,
+            scale: 1.1,
+            duration: 0.8,
+            ease: 'power2.in',
           },
-          {
-            scaleX: 1,
-            duration: 0.4,
-            ease: 'power4.inOut',
-            stagger: 0,
-          },
-          1
-        )
-
-        tl.set(logoLinesV, {
-          transformOrigin: '50% 0',
-        })
-
-        tl.fromTo(
-          logoLinesV,
-          {
-            scaleY: 1,
-          },
-          {
-            scaleY: 0,
-            duration: 1,
-            ease: 'power4.in',
-            immediateRender: false,
-            stagger: 0.1,
-          },
-          2
-        )
-
-        tl.fromTo(
-          logoLinesH,
-          {
-            scaleY: 1,
-          },
-          {
-            scaleY: 0,
-            duration: 0.5,
-            ease: 'power4.in',
-            immediateRender: false,
-            stagger: 0.1,
-          },
-          2.1
+          2.5,
         )
 
         tl.from(
@@ -479,7 +457,7 @@ import '../styles/global.scss'
             duration: 3,
             ease: 'power3.inOut',
           },
-          1
+          1,
         )
 
         tl.from(
@@ -489,7 +467,7 @@ import '../styles/global.scss'
             duration: 3,
             ease: 'power3.inOut',
           },
-          1
+          1,
         )
 
         tl.call(
@@ -497,7 +475,7 @@ import '../styles/global.scss'
             document.dispatchEvent(new CustomEvent('intro'))
           },
           null,
-          '-=1.85'
+          '-=1.85',
           // 0.5
         )
 
@@ -513,7 +491,7 @@ import '../styles/global.scss'
             })
           },
           null,
-          5
+          5,
           // 0
         )
       }
@@ -589,67 +567,6 @@ import '../styles/global.scss'
         @include mq(phone) {
           width: 1.875rem;
           height: 1.875rem;
-        }
-
-        .sb__path {
-          position: absolute;
-
-          background: color(secondary);
-
-          &--v {
-            top: 0;
-
-            width: 14.2857%;
-            height: 100%;
-
-            transform-origin: 50% 100%;
-
-            &-1 {
-              left: 0;
-            }
-
-            &-2 {
-              left: 21.3214%;
-            }
-
-            &-3 {
-              left: 43.2143%;
-            }
-
-            &-4 {
-              left: 64.7857%;
-            }
-
-            &-5 {
-              right: 0;
-            }
-          }
-
-          &--h {
-            width: 7.5%;
-            height: 6%;
-
-            &-1 {
-              top: 0;
-              left: 14.2857%;
-
-              transform-origin: 100% 0;
-            }
-
-            &-2 {
-              left: 57.5%;
-              bottom: 0;
-
-              transform-origin: 0 0;
-            }
-
-            &-3 {
-              right: 14.2857%;
-              bottom: 0;
-
-              transform-origin: 0% 0;
-            }
-          }
         }
       }
 
