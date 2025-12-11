@@ -1,6 +1,6 @@
 ---
 import logo from '../assets/logo.png'
-import pfpSpicy from '../assets/pfp-spicy.png'
+import pfpExtraSpicy from '../assets/pfp-extra-spicy.png'
 import '../styles/global.scss'
 ---
 
@@ -30,7 +30,7 @@ import '../styles/global.scss'
       }
       .header {
         height: 220px;
-        background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop'); /* Aesthetic dark liquid abstract */
+        background-image: url('https://images.unsplash.com/photo-1496337589254-7e19d01cec44?q=80&w=2670&auto=format&fit=crop'); /* Red moody abstract */
         background-size: cover;
         background-position: center;
         position: relative;
@@ -406,7 +406,7 @@ import '../styles/global.scss'
       <div class="header">
         <div class="profile-container">
           <div class="profile-pic">
-            <img src={pfpSpicy.src} alt="Polochon" />
+            <img src={pfpExtraSpicy.src} alt="Polochon" />
           </div>
         </div>
       </div>
@@ -424,14 +424,15 @@ import '../styles/global.scss'
                 </svg>
               </h1>
               <p class="handle">@Polochon</p>
-              <div class="last-seen">Available now</div>
+              <div class="last-seen">Online right now 😈</div>
             </div>
 
             <div class="bio">
-              Hey! I'm Paul. 💻 I make hot websites and reveal my source code to
-              subscribers only. 🥵
-              <br /><br />
-              Subscribe for exclusive access to my `node_modules` folder.
+              10x Developer in the sheets... style sheets. 💦
+              <br />
+              I don't just center divs, I center your attention. 😉
+              <br />
+              Subscribe for uncensored commits and raw data.
             </div>
 
             <div class="stats">
@@ -443,14 +444,14 @@ import '../styles/global.scss'
             <div class="post-feed">
               <div class="post-card">
                 <div class="post-header">
-                  <div class="post-avatar"><img src={pfpSpicy.src} /></div>
+                  <div class="post-avatar"><img src={pfpExtraSpicy.src} /></div>
                   <div class="post-meta">
                     <span class="post-name">Polochon</span>
-                    <span class="post-time">2 hours ago</span>
+                    <span class="post-time">22 minutes ago</span>
                   </div>
                 </div>
                 <div class="post-content">
-                  <p>Ready for a deep dive into my backend? 😈</p>
+                  <p>Feeling naughty... might force push to master later. 🥵</p>
                   <svg class="lock-icon" viewBox="0 0 24 24" fill="#8a96a3">
                     <path
                       d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
@@ -469,14 +470,16 @@ import '../styles/global.scss'
               <div class="post-feed">
                 <div class="post-card">
                   <div class="post-header">
-                    <div class="post-avatar"><img src={pfpSpicy.src} /></div>
+                    <div class="post-avatar">
+                      <img src={pfpExtraSpicy.src} />
+                    </div>
                     <div class="post-meta">
                       <span class="post-name">Polochon</span>
-                      <span class="post-time">1 day ago</span>
+                      <span class="post-time">3 hours ago</span>
                     </div>
                   </div>
                   <div class="post-content">
-                    <p>You won't believe how big my component library is. 👇</p>
+                    <p>Want to see my large... payload? 👇</p>
                     <svg class="lock-icon" viewBox="0 0 24 24" fill="#8a96a3">
                       <path
                         d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
@@ -579,6 +582,9 @@ import '../styles/global.scss'
                 `
           virusLayer.appendChild(popup)
         }
+
+        // Audio annoyance (commented out to be nice, but visual is enough)
+        // const context = new AudioContext();
 
         // Glitch effect on body
         document.body.classList.add('glitch-mode')
