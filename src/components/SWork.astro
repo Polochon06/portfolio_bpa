@@ -4,32 +4,32 @@ import dummyVideo from '/src/assets/works/Dummy.mp4'
 
 // Custom Project List for Paul Blanc
 const myProjects = [
-  { 
-    caption: 'MT-CONGÉS • Architecture Java', 
-    site: 'https://github.com/Paul-B-06/mt-conges', 
+  {
+    caption: 'MT-CONGÉS • Architecture Java',
+    site: 'https://github.com/Paul-B-06/mt-conges',
     src: '/portfolio_bpa/images/works/mt-conges-dashboard.png',
     type: 'image',
     description: `CONTEXTE: Projet scolaire (3 mois - 2024). Gestion de congés hierarchisée.
 TECH: Java 17, Swing, MySQL, MVC, DAO, Git.
 FONCTIONNALITÉS: Auth sécurisée, Rôles (Admin/Manager/Employé), Logging.
-DÉFIS: Sécurité (Injection SQL -> DAO), Architecture (MVC Strict).`
+DÉFIS: Sécurité (Injection SQL -> DAO), Architecture (MVC Strict).`,
   },
-  { 
-    caption: 'VFX_LAB • Motion Design', 
-    site: 'https://youtu.be/-diwAEusMBA', 
+  {
+    caption: 'VFX_LAB • Motion Design',
+    site: 'https://youtu.be/-diwAEusMBA',
     src: 'https://www.youtube.com/embed/-diwAEusMBA?autoplay=1&mute=1&controls=0&loop=1&playlist=-diwAEusMBA&playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&fs=0&disablekb=1&showinfo=0',
     type: 'youtube',
     description: `Projet de Motion Design et VFX.
-Réalisé avec Adobe After Effects.`
+Réalisé avec Adobe After Effects.`,
   },
-  { 
-    caption: 'CYBER_CORE • Digital Art', 
-    site: 'https://youtu.be/olD2CUUyhqI', 
+  {
+    caption: 'CYBER_CORE • Digital Art',
+    site: 'https://youtu.be/olD2CUUyhqI',
     src: 'https://www.youtube.com/embed/olD2CUUyhqI?start=0&end=33&autoplay=1&mute=1&controls=0&loop=1&playlist=olD2CUUyhqI&playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&fs=0&disablekb=1&showinfo=0',
     type: 'youtube',
     description: `Expérience visuelle et sonore.
-Création artistique réalisée avec Adobe Photoshop et After Effects.`
-  }
+Création artistique réalisée avec Adobe Photoshop et After Effects.`,
+  },
 ]
 
 const works = myProjects
@@ -267,7 +267,7 @@ const works = myProjects
      */
     setCtxStyle() {
       const color = getComputedStyle(this.el).getPropertyValue(
-        '--color-primary'
+        '--color-primary',
       )
 
       Ticker.nextTick(() => {
@@ -447,12 +447,14 @@ const works = myProjects
           el.style.top = ghost.y + 'px'
           el.style.left = ghost.x + 'px'
 
-          el.style.zIndex = String(j !== 1 && j !== 2 && (j + letters.length + i) % 5 === 0 ? 3 : 1)
+          el.style.zIndex = String(
+            j !== 1 && j !== 2 && (j + letters.length + i) % 5 === 0 ? 3 : 1,
+          )
 
           el.style.setProperty('--ix', String(ghost.i))
           el.style.setProperty(
             '--iy',
-            String(((j + 1) / (letters.length + 1) - 0.5) * 2)
+            String(((j + 1) / (letters.length + 1) - 0.5) * 2),
           )
 
           el.style.setProperty('--ap', String(ghost.ap))
@@ -472,10 +474,13 @@ const works = myProjects
       works.forEach((work, i) => {
         const el = work.el
 
-        el.style.setProperty('--size', String(0.5 + Math.random() * 0.5))
+        // Make the middle item significantly larger
+        const size = i === 1 ? 1.5 : 0.5 + Math.random() * 0.5
+
+        el.style.setProperty('--size', String(size))
         el.style.setProperty(
           '--y',
-          String((0.5 + Math.random() * 0.5) * (i % 2 ? -1 : 1))
+          String((0.5 + Math.random() * 0.5) * (i % 2 ? -1 : 1)),
         )
       })
     }
@@ -516,7 +521,7 @@ const works = myProjects
           duration: 0.75,
           ease: 'power4.in',
         },
-        0
+        0,
       )
 
       tl.fromTo(
@@ -529,7 +534,7 @@ const works = myProjects
           duration: 0.75,
           ease: 'power3.in',
         },
-        0
+        0,
       )
 
       tl.fromTo(
@@ -542,7 +547,7 @@ const works = myProjects
           duration: 0.75,
           ease: 'power3.in',
         },
-        0
+        0,
       )
 
       tl.fromTo(
@@ -555,7 +560,7 @@ const works = myProjects
           duration: 1,
           ease: 'power4.inOut',
         },
-        0
+        0,
       )
 
       tl.fromTo(
@@ -568,7 +573,7 @@ const works = myProjects
           duration: 0.75,
           ease: 'power4.in',
         },
-        0
+        0,
       )
 
       tl.fromTo(
@@ -585,7 +590,7 @@ const works = myProjects
           ease: 'slow(0.15, 0.6)',
           stagger: 0.25,
         },
-        0.75
+        0.75,
       )
 
       tl.fromTo(
@@ -598,7 +603,7 @@ const works = myProjects
           duration: tl.totalDuration(),
           ease: 'power1.out',
         },
-        0.75
+        0.75,
       )
 
       tl.fromTo(
@@ -612,7 +617,7 @@ const works = myProjects
           ease: 'power4.inOut',
           immediateRender: false,
         },
-        '-=1'
+        '-=1',
       )
 
       tl.fromTo(
@@ -626,7 +631,7 @@ const works = myProjects
           ease: 'power4.inOut',
           immediateRender: false,
         },
-        '-=1'
+        '-=1',
       )
 
       tl.fromTo(
@@ -640,7 +645,7 @@ const works = myProjects
           ease: 'power3.inOut',
           immediateRender: false,
         },
-        '-=1'
+        '-=1',
       )
 
       tl.fromTo(
@@ -654,7 +659,7 @@ const works = myProjects
           ease: 'power3.inOut',
           immediateRender: false,
         },
-        '-=1'
+        '-=1',
       )
 
       tl.fromTo(
@@ -667,7 +672,7 @@ const works = myProjects
           duration: 1,
           ease: 'power4.inOut',
         },
-        '-=1'
+        '-=1',
       )
     }
 
@@ -676,7 +681,7 @@ const works = myProjects
      */
     loadNextVideo() {
       const video = Array.from(this.videos).find(
-        (video) => !video.classList.contains('is-loaded')
+        (video) => !video.classList.contains('is-loaded'),
       )
 
       if (video) {
@@ -688,7 +693,7 @@ const works = myProjects
             () => {
               this.videoLoaded(video)
             },
-            { once: true }
+            { once: true },
           )
 
           video.setAttribute('src', video.getAttribute('data-src'))
@@ -817,20 +822,20 @@ const works = myProjects
       this.scrollProgress =
         Math.max(
           Math.min(1, ScrollTrigger.positionInViewport(this.el, 'top')),
-          0
+          0,
         ) *
           -1 +
         (1 -
           Math.max(
             Math.min(1, ScrollTrigger.positionInViewport(this.el, 'bottom')),
-            0
+            0,
           ))
       this.smoothScrollProgress +=
         (this.scrollProgress - this.smoothScrollProgress) * 0.1
 
       this.el.style.setProperty(
         '--scroll-progress',
-        String(this.scrollProgress)
+        String(this.scrollProgress),
       )
 
       // Movement
@@ -1049,10 +1054,8 @@ const works = myProjects
 
           color: color(shadow);
 
-          opacity: min(calc( var(--state) * 2 ), 1);
-          transform: scale(
-              1.05, 1.02
-            )
+          opacity: min(calc(var(--state) * 2), 1);
+          transform: scale(1.05, 1.02)
             translate3d(
               calc(var(--head) * 0.1rem * var(--state) * var(--state)),
               0,
