@@ -48,41 +48,14 @@ import logo from '../assets/logo.png'
       }
       body {
         margin: 0;
-        background-color: #050505;
-        color: #e0e0e0;
-        font-family: 'PP Fraktion Mono', monospace;
+        background-color: #f7f3f0; /* Soft warm beige/off-white */
+        color: #2b2b2b; /* Soft black */
+        font-family: 'Helvetica', 'Arial', sans-serif;
         overflow-x: hidden;
       }
 
-      #bg-3d {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        opacity: 0.6;
-      }
-
-      .ambient-light {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        width: 80vw;
-        height: 80vw;
-        background: radial-gradient(
-          circle,
-          rgba(138, 43, 226, 0.15) 0%,
-          rgba(0, 0, 0, 0) 70%
-        );
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-        z-index: -1;
-        filter: blur(50px);
-      }
-
       .container {
-        max-width: 1400px;
+        max-width: 1200px;
         margin: 0 auto;
         padding: 0 2rem;
       }
@@ -92,161 +65,156 @@ import logo from '../assets/logo.png'
         top: 0;
         left: 0;
         width: 100%;
-        padding: 2rem;
+        padding: 1.5rem 2rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
         z-index: 100;
-        mix-blend-mode: exclusion;
+        background: rgba(247, 243, 240, 0.9);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 
         a {
           text-decoration: none;
-          color: white;
-          font-weight: bold;
+          color: #2b2b2b;
+          font-weight: 500;
           text-transform: uppercase;
           letter-spacing: 0.05em;
-          font-size: 0.9rem;
+          font-size: 0.85rem;
         }
       }
 
       .hero {
-        min-height: 100vh;
+        min-height: 90vh; /* Slightly shorter than full VH for editorial feel */
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        position: relative;
         text-align: center;
-        padding-top: 4rem;
+        padding-top: 6rem;
 
         h1 {
-          font-family: 'Bigger Display', sans-serif;
-          font-size: clamp(4rem, 18vw, 15rem);
-          line-height: 0.8;
-          margin: 0;
-          text-transform: uppercase;
-          color: #fff;
-          text-shadow: 0 0 30px rgba(138, 43, 226, 0.3);
-
+          font-family: 'PPEditorialNew-Regular', 'Times New Roman', serif;
+          font-size: clamp(3rem, 12vw, 8rem);
+          font-weight: 400; /* Regular weight for editorial look */
+          line-height: 1;
+          margin: 0 0 2rem 0;
+          color: #2b2b2b;
           opacity: 0;
-          transform: translateY(50px);
-          animation: heroReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          transform: translateY(30px);
+          animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .subtitle {
+          font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+          color: #555;
+          max-width: 700px;
+          font-weight: 400;
+          line-height: 1.4;
+          opacity: 0;
+          transform: translateY(20px);
+          animation: fadeUp 1s ease-out forwards 0.3s;
         }
 
         .tags {
           display: flex;
           gap: 1rem;
-          margin-bottom: 2rem;
+          margin-bottom: 3rem;
           opacity: 0;
-          animation: fadeUp 1s ease-out forwards 0.5s;
+          animation: fadeUp 1s ease-out forwards 0.2s;
 
           span {
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 0.5rem 1rem;
-            border-radius: 100px;
+            background: #e6e2de;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
             font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.05em;
+            color: #444;
           }
-        }
-
-        .subtitle {
-          font-size: clamp(1rem, 2vw, 1.5rem);
-          margin-top: 3rem;
-          color: #ccc;
-          max-width: 600px;
-          font-family: 'Helvetica', sans-serif; /* Contrast font */
-          font-weight: 300;
-          opacity: 0;
-          transform: translateY(20px);
-          animation: fadeUp 1s ease-out forwards 0.8s;
         }
       }
 
       .showcase {
-        position: relative;
-        margin: -10vh auto 5rem;
         width: 100%;
-        max-width: 1200px;
-        perspective: 1000px;
+        max-width: 1100px;
+        margin: 0 auto 6rem;
 
         &__img {
           width: 100%;
           height: auto;
-          border-radius: 12px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          box-shadow: 0 20px 80px rgba(0, 0, 0, 0.5);
-          transform: rotateX(5deg);
+          border-radius: 24px; /* Softer corners */
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08); /* Soft shadow */
           transition: transform 0.5s ease;
 
           &:hover {
-            transform: rotateX(0deg);
+            transform: scale(1.02);
           }
         }
       }
 
       .section {
-        padding: 10rem 0;
+        padding: 8rem 0;
 
         h2 {
-          font-family: 'Bigger Display', sans-serif;
-          font-size: clamp(3rem, 8vw, 6rem);
-          margin-bottom: 4rem;
-          color: #fff;
-          text-transform: uppercase;
-          line-height: 0.9;
+          font-family: 'PPEditorialNew-Regular', serif;
+          font-size: clamp(2.5rem, 5vw, 4rem);
+          font-weight: 400;
+          margin-bottom: 3rem;
+          color: #2b2b2b;
+          line-height: 1.1;
         }
       }
 
       .grid-cols-2 {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 4rem;
+        gap: 6rem;
+        align-items: start;
 
         @media (max-width: 768px) {
           grid-template-columns: 1fr;
+          gap: 3rem;
         }
 
         p {
-          font-size: 1.1rem;
+          font-size: 1.2rem;
           line-height: 1.6;
-          color: #bbb;
+          color: #444;
           margin-bottom: 2rem;
         }
       }
 
       .feature-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 2rem;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 3rem;
 
         .card {
-          background: rgba(20, 20, 20, 0.6);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          padding: 2.5rem;
-          border-radius: 16px;
-          transition: all 0.3s ease;
+          background: #fff;
+          padding: 3rem;
+          border-radius: 24px;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+          transition: transform 0.3s ease;
 
           &:hover {
-            background: rgba(40, 40, 40, 0.6);
-            border-color: rgba(138, 43, 226, 0.5);
             transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.06);
           }
 
           h3 {
-            font-size: 1.2rem;
+            font-family: 'PPEditorialNew-Regular', serif;
+            font-size: 1.8rem;
             margin-top: 0;
             margin-bottom: 1rem;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            color: #2b2b2b;
+            font-weight: 400;
           }
 
           p {
-            font-size: 0.95rem;
-            color: #888;
-            line-height: 1.6;
+            font-size: 1rem;
+            color: #666;
+            line-height: 1.7;
           }
         }
       }
@@ -257,37 +225,40 @@ import logo from '../assets/logo.png'
         gap: 1rem;
 
         span {
-          background: rgba(255, 255, 255, 0.05);
-          padding: 0.8rem 1.5rem;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 4px;
-          font-size: 0.9rem;
-          color: #ccc;
-          text-transform: uppercase;
-          transition: all 0.3s ease;
+          background: #fff;
+          padding: 0.8rem 1.6rem;
+          border-radius: 12px;
+          font-size: 1rem;
+          color: #333;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+          transition: all 0.2s ease;
 
           &:hover {
-            background: #fff;
-            color: #000;
+            background: #f0ece9;
+            transform: translateY(-2px);
           }
         }
       }
 
       .dual-images {
         display: flex;
-        gap: 2rem;
-        margin: 5rem 0;
+        gap: 4rem;
         align-items: center;
+        background: #fff;
+        padding: 4rem;
+        border-radius: 32px;
 
         @media (max-width: 768px) {
           flex-direction: column;
+          padding: 2rem;
+          gap: 2rem;
         }
 
         img {
           width: 50%;
           height: auto;
-          border-radius: 8px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
 
           @media (max-width: 768px) {
             width: 100%;
@@ -298,21 +269,25 @@ import logo from '../assets/logo.png'
       .cta-footer {
         text-align: center;
         padding: 8rem 0;
+        background: #e6e2de; /* Slightly darker beige */
+        border-radius: 32px;
+        margin-bottom: 2rem;
 
         a.main-btn {
           display: inline-block;
-          font-size: 2rem;
+          background: #2b2b2b;
           color: #fff;
+          font-size: 1.2rem;
           text-decoration: none;
-          padding-bottom: 5px;
-          border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+          padding: 1.2rem 3rem;
+          border-radius: 50px;
           transition: all 0.3s ease;
-          font-family: 'Bigger Display', sans-serif;
-          text-transform: uppercase;
+          font-weight: 500;
+          margin-top: 2rem;
 
           &:hover {
-            border-color: #fff;
-            text-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+            background: #000;
+            transform: scale(1.05);
           }
         }
       }
@@ -320,17 +295,10 @@ import logo from '../assets/logo.png'
       footer {
         padding: 2rem;
         text-align: center;
-        color: #444;
+        color: #777;
         font-size: 0.8rem;
         text-transform: uppercase;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
-      }
-
-      @keyframes heroReveal {
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+        letter-spacing: 0.1em;
       }
 
       @keyframes fadeUp {
@@ -341,12 +309,9 @@ import logo from '../assets/logo.png'
       }
     </style>
   </head>
-  <canvas id="bg-3d"></canvas>
-  <div class="ambient-light"></div>
-
   <header>
     <a href="/portfolio_bpa/">Paul Blanc ©24</a>
-    <a href="https://github.com/Paul-B-06/mt-conges" target="_blank">
+    <a href="https://github.com/Polochon06/mt-conges" target="_blank">
       GitHub Repository ↗
     </a>
   </header>
@@ -465,7 +430,7 @@ import logo from '../assets/logo.png'
           Code Source
         </p>
         <a
-          href="https://github.com/Paul-B-06/mt-conges"
+          href="https://github.com/Polochon06/mt-conges"
           target="_blank"
           class="main-btn"
         >
@@ -476,64 +441,6 @@ import logo from '../assets/logo.png'
   </main>
 
   <footer>Designed & Developed by Paul Blanc</footer>
-
-  <script>
-    const canvas = document.getElementById('bg-3d')
-    const ctx = canvas.getContext('2d')
-
-    let width = (canvas.width = window.innerWidth)
-    let height = (canvas.height = window.innerHeight)
-
-    window.addEventListener('resize', () => {
-      width = canvas.width = window.innerWidth
-      height = canvas.height = window.innerHeight
-    })
-
-    const stars = []
-    const numStars = 800
-    const centerX = width / 2
-    const centerY = height / 2
-
-    for (let i = 0; i < numStars; i++) {
-      stars.push({
-        x: Math.random() * width - centerX,
-        y: Math.random() * height - centerY,
-        z: Math.random() * width,
-      })
-    }
-
-    function animate() {
-      ctx.fillStyle = '#0b0b0b'
-      ctx.fillRect(0, 0, width, height)
-
-      for (let i = 0; i < numStars; i++) {
-        const star = stars[i]
-        star.z -= 2 // Speed
-
-        if (star.z <= 0) {
-          star.x = Math.random() * width - centerX
-          star.y = Math.random() * height - centerY
-          star.z = width
-        }
-
-        const x = (star.x / star.z) * width + centerX
-        const y = (star.y / star.z) * height + centerY
-        const size = (1 - star.z / width) * 3
-
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-          const alpha = 1 - star.z / width
-          ctx.fillStyle = 'rgba(255, 255, 255, ' + alpha + ')'
-          ctx.beginPath()
-          ctx.arc(x, y, size, 0, Math.PI * 2)
-          ctx.fill()
-        }
-      }
-
-      requestAnimationFrame(animate)
-    }
-
-    animate()
-  </script>
 
 
 </html>
