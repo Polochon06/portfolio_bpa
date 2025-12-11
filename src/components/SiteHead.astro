@@ -421,17 +421,17 @@ const menu = [
       @include flex(row, stretch, space-between);
 
       width: 100%;
-      height: 9rem;
+      height: 6rem;
 
       @include mq(phone) {
-        height: 6rem;
+        height: 4rem;
       }
     }
 
     .sb-logo {
       padding: 0;
-      width: 9rem;
-      height: 9rem;
+      width: 6rem;
+      height: 6rem;
 
       border-right: 1px solid color(secondary);
 
@@ -441,14 +441,16 @@ const menu = [
 
       @include mq(phone) {
         padding: 0;
-        width: 6rem;
-        height: 6rem;
+        width: 4rem;
+        height: 4rem;
       }
 
       img {
+        display: block;
         width: 100%;
         height: 100%;
         object-fit: contain;
+        transform: scale(1.8);
       }
     }
 
@@ -704,7 +706,7 @@ const menu = [
       position: relative;
 
       width: 48px;
-      height: 100%;
+      height: 96px;
 
       appearance: none;
       background: none;
