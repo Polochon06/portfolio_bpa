@@ -263,10 +263,9 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
           letter-spacing: -0.02em;
           margin-bottom: 2rem;
 
-          /* Gradient Text */
-          background: linear-gradient(to bottom, #fff 30%, #a5f3fc 90%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          /* Solid text for better readability */
+          color: #fff;
+          text-shadow: 0 4px 30px rgba(100, 255, 218, 0.3);
 
           animation: fadeUp 1.2s var(--ease-out) forwards;
           opacity: 0;
