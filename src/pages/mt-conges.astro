@@ -1,6 +1,7 @@
 ---
 import '../styles/global.scss'
-import logo from '../assets/logo.png'
+
+const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
 ---
 
 <html lang="fr" class="theme-contrasted">
@@ -23,22 +24,14 @@ import logo from '../assets/logo.png'
       type="font/woff2"
       crossorigin="anonymous"
     />
-    <link
-      rel="preload"
-      href="/fonts/Bigger-Display.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <style lang="scss">
+    <style lang="scss" define:vars={{ bgImage }}>
       @font-face {
-        font-family: 'Bigger Display';
-        src: url('/fonts/Bigger-Display.woff2') format('woff2');
+        font-family: 'Editorial New';
+        src: url('/fonts/PPEditorialNew-Regular.woff2') format('woff2');
         font-weight: normal;
         font-style: normal;
         font-display: swap;
       }
-
       @font-face {
         font-family: 'PP Fraktion Mono';
         src: url('/fonts/PPFraktionMono-Regular.woff2') format('woff2');
@@ -46,22 +39,111 @@ import logo from '../assets/logo.png'
         font-style: normal;
         font-display: swap;
       }
-      body {
+
+      :root {
+        --color-bg: #001f3f; /* Deep blue fallback */
+        --color-text: #e0f7fa; /* Light cyan text */
+        --color-text-muted: #b2ebf2; /* Muted cyan */
+        --font-serif: 'Editorial New', serif;
+        --font-mono: 'PP Fraktion Mono', monospace;
+        --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-shine: rgba(255, 255, 255, 0.05);
+        --glass-blur: blur(12px);
+      }
+
+      /* Global resets and body style */
+      :global(body) {
         margin: 0;
-        background-color: #f9f8f6; /* Lighter, cleaner beige */
-        color: #1a1a1a;
+        background-color: var(--color-bg);
+        color: var(--color-text);
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         overflow-x: hidden;
         -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
+        min-height: 100vh;
+
+        /* The Aquarium Background */
+        background-image: var(--bgImage);
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+      }
+
+      /* Bubbles Animation */
+      .bubbles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0; /* Changed from -1 to 0 to sit on top of background but behind content */
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .bubble {
+        position: absolute;
+        bottom: -20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: rise 15s infinite ease-in;
+        box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(1px);
+      }
+
+      @keyframes rise {
+        0% {
+          bottom: -20px;
+          transform: translateX(0);
+          opacity: 0;
+        }
+        20% {
+          opacity: 0.5;
+        }
+        50% {
+          transform: translateX(20px);
+        }
+        80% {
+          opacity: 0.2;
+        }
+        100% {
+          bottom: 110%;
+          transform: translateX(-20px);
+          opacity: 0;
+        }
       }
 
       .container {
-        max-width: 1300px;
+        max-width: 1400px;
         margin: 0 auto;
         padding: 0 2rem;
+        position: relative;
+        z-index: 1; /* Ensure content is above bubbles */
       }
 
+      /* Common Glass Card Style */
+      .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        transition:
+          transform 0.4s var(--ease-out),
+          background 0.4s ease;
+
+        &:hover {
+          background: var(--glass-shine);
+          transform: translateY(-5px);
+          border-color: rgba(255, 255, 255, 0.2);
+        }
+      }
+
+      /* Navigation */
       header {
         position: fixed;
         top: 0;
@@ -72,253 +154,328 @@ import logo from '../assets/logo.png'
         justify-content: space-between;
         align-items: center;
         z-index: 100;
-        background: rgba(249, 248, 246, 0.85); /* Matches body bg */
-        backdrop-filter: blur(12px);
         transition: padding 0.3s ease;
 
+        /* Slight gradient to make nav readable */
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.4) 0%,
+          transparent 100%
+        );
+
         a {
+          color: white;
           text-decoration: none;
-          color: #1a1a1a;
-          font-weight: 500;
+          font-family: var(--font-mono);
           text-transform: uppercase;
+          font-size: 0.85rem;
           letter-spacing: 0.05em;
-          font-size: 0.8rem;
-          font-family: 'Fraktion Mono', monospace;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+
+          &:hover {
+            opacity: 0.8;
+          }
         }
       }
 
+      /* Hero Section */
       .hero {
-        min-height: 95vh;
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         text-align: center;
-        padding-top: 8rem;
+        padding-top: 0; /* Centered */
+        position: relative;
+        z-index: 1;
+
+        &__tags {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 2rem;
+          opacity: 0;
+          animation: fadeUp 1.2s var(--ease-out) forwards;
+        }
+
+        &__tag {
+          font-family: var(--font-mono);
+          font-size: 0.8rem;
+          padding: 0.4rem 1rem;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          background: rgba(255, 255, 255, 0.05);
+          backdrop-filter: blur(4px);
+          border-radius: 50px;
+          text-transform: uppercase;
+          color: #fff;
+        }
 
         h1 {
-          font-family: 'Editorial New', serif;
-          font-size: clamp(3.5rem, 11vw, 9rem);
-          font-weight: 400;
-          line-height: 0.95;
-          margin: 0 0 2.5rem 0;
-          color: #1a1a1a;
-          letter-spacing: -0.02em;
+          font-family: var(--font-serif);
+          font-size: clamp(4rem, 15vw, 11rem);
+          line-height: 0.9;
+          letter-spacing: -0.03em;
+          margin-bottom: 2rem;
           opacity: 0;
-          transform: translateY(40px);
-          animation: heroFadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        .subtitle {
-          font-size: clamp(1.1rem, 2vw, 1.4rem);
-          color: #4a4a4a;
-          max-width: 650px;
-          font-weight: 300;
-          line-height: 1.5;
-          opacity: 0;
-          transform: translateY(20px);
-          animation: heroFadeUp 1s ease-out forwards 0.2s;
-        }
-
-        .tags {
-          display: flex;
-          gap: 0.8rem;
-          margin-bottom: 3rem;
-          opacity: 0;
-          animation: heroFadeUp 1s ease-out forwards 0.1s;
+          color: #fff;
+          text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Deep water feeling */
+          animation: fadeUp 1.2s var(--ease-out) 0.1s forwards;
 
           span {
-            background: #e8e6e4;
-            padding: 0.5rem 1rem;
-            border-radius: 100px;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #333;
-            font-family: 'Fraktion Mono', monospace;
+            display: block;
+            background: linear-gradient(180deg, #fff 20%, #8be9fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
           }
         }
-      }
 
-      .showcase {
-        width: 100%;
-        max-width: 1200px;
-        margin: 0 auto 8rem;
-        padding: 0 1rem;
-
-        &__img {
-          width: 100%;
-          height: auto;
-          border-radius: 20px;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        &__lead {
+          font-size: clamp(1.1rem, 2vw, 1.5rem);
+          max-width: 600px;
+          color: var(--color-text-muted);
+          line-height: 1.4;
           opacity: 0;
-          transform: translateY(40px);
-          animation: heroFadeUp 1s ease-out forwards 0.4s;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+          animation: fadeUp 1s var(--ease-out) 0.3s forwards;
         }
       }
 
+      /* Sections General */
       .section {
         padding: 8rem 0;
+        position: relative;
+        z-index: 1;
+      }
+
+      .section-header {
+        margin-bottom: 4rem;
 
         h2 {
-          font-family: 'Editorial New', serif;
-          font-size: clamp(2.5rem, 5vw, 4.5rem);
-          font-weight: 400;
-          margin-bottom: 4rem;
-          color: #1a1a1a;
-          line-height: 1.1;
-          letter-spacing: -0.01em;
-        }
-      }
-
-      .grid-cols-2 {
-        display: grid;
-        grid-template-columns: 0.8fr 1.2fr;
-        gap: 6rem;
-        align-items: start;
-
-        @media (max-width: 900px) {
-          grid-template-columns: 1fr;
-          gap: 3rem;
-        }
-
-        p {
-          font-size: 1.3rem;
-          line-height: 1.5;
-          color: #333;
-          margin-bottom: 2rem;
-          font-weight: 300;
-        }
-      }
-
-      .feature-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 2rem;
-
-        .card {
-          background: #fff;
-          padding: 3.5rem;
-          border-radius: 24px;
-          border: 1px solid rgba(0, 0, 0, 0.03);
-          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-
-          &:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
-          }
-
-          h3 {
-            font-family: 'Editorial New', serif;
-            font-size: 2rem;
-            margin-top: 0;
-            margin-bottom: 1.2rem;
-            color: #1a1a1a;
-            font-weight: 400;
-          }
-
-          p {
-            font-size: 1.05rem;
-            color: #555;
-            line-height: 1.6;
-            margin: 0;
-          }
-        }
-      }
-
-      .tech-stack {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.8rem;
-
-        span {
-          background: #fff;
-          padding: 1rem 1.8rem;
-          border-radius: 100px; /* Pillow shape like Bite */
-          font-size: 0.95rem;
-          color: #1a1a1a;
-          border: 1px solid rgba(0, 0, 0, 0.08);
-          transition: all 0.2s ease;
-          font-family: 'Fraktion Mono', monospace;
-
-          &:hover {
-            background: #1a1a1a;
-            color: #fff;
-            border-color: #1a1a1a;
-            transform: translateY(-2px);
-          }
-        }
-      }
-
-      .dual-images {
-        display: flex;
-        gap: 4rem;
-        align-items: center;
-        background: #e8e6e4; /* Darker accent beige */
-        padding: 5rem;
-        border-radius: 40px;
-
-        @media (max-width: 900px) {
-          flex-direction: column-reverse;
-          padding: 2.5rem;
-          gap: 3rem;
-        }
-
-        img {
-          width: 55%;
-          height: auto;
-          border-radius: 16px;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-
-          @media (max-width: 900px) {
-            width: 100%;
-          }
-        }
-
-        .text-content {
-          width: 45%;
-          @media (max-width: 900px) {
-            width: 100%;
-          }
-        }
-      }
-
-      .cta-footer {
-        text-align: center;
-        padding: 10rem 0 6rem;
-
-        a.main-btn {
-          display: inline-block;
-          background: #1a1a1a;
+          font-family: var(--font-serif);
+          font-size: clamp(2.5rem, 5vw, 4rem);
+          margin-bottom: 1.5rem;
           color: #fff;
-          font-size: 1.4rem;
-          text-decoration: none;
-          padding: 1.5rem 3.5rem;
-          border-radius: 100px;
-          transition: all 0.3s ease;
-          font-family: 'Editorial New', serif;
-          font-weight: 400;
-
-          &:hover {
-            transform: scale(1.03);
-            background: #000;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-          }
         }
       }
 
-      footer {
-        padding: 3rem 2rem;
-        text-align: center;
-        color: #888;
+      .subtitle-tag {
+        display: inline-block;
+        font-family: var(--font-mono);
         font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.1em;
-        font-family: 'Fraktion Mono', monospace;
-        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        margin-bottom: 1rem;
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--glass-border);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(4px);
+        color: #fff;
+        border-radius: 4px;
       }
 
-      @keyframes heroFadeUp {
+      /* Showcase Image */
+      .showcase-wrapper {
+        margin-bottom: 8rem;
+        position: relative;
+        border-radius: 20px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.05); /* Outer glow ring */
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(2px);
+      }
+
+      .showcase-img {
+        width: 100%;
+        border-radius: 16px;
+        display: block;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+      }
+
+      /* Context Section */
+      .context-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+
+        @media (max-width: 900px) {
+          grid-template-columns: 1fr;
+        }
+
+        &__text {
+          p {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            color: var(--color-text-muted);
+            margin-bottom: 2rem;
+          }
+        }
+      }
+
+      /* Tech Stack */
+      .tech-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+
+        span {
+          font-family: var(--font-mono);
+          font-size: 0.9rem;
+          padding: 0.6rem 1.2rem;
+          background: rgba(255, 255, 255, 0.1);
+          color: #fff;
+          border-radius: 100px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          backdrop-filter: blur(4px);
+          transition: all 0.3s ease;
+
+          &:hover {
+            background: #fff;
+            color: #001f3f;
+            transform: scale(1.05);
+          }
+        }
+      }
+
+      /* Features Grid */
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+
+        .card {
+          /* Inherits glass-card */
+          @extend .glass-card;
+
+          h3 {
+            font-family: var(--font-serif);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #fff;
+          }
+
+          p {
+            font-size: 1rem;
+            color: var(--color-text-muted);
+            line-height: 1.5;
+          }
+        }
+      }
+
+      /* Challenges */
+      .challenge-row {
+        display: grid;
+        grid-template-columns: 0.8fr 1.2fr;
+        gap: 2rem;
+        padding: 3rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+        }
+
+        h3 {
+          font-family: var(--font-mono);
+          font-size: 1.2rem;
+          color: #8be9fd; /* Cyan accent */
+          text-transform: uppercase;
+        }
+
+        .solution-block {
+          h4 {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+          }
+          p {
+            margin-top: 0;
+            line-height: 1.6;
+            opacity: 0.9;
+            color: #e0f7fa;
+          }
+          .badge-problem {
+            color: #ff80ab;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-right: 1rem;
+          }
+          .badge-solution {
+            color: #69f0ae;
+            font-weight: bold;
+            font-size: 0.9em;
+          }
+        }
+      }
+
+      /* Results */
+      .results-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        text-align: center;
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+        }
+
+        .stat-item {
+          padding: 2rem;
+          background: rgba(255, 255, 255, 0.02);
+          border-radius: 20px;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+
+          h3 {
+            font-size: 4rem;
+            font-family: var(--font-serif);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(180deg, #fff 20%, #8be9fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
+          span {
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            color: var(--color-text-muted);
+          }
+        }
+      }
+
+      /* CTA */
+      .cta-section {
+        text-align: center;
+        padding: 10rem 0;
+
+        a {
+          display: inline-block;
+          background: #fff;
+          color: #001f3f;
+          padding: 1.5rem 4rem;
+          border-radius: 100px;
+          font-family: var(--font-serif);
+          font-size: 1.5rem;
+          text-decoration: none;
+          transition: all 0.3s ease;
+          box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+
+          &:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.6);
+            background: #e0f7fa;
+          }
+        }
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(40px);
+        }
         to {
           opacity: 1;
           transform: translateY(0);
@@ -326,138 +483,237 @@ import logo from '../assets/logo.png'
       }
     </style>
   </head>
-  <header>
-    <a href="/portfolio_bpa/">Paul Blanc ©24</a>
-    <a href="https://github.com/Polochon06/mt-conges" target="_blank">
-      GitHub Repository ↗
-    </a>
-  </header>
 
-  <main>
-    <div class="container">
+  <body>
+    <!-- Bubbles need to be high enough not to get hidden by bg color if strange stacking matches, using z-index:0 relative to body which should work -->
+    <div class="bubbles">
+      {/* Generating bubbles */}
+      {
+        [...Array(20)].map((_, i) => (
+          <div
+            class="bubble"
+            style={`
+              left: ${Math.random() * 100}%;
+              width: ${10 + Math.random() * 60}px;
+              height: ${10 + Math.random() * 60}px;
+              animation-delay: ${Math.random() * 15}s;
+              animation-duration: ${10 + Math.random() * 10}s;
+             `}
+          />
+        ))
+      }
+    </div>
+
+    <header>
+      <a href="/portfolio_bpa/">Paul Blanc ©24</a>
+      <a href="https://github.com/Polochon06/mt-conges" target="_blank">
+        GitHub ↗
+      </a>
+    </header>
+
+    <main>
       <section class="hero">
-        <div class="tags">
-          <span>2024</span>
-          <span>Java Architecture</span>
-          <span>School Project</span>
+        <div class="hero__tags">
+          <span class="hero__tag">Projet Scolaire</span>
+          <span class="hero__tag">3 Mois</span>
+          <span class="hero__tag">Java Swing</span>
         </div>
-        <h1>MT-Congés</h1>
-        <div class="subtitle">
-          Une plateforme moderne de gestion RH.<br />Architecture stricte.
-          Sécurité maximale.
-        </div>
+        <h1>
+          <span>MT-Congés</span>
+        </h1>
+        <p class="hero__lead">
+          Une architecture MVC stricte pour une gestion RH sécurisée, moderne et
+          efficace.
+        </p>
       </section>
 
-      <div class="showcase">
-        <img
-          src="/portfolio_bpa/images/works/mt-conges-dashboard.png"
-          alt="Dashboard"
-          class="showcase__img"
-        />
-      </div>
-
-      <section class="section">
-        <div class="grid-cols-2">
-          <div>
-            <h2>Le Projet</h2>
-          </div>
-          <div>
-            <p>
-              <b>MT-CONGÉS</b> redéfinit la gestion des temps en entreprise. Conçue
-              pour remplacer les processus papiers obsolètes, cette application Java
-              offre une expérience fluide et sécurisée pour la gestion des demandes
-              de congés.
-            </p>
-            <p>
-              Développée avec une rigueur architecturale (MVC, DAO), elle
-              garantit une maintenabilité exemplaire et une séparation nette des
-              responsabilités, répondant aux standards industriels les plus
-              exigeants.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2>Stack Technique</h2>
-        <div class="tech-stack">
-          <span>Java 17</span>
-          <span>Swing (FlatLaf)</span>
-          <span>MySQL 8.0</span>
-          <span>MVC Pattern</span>
-          <span>DAO Pattern</span>
-          <span>BCrypt</span>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="dual-images">
-          <div style="flex: 1;">
-            <h2 style="font-size: 3rem; margin-bottom: 2rem;">
-              Interface<br />Utilisateur
-            </h2>
-            <p style="color:#aaa; margin-bottom: 2rem;">
-              Une interface graphique soignée utilisant la librairie Swing, avec
-              un thème "Purple" cohérent pour une expérience utilisateur
-              premium.
-            </p>
-          </div>
+      <div class="container">
+        <!-- Showcase Image -->
+        <div class="showcase-wrapper">
           <img
-            src="/portfolio_bpa/images/works/mt-conges-login-screen.png"
-            alt="Ecran de Connexion"
-            style="flex: 1.5;"
+            src="/portfolio_bpa/images/works/mt-conges-dashboard.png"
+            alt="Dashboard MT Conges"
+            class="showcase-img"
+            style="min-height: 200px; background: rgba(0,0,0,0.2);"
           />
         </div>
-      </section>
 
+        <!-- Section 1: Context & Problem -->
+        <section class="section">
+          <div class="context-grid">
+            <div>
+              <span class="subtitle-tag">Contexte et Problématique</span>
+              <h2 class="font-serif" style="font-size: 3rem; line-height: 1.1;">
+                Réinventer la gestion des temps en entreprise.
+              </h2>
+            </div>
+            <div class="glass-card">
+              <div class="context-grid__text">
+                <p>
+                  Dans une organisation hiérarchisée, comment gérer efficacement
+                  les demandes de congés tout en garantissant la sécurité
+                  absolue des données sensibles ?
+                </p>
+                <p>
+                  MT-Congés répond à ce défi par une application robuste,
+                  éliminant les processus papier obsolètes au profit d'une
+                  interface Swing fluide et d'une architecture conçue pour la
+                  scalabilité.
+                </p>
+                <div class="tech-list" style="margin-top: 2rem;">
+                  <span>Java 17</span>
+                  <span>Swing</span>
+                  <span>MySQL</span>
+                  <span>MVC</span>
+                  <span>DAO</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Section 2: Features (Bento) -->
       <section class="section">
-        <h2>Fonctionnalités Clés</h2>
-        <div class="feature-grid">
-          <div class="card">
-            <h3>01. Hiérarchie RBAC</h3>
-            <p>
-              Système de contrôle d'accès basé sur les rôles (RBAC). Les
-              permissions sont strictement cloisonnées entre Employés, Managers
-              et Admins.
-            </p>
+        <div class="container">
+          <div class="section-header" style="text-align: center;">
+            <span class="subtitle-tag">Fonctionnalités Clés</span>
+            <h2>Un Système Complet</h2>
           </div>
-          <div class="card">
-            <h3>02. Sécurité Core</h3>
-            <p>
-              Hachage des mots de passe avec BCrypt et prévention des injections
-              SQL via l'utilisation systématique de PreparedStatements dans la
-              couche DAO.
-            </p>
-          </div>
-          <div class="card">
-            <h3>03. Audit Logs</h3>
-            <p>
-              Traçabilité complète via un système de logging intégré. Chaque
-              action critique laisse une empreinte numérique inaltérable pour
-              l'audit.
-            </p>
+
+          <div class="features-grid">
+            <div class="card">
+              <h3>Sécurité Renforcée</h3>
+              <p>
+                Authentification sécurisée avec verrouillage automatique après 3
+                tentatives échouées et hachage BCrypt des mots de passe. Vos
+                données sont un coffre-fort.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Gestion des Rôles</h3>
+              <p>
+                Une hiérarchie claire : Administrateurs pour la gestion
+                utilisateurs, Responsables pour la validation d'équipe, et
+                Employés pour les demandes personnelles.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Audit & Logging</h3>
+              <p>
+                Chaque action est tracée. Le système de logging intégré assure
+                une transparence totale sur les mouvements et les validations au
+                sein de l'application.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="cta-footer">
-        <p
-          style="color: #666; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.1em;"
-        >
-          Code Source
-        </p>
-        <a
-          href="https://github.com/Polochon06/mt-conges"
-          target="_blank"
-          class="main-btn"
-        >
-          Explorer le Repository
-        </a>
+      <!-- Section 3: Difficulties & Solutions -->
+      <section class="section">
+        <div class="container glass-card">
+          <div class="section-header">
+            <span class="subtitle-tag">Challenges Techniques</span>
+            <h2>Difficultés & Solutions</h2>
+          </div>
+
+          <div class="challenge-row">
+            <div>
+              <h3>🔒 Sécurité des Données</h3>
+            </div>
+            <div class="solution-block">
+              <p>
+                <span class="badge-problem">Problème :</span> Risques d'injections
+                SQL critiques pour les données RH.
+              </p>
+              <p>
+                <span class="badge-solution">Solution :</span> Implémentation stricte
+                du pattern DAO avec PreparedStatements et validation rigoureuse des
+                entrées utilisateurs.
+              </p>
+            </div>
+          </div>
+
+          <div class="challenge-row">
+            <div>
+              <h3>🏗️ Architecture</h3>
+            </div>
+            <div class="solution-block">
+              <p>
+                <span class="badge-problem">Problème :</span> Maintenabilité difficile
+                avec la complexité croissante.
+              </p>
+              <p>
+                <span class="badge-solution">Solution :</span> Architecture MVC (Modèle-Vue-Contrôleur)
+                stricte assurant une séparation nette des responsabilités.
+              </p>
+            </div>
+          </div>
+
+          <div class="challenge-row">
+            <div>
+              <h3>⚖️ Conformité RGPD</h3>
+            </div>
+            <div class="solution-block">
+              <p>
+                <span class="badge-problem">Problème :</span> Gestion de données personnelles
+                sensibles (santé, congés).
+              </p>
+              <p>
+                <span class="badge-solution">Solution :</span> Privacy by Design.
+                Minirnisation des données et accès restreints par rôles dès la conception.
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
-    </div>
-  </main>
 
-  <footer>Designed & Developed by Paul Blanc</footer>
+      <!-- Section 4: Results -->
+      <section class="section">
+        <div class="container">
+          <div class="section-header" style="text-align: center;">
+            <span class="subtitle-tag">Résultats</span>
+            <h2>Bilan du Projet</h2>
+          </div>
 
+          <div class="results-grid">
+            <div class="stat-item">
+              <h3>100%</h3>
+              <span>Fonctionnel & Sécurisé</span>
+            </div>
+            <div class="stat-item">
+              <h3>MVC</h3>
+              <span>Maîtrise de l'Architecture</span>
+            </div>
+            <div class="stat-item">
+              <h3>V1.0</h3>
+              <span>Livré en 3 mois</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
+      <!-- CTA -->
+      <section class="cta-section">
+        <div class="container">
+          <h2
+            class="font-serif"
+            style="font-size: 3rem; margin-bottom: 2rem; color: #fff;"
+          >
+            Explorer le code
+          </h2>
+          <a href="https://github.com/Polochon06/mt-conges" target="_blank">
+            Voir sur GitHub ↗
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer
+      style="text-align: center; padding: 2rem; opacity: 0.5; font-family: var(--font-mono); font-size: 0.8rem; color: #fff;"
+    >
+      DESIGNED & DEVELOPED BY PAUL BLANC
+    </footer>
+  </body>
 </html>
