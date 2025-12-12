@@ -7,7 +7,7 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
 <html lang="fr" class="theme-contrasted">
   <head>
     <meta charset="utf-8" />
-    <title>MT-CONGÉS | Paul Blanc</title>
+    <title>MT-CONGÉS | Architecture Java & Sécurité</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/png" href="/icons/favicon-48x48.png" />
     <link
@@ -41,19 +41,24 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
       }
 
       :root {
-        --color-bg: #001f3f; /* Deep blue fallback */
-        --color-text: #e0f7fa; /* Light cyan text */
-        --color-text-muted: #b2ebf2; /* Muted cyan */
+        --color-bg: #001220;
+        --color-text: #e0f7fa;
+        --color-text-muted: #b2ebf2;
+        --color-accent: #64ffda;
+
         --font-serif: 'Editorial New', serif;
         --font-mono: 'PP Fraktion Mono', monospace;
+
         --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-        --glass-bg: rgba(255, 255, 255, 0.03);
-        --glass-border: rgba(255, 255, 255, 0.1);
-        --glass-shine: rgba(255, 255, 255, 0.05);
-        --glass-blur: blur(12px);
+
+        /* Ultra Premium Glass */
+        --glass-bg: rgba(20, 30, 40, 0.4);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --glass-highlight: rgba(255, 255, 255, 0.03);
+        --glass-blur: blur(20px);
+        --glass-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
       }
 
-      /* Global resets and body style */
       :global(body) {
         margin: 0;
         background-color: var(--color-bg);
@@ -63,7 +68,6 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
         -webkit-font-smoothing: antialiased;
         min-height: 100vh;
 
-        /* The Aquarium Background */
         background-image: var(--bgImage);
         background-size: cover;
         background-position: center;
@@ -71,97 +75,159 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
         background-repeat: no-repeat;
       }
 
-      /* Bubbles Animation */
+      /* Animated Gradient Mesh (Optional subtle overlay) */
+      .ambient-light {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background:
+          radial-gradient(
+            circle at 50% 0%,
+            rgba(100, 255, 218, 0.05),
+            transparent 60%
+          ),
+          radial-gradient(
+            circle at 80% 80%,
+            rgba(0, 100, 255, 0.05),
+            transparent 50%
+          );
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      /* Bubbles */
       .bubbles {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: 0; /* Changed from -1 to 0 to sit on top of background but behind content */
+        z-index: 0;
         pointer-events: none;
         overflow: hidden;
       }
 
       .bubble {
         position: absolute;
-        bottom: -20px;
-        background: rgba(255, 255, 255, 0.1);
+        bottom: -50px;
+        background: radial-gradient(
+          circle at 30% 30%,
+          rgba(255, 255, 255, 0.1),
+          rgba(255, 255, 255, 0.02)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 50%;
-        animation: rise 15s infinite ease-in;
-        box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(1px);
+        animation: rise var(--duration) infinite ease-in;
+        backdrop-filter: blur(2px);
       }
 
       @keyframes rise {
         0% {
-          bottom: -20px;
-          transform: translateX(0);
+          bottom: -50px;
+          transform: translateX(0) scale(1);
           opacity: 0;
         }
         20% {
-          opacity: 0.5;
+          opacity: 0.6;
         }
         50% {
-          transform: translateX(20px);
-        }
-        80% {
-          opacity: 0.2;
+          transform: translateX(var(--sway)) scale(1.1);
         }
         100% {
           bottom: 110%;
-          transform: translateX(-20px);
+          transform: translateX(calc(var(--sway) * -1)) scale(1.2);
           opacity: 0;
         }
       }
 
       .container {
-        max-width: 1400px;
+        max-width: 1200px;
         margin: 0 auto;
         padding: 0 2rem;
         position: relative;
-        z-index: 1; /* Ensure content is above bubbles */
+        z-index: 2;
       }
 
-      /* Common Glass Card Style */
-      .glass-card {
+      /* Typography */
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        font-weight: normal;
+      }
+
+      .font-serif {
+        font-family: var(--font-serif);
+      }
+      .font-mono {
+        font-family: var(--font-mono);
+      }
+
+      /* Components */
+      .glass-panel {
         background: var(--glass-bg);
         backdrop-filter: var(--glass-blur);
         -webkit-backdrop-filter: var(--glass-blur);
         border: 1px solid var(--glass-border);
-        border-radius: 20px;
-        padding: 2.5rem;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        border-radius: 24px;
+        padding: 3rem;
+        box-shadow: var(--glass-shadow);
         transition:
-          transform 0.4s var(--ease-out),
-          background 0.4s ease;
+          transform 0.6s var(--ease-out),
+          border-color 0.4s ease;
+        position: relative;
+        overflow: hidden;
+
+        /* Inner subtle shine */
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(
+            135deg,
+            var(--glass-highlight) 0%,
+            transparent 40%
+          );
+          pointer-events: none;
+        }
 
         &:hover {
-          background: var(--glass-shine);
           transform: translateY(-5px);
           border-color: rgba(255, 255, 255, 0.2);
         }
       }
 
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--glass-border);
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 100px;
+        backdrop-filter: blur(4px);
+        margin-bottom: 1.5rem;
+        color: var(--color-accent);
+      }
+
       /* Navigation */
       header {
         position: fixed;
-        top: 0;
-        left: 0;
         width: 100%;
         padding: 2rem 3rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
         z-index: 100;
-        transition: padding 0.3s ease;
-
-        /* Slight gradient to make nav readable */
-        background: linear-gradient(
-          to bottom,
-          rgba(0, 0, 0, 0.4) 0%,
-          transparent 100%
-        );
 
         a {
           color: white;
@@ -169,16 +235,16 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
           font-family: var(--font-mono);
           text-transform: uppercase;
           font-size: 0.85rem;
-          letter-spacing: 0.05em;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+          opacity: 0.8;
+          transition: opacity 0.3s;
 
           &:hover {
-            opacity: 0.8;
+            opacity: 1;
           }
         }
       }
 
-      /* Hero Section */
+      /* Hero */
       .hero {
         min-height: 100vh;
         display: flex;
@@ -186,287 +252,224 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
         justify-content: center;
         align-items: center;
         text-align: center;
-        padding-top: 0; /* Centered */
+        padding-top: 4rem;
         position: relative;
-        z-index: 1;
-
-        &__tags {
-          display: flex;
-          gap: 1rem;
-          margin-bottom: 2rem;
-          opacity: 0;
-          animation: fadeUp 1.2s var(--ease-out) forwards;
-        }
-
-        &__tag {
-          font-family: var(--font-mono);
-          font-size: 0.8rem;
-          padding: 0.4rem 1rem;
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          background: rgba(255, 255, 255, 0.05);
-          backdrop-filter: blur(4px);
-          border-radius: 50px;
-          text-transform: uppercase;
-          color: #fff;
-        }
+        z-index: 2;
 
         h1 {
           font-family: var(--font-serif);
-          font-size: clamp(4rem, 15vw, 11rem);
+          font-size: clamp(4rem, 12vw, 9rem);
           line-height: 0.9;
-          letter-spacing: -0.03em;
+          letter-spacing: -0.02em;
           margin-bottom: 2rem;
-          opacity: 0;
-          color: #fff;
-          text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Deep water feeling */
-          animation: fadeUp 1.2s var(--ease-out) 0.1s forwards;
 
-          span {
-            display: block;
-            background: linear-gradient(180deg, #fff 20%, #8be9fd 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-          }
+          /* Gradient Text */
+          background: linear-gradient(to bottom, #fff 30%, #a5f3fc 90%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+
+          animation: fadeUp 1.2s var(--ease-out) forwards;
+          opacity: 0;
         }
 
-        &__lead {
-          font-size: clamp(1.1rem, 2vw, 1.5rem);
+        p {
+          font-size: clamp(1.1rem, 2vw, 1.4rem);
           max-width: 600px;
           color: var(--color-text-muted);
-          line-height: 1.4;
+          line-height: 1.5;
+          margin-bottom: 3rem;
+          animation: fadeUp 1.2s var(--ease-out) 0.2s forwards;
           opacity: 0;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-          animation: fadeUp 1s var(--ease-out) 0.3s forwards;
         }
       }
 
-      /* Sections General */
-      .section {
-        padding: 8rem 0;
-        position: relative;
-        z-index: 1;
-      }
-
-      .section-header {
-        margin-bottom: 4rem;
-
-        h2 {
-          font-family: var(--font-serif);
-          font-size: clamp(2.5rem, 5vw, 4rem);
-          margin-bottom: 1.5rem;
-          color: #fff;
-        }
-      }
-
-      .subtitle-tag {
-        display: inline-block;
+      .scroll-indicator {
+        position: absolute;
+        bottom: 3rem;
+        left: 50%;
+        transform: translateX(-50%);
         font-family: var(--font-mono);
         font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        margin-bottom: 1rem;
-        padding: 0.5rem 1rem;
-        border: 1px solid var(--glass-border);
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(4px);
-        color: #fff;
-        border-radius: 4px;
+        opacity: 0.5;
+        animation: bounce 2s infinite;
       }
 
-      /* Showcase Image */
-      .showcase-wrapper {
-        margin-bottom: 8rem;
-        position: relative;
-        border-radius: 20px;
-        padding: 10px;
-        background: rgba(255, 255, 255, 0.05); /* Outer glow ring */
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(2px);
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translate(-50%, 0);
+        }
+        50% {
+          transform: translate(-50%, 10px);
+        }
       }
 
-      .showcase-img {
-        width: 100%;
-        border-radius: 16px;
-        display: block;
-        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
-      }
-
-      /* Context Section */
-      .context-grid {
+      /* Alternating Sections */
+      .section-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 4rem;
+        gap: 6rem;
         align-items: center;
+        margin: 10rem 0;
+
+        &.reversed {
+          direction: rtl; // Hack for visual reverse, reset in children
+          .section-content {
+            direction: ltr;
+          }
+          .glass-panel {
+            direction: ltr;
+          }
+        }
 
         @media (max-width: 900px) {
           grid-template-columns: 1fr;
-        }
-
-        &__text {
-          p {
-            font-size: 1.25rem;
-            line-height: 1.6;
-            color: var(--color-text-muted);
-            margin-bottom: 2rem;
+          gap: 3rem;
+          margin: 6rem 0;
+          &.reversed {
+            direction: ltr;
           }
         }
       }
 
-      /* Tech Stack */
-      .tech-list {
+      .section-content {
+        h2 {
+          font-family: var(--font-serif);
+          font-size: 3.5rem;
+          margin-bottom: 2rem;
+          line-height: 1.05;
+        }
+        p {
+          font-size: 1.15rem;
+          line-height: 1.6;
+          color: var(--color-text-muted);
+          margin-bottom: 2rem;
+        }
+      }
+
+      /* Tech Stack Pills */
+      .tech-stack {
         display: flex;
         flex-wrap: wrap;
-        gap: 1rem;
+        gap: 0.8rem;
 
         span {
           font-family: var(--font-mono);
           font-size: 0.9rem;
           padding: 0.6rem 1.2rem;
-          background: rgba(255, 255, 255, 0.1);
-          color: #fff;
-          border-radius: 100px;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          backdrop-filter: blur(4px);
-          transition: all 0.3s ease;
+          border: 1px solid rgba(100, 255, 218, 0.2);
+          background: rgba(100, 255, 218, 0.05);
+          color: var(--color-accent);
+          border-radius: 50px;
+          transition: 0.3s;
 
           &:hover {
-            background: #fff;
-            color: #001f3f;
-            transform: scale(1.05);
+            background: var(--color-accent);
+            color: #000;
+            cursor: default;
           }
         }
       }
 
-      /* Features Grid */
-      .features-grid {
+      /* Challenges Grid */
+      .challenges-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
-
-        .card {
-          /* Inherits glass-card */
-          @extend .glass-card;
-
-          h3 {
-            font-family: var(--font-serif);
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-            color: #fff;
-          }
-
-          p {
-            font-size: 1rem;
-            color: var(--color-text-muted);
-            line-height: 1.5;
-          }
-        }
+        gap: 2rem;
+        margin-top: 4rem;
       }
 
-      /* Challenges */
-      .challenge-row {
-        display: grid;
-        grid-template-columns: 0.8fr 1.2fr;
-        gap: 2rem;
-        padding: 3rem 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      .challenge-card {
+        padding: 2.5rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        transition: 0.4s var(--ease-out);
 
-        &:last-child {
-          border-bottom: none;
-        }
-
-        @media (max-width: 768px) {
-          grid-template-columns: 1fr;
+        &:hover {
+          background: rgba(255, 255, 255, 0.06);
+          transform: translateY(-5px);
         }
 
         h3 {
-          font-family: var(--font-mono);
-          font-size: 1.2rem;
-          color: #8be9fd; /* Cyan accent */
-          text-transform: uppercase;
+          font-family: var(--font-serif);
+          font-size: 1.8rem;
+          margin-bottom: 1rem;
+          color: #fff;
         }
 
-        .solution-block {
-          h4 {
-            font-family: var(--font-serif);
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
+        .badge {
+          display: inline-block;
+          font-size: 0.75rem;
+          font-weight: bold;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          margin-bottom: 0.5rem;
+
+          &.problem {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
           }
-          p {
-            margin-top: 0;
-            line-height: 1.6;
-            opacity: 0.9;
-            color: #e0f7fa;
-          }
-          .badge-problem {
-            color: #ff80ab;
-            font-weight: bold;
-            font-size: 0.9em;
-            margin-right: 1rem;
-          }
-          .badge-solution {
-            color: #69f0ae;
-            font-weight: bold;
-            font-size: 0.9em;
+          &.solution {
+            background: rgba(81, 207, 102, 0.2);
+            color: #51cf66;
           }
         }
       }
 
-      /* Results */
-      .results-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
+      /* Stats */
+      .stats-container {
+        display: flex;
+        justify-content: space-around;
         gap: 2rem;
-        text-align: center;
+        margin-top: 3rem;
+        flex-wrap: wrap;
 
-        @media (max-width: 768px) {
-          grid-template-columns: 1fr;
+        div {
+          text-align: center;
         }
 
-        .stat-item {
-          padding: 2rem;
-          background: rgba(255, 255, 255, 0.02);
-          border-radius: 20px;
-          border: 1px solid rgba(255, 255, 255, 0.05);
-
-          h3 {
-            font-size: 4rem;
-            font-family: var(--font-serif);
-            margin-bottom: 0.5rem;
-            background: linear-gradient(180deg, #fff 20%, #8be9fd 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-          }
-          span {
-            font-family: var(--font-mono);
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.1em;
-            color: var(--color-text-muted);
-          }
+        h3 {
+          font-family: var(--font-serif);
+          font-size: 5rem;
+          background: linear-gradient(
+            180deg,
+            #fff 0%,
+            rgba(255, 255, 255, 0.5) 100%
+          );
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          margin-bottom: 0.5rem;
+        }
+        span {
+          font-family: var(--font-mono);
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          color: var(--color-accent);
+          font-size: 0.9rem;
         }
       }
 
       /* CTA */
-      .cta-section {
+      .cta-wrapper {
         text-align: center;
         padding: 10rem 0;
 
         a {
           display: inline-block;
-          background: #fff;
-          color: #001f3f;
-          padding: 1.5rem 4rem;
-          border-radius: 100px;
           font-family: var(--font-serif);
-          font-size: 1.5rem;
+          font-size: 2rem;
+          color: #fff;
           text-decoration: none;
-          transition: all 0.3s ease;
-          box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+          padding-bottom: 0.5rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+          transition: 0.3s;
 
           &:hover {
+            border-color: #fff;
             transform: scale(1.05);
-            box-shadow: 0 0 40px rgba(255, 255, 255, 0.6);
-            background: #e0f7fa;
           }
         }
       }
@@ -485,235 +488,261 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
   </head>
 
   <body>
-    <!-- Bubbles need to be high enough not to get hidden by bg color if strange stacking matches, using z-index:0 relative to body which should work -->
+    <div class="ambient-light"></div>
     <div class="bubbles">
-      {/* Generating bubbles */}
+      {/* 15 animated bubbles with random props */}
       {
-        [...Array(20)].map((_, i) => (
-          <div
-            class="bubble"
-            style={`
-              left: ${Math.random() * 100}%;
-              width: ${10 + Math.random() * 60}px;
-              height: ${10 + Math.random() * 60}px;
-              animation-delay: ${Math.random() * 15}s;
-              animation-duration: ${10 + Math.random() * 10}s;
-             `}
-          />
-        ))
+        [...Array(15)].map(() => {
+          const size = 20 + Math.random() * 80
+          return (
+            <div
+              class="bubble"
+              style={{
+                left: `${Math.random() * 100}%`,
+                width: `${size}px`,
+                height: `${size}px`,
+                '--duration': `${15 + Math.random() * 15}s`,
+                '--sway': `${-20 + Math.random() * 40}px`,
+              }}
+            />
+          )
+        })
       }
     </div>
 
     <header>
       <a href="/portfolio_bpa/">Paul Blanc ©24</a>
-      <a href="https://github.com/Polochon06/mt-conges" target="_blank">
-        GitHub ↗
-      </a>
+      <div style="display: flex; gap: 2rem;">
+        <a href="https://github.com/Polochon06/portfolio_bpa" target="_blank">
+          Portfolio
+        </a>
+        <a href="https://github.com/Polochon06/mt-conges" target="_blank">
+          Source Code ↗
+        </a>
+      </div>
     </header>
 
     <main>
       <section class="hero">
-        <div class="hero__tags">
-          <span class="hero__tag">Projet Scolaire</span>
-          <span class="hero__tag">3 Mois</span>
-          <span class="hero__tag">Java Swing</span>
-        </div>
+        <div class="tag">Java Swing • MVC Architecture</div>
         <h1>
           <span>MT-Congés</span>
         </h1>
-        <p class="hero__lead">
-          Une architecture MVC stricte pour une gestion RH sécurisée, moderne et
-          efficace.
+        <p>
+          Une solution RH d'entreprise conçue pour la rigueur. <br />
+          Sécurité maximale, traçabilité complète et architecture évolutive.
         </p>
-      </section>
 
-      <div class="container">
-        <!-- Showcase Image -->
-        <div class="showcase-wrapper">
+        <div
+          class="glass-panel"
+          style="padding: 1rem; border-radius: 16px; margin-top: 2rem; max-width: 900px; width: 90%;"
+        >
           <img
             src="/portfolio_bpa/images/works/mt-conges-dashboard.png"
             alt="Dashboard MT Conges"
             class="showcase-img"
-            style="min-height: 200px; background: rgba(0,0,0,0.2);"
+            style="width: 100%; border-radius: 8px; display: block;"
           />
         </div>
 
-        <!-- Section 1: Context & Problem -->
-        <section class="section">
-          <div class="context-grid">
-            <div>
-              <span class="subtitle-tag">Contexte et Problématique</span>
-              <h2 class="font-serif" style="font-size: 3rem; line-height: 1.1;">
-                Réinventer la gestion des temps en entreprise.
-              </h2>
+        <div class="scroll-indicator">SCROLL TO EXPLORE</div>
+      </section>
+
+      <div class="container">
+        <!-- Section: The Challenge -->
+        <div class="section-row">
+          <div class="section-content">
+            <div class="tag">Le Défi</div>
+            <h2>Sécuriser la Gestion du Temps</h2>
+            <p>
+              Dans un environnement d'entreprise où la confidentialité est
+              primordiale, comment centraliser la gestion des congés sans
+              compromettre les données sensibles des employés ?
+            </p>
+            <p>
+              MT-Congés n'est pas qu'un simple calendrier. C'est une forteresse
+              numérique conçue pour orchestrer les validations hiérarchiques
+              (Managers, RH, Employés) avec une traçabilité auditée et une
+              protection contre les injections SQL.
+            </p>
+          </div>
+          <div class="glass-panel">
+            <h3
+              class="font-serif"
+              style="font-size: 2rem; margin-bottom: 1.5rem;"
+            >
+              Stack Technique
+            </h3>
+            <div class="tech-stack">
+              <span>Java 17</span>
+              <span>Java Swing (UI)</span>
+              <span>MySQL 8</span>
+              <span>JDBC & DAO</span>
+              <span>BCrypt Encryption</span>
+              <span>MVC Pattern</span>
             </div>
-            <div class="glass-card">
-              <div class="context-grid__text">
-                <p>
-                  Dans une organisation hiérarchisée, comment gérer efficacement
-                  les demandes de congés tout en garantissant la sécurité
-                  absolue des données sensibles ?
+            <div style="margin-top: 2rem; font-size: 1.25rem;">
+              <span style="display:block; margin-bottom:0.5rem;">
+                🔒 <strong>Auth:</strong> SHA-256 & Salt
+              </span>
+              <span style="display:block;">
+                ⚡ <strong>Perf:</strong> Connexions Poolées
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Architecture -->
+        <div class="section-row reversed">
+          <div class="section-content">
+            <div class="tag">Architecture</div>
+            <h2>Design Pattern MVC Strict</h2>
+            <p>
+              La maintenance est la clé de la longévité logicielle. J'ai conçu
+              MT-Congés en découplant strictement la logique métier (Modèle),
+              l'interface utilisateur (Vue) et le pilotage des interactions
+              (Contrôleur).
+            </p>
+            <p>
+              Ce choix garantit un code modulaire, testable et évolutif. Chaque
+              couche a une responsabilité unique, permettant des mises à jour de
+              l'UI sans risque de régression sur la logique de sécurité.
+            </p>
+          </div>
+          <div
+            class="glass-panel"
+            style="font-family: var(--font-mono); font-size: 0.9rem; line-height: 1.8;"
+          >
+            <div style="opacity: 0.7">// Structure du Projet</div>
+            <div>src/</div>
+            <div style="padding-left: 1rem;">
+              ├── controllers/ <span style="color: #64ffda;">
+                # Gestion des events
+              </span>
+            </div>
+            <div style="padding-left: 1rem;">
+              ├── models/ <span style="color: #64ffda;">
+                # Logique métier & DAO
+              </span>
+            </div>
+            <div style="padding-left: 1rem;">
+              ├── views/ <span style="color: #64ffda;"># Interface Swing</span>
+            </div>
+            <div style="padding-left: 1rem;">
+              └── utils/ <span style="color: #64ffda;">
+                # Helpers & Sécurité
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Deep Dive (Grid) -->
+        <div style="margin: 10rem 0;">
+          <div style="text-align: center; margin-bottom: 4rem;">
+            <div class="tag">Problèmes & Solutions</div>
+            <h2 class="font-serif" style="font-size: 3.5rem;">
+              Ingénierie Logicielle
+            </h2>
+          </div>
+
+          <div class="challenges-grid">
+            <div class="challenge-card">
+              <span class="badge problem">Danger</span>
+              <h3>Injections SQL</h3>
+              <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
+                Les données RH sont critiques. Une simple concaténation de
+                chaînes SQL exposerait toute la base.
+              </p>
+              <div
+                style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
+              >
+                <span class="badge solution">Solution</span>
+                <p style="opacity:0.8; font-size:0.9rem;">
+                  Utilisation systématique de <strong>
+                    PreparedStatements
+                  </strong> pour typer et échapper toutes les entrées.
                 </p>
-                <p>
-                  MT-Congés répond à ce défi par une application robuste,
-                  éliminant les processus papier obsolètes au profit d'une
-                  interface Swing fluide et d'une architecture conçue pour la
-                  scalabilité.
+              </div>
+            </div>
+
+            <div class="challenge-card">
+              <span class="badge problem">UX</span>
+              <h3>Complexité Hiérarchique</h3>
+              <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
+                Gérer les droits d'accès dynamiques pour 3 niveaux de rôles sans
+                spaghetti code.
+              </p>
+              <div
+                style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
+              >
+                <span class="badge solution">Solution</span>
+                <p style="opacity:0.8; font-size:0.9rem;">
+                  Implémentation d'un <strong>SessionManager</strong> singleton et
+                  de vues adaptatives selon le rôle (RBAC).
                 </p>
-                <div class="tech-list" style="margin-top: 2rem;">
-                  <span>Java 17</span>
-                  <span>Swing</span>
-                  <span>MySQL</span>
-                  <span>MVC</span>
-                  <span>DAO</span>
-                </div>
+              </div>
+            </div>
+
+            <div class="challenge-card">
+              <span class="badge problem">Data</span>
+              <h3>Intégrité des Dates</h3>
+              <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
+                Éviter les chevauchements de congés et les soldes négatifs
+                impossibles.
+              </p>
+              <div
+                style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
+              >
+                <span class="badge solution">Solution</span>
+                <p style="opacity:0.8; font-size:0.9rem;">
+                  Triggers SQL et validation métier côté Java avant même
+                  l'insertion en base.
+                </p>
               </div>
             </div>
           </div>
-        </section>
-      </div>
-
-      <!-- Section 2: Features (Bento) -->
-      <section class="section">
-        <div class="container">
-          <div class="section-header" style="text-align: center;">
-            <span class="subtitle-tag">Fonctionnalités Clés</span>
-            <h2>Un Système Complet</h2>
-          </div>
-
-          <div class="features-grid">
-            <div class="card">
-              <h3>Sécurité Renforcée</h3>
-              <p>
-                Authentification sécurisée avec verrouillage automatique après 3
-                tentatives échouées et hachage BCrypt des mots de passe. Vos
-                données sont un coffre-fort.
-              </p>
-            </div>
-            <div class="card">
-              <h3>Gestion des Rôles</h3>
-              <p>
-                Une hiérarchie claire : Administrateurs pour la gestion
-                utilisateurs, Responsables pour la validation d'équipe, et
-                Employés pour les demandes personnelles.
-              </p>
-            </div>
-            <div class="card">
-              <h3>Audit & Logging</h3>
-              <p>
-                Chaque action est tracée. Le système de logging intégré assure
-                une transparence totale sur les mouvements et les validations au
-                sein de l'application.
-              </p>
-            </div>
-          </div>
         </div>
-      </section>
 
-      <!-- Section 3: Difficulties & Solutions -->
-      <section class="section">
-        <div class="container glass-card">
-          <div class="section-header">
-            <span class="subtitle-tag">Challenges Techniques</span>
-            <h2>Difficultés & Solutions</h2>
-          </div>
-
-          <div class="challenge-row">
-            <div>
-              <h3>🔒 Sécurité des Données</h3>
-            </div>
-            <div class="solution-block">
-              <p>
-                <span class="badge-problem">Problème :</span> Risques d'injections
-                SQL critiques pour les données RH.
-              </p>
-              <p>
-                <span class="badge-solution">Solution :</span> Implémentation stricte
-                du pattern DAO avec PreparedStatements et validation rigoureuse des
-                entrées utilisateurs.
-              </p>
-            </div>
-          </div>
-
-          <div class="challenge-row">
-            <div>
-              <h3>🏗️ Architecture</h3>
-            </div>
-            <div class="solution-block">
-              <p>
-                <span class="badge-problem">Problème :</span> Maintenabilité difficile
-                avec la complexité croissante.
-              </p>
-              <p>
-                <span class="badge-solution">Solution :</span> Architecture MVC (Modèle-Vue-Contrôleur)
-                stricte assurant une séparation nette des responsabilités.
-              </p>
-            </div>
-          </div>
-
-          <div class="challenge-row">
-            <div>
-              <h3>⚖️ Conformité RGPD</h3>
-            </div>
-            <div class="solution-block">
-              <p>
-                <span class="badge-problem">Problème :</span> Gestion de données personnelles
-                sensibles (santé, congés).
-              </p>
-              <p>
-                <span class="badge-solution">Solution :</span> Privacy by Design.
-                Minirnisation des données et accès restreints par rôles dès la conception.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Section 4: Results -->
-      <section class="section">
-        <div class="container">
-          <div class="section-header" style="text-align: center;">
-            <span class="subtitle-tag">Résultats</span>
-            <h2>Bilan du Projet</h2>
-          </div>
-
-          <div class="results-grid">
-            <div class="stat-item">
-              <h3>100%</h3>
-              <span>Fonctionnel & Sécurisé</span>
-            </div>
-            <div class="stat-item">
-              <h3>MVC</h3>
-              <span>Maîtrise de l'Architecture</span>
-            </div>
-            <div class="stat-item">
-              <h3>V1.0</h3>
-              <span>Livré en 3 mois</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- CTA -->
-      <section class="cta-section">
-        <div class="container">
+        <!-- Stats -->
+        <div class="glass-panel" style="text-align:center; padding: 4rem 2rem;">
           <h2
             class="font-serif"
-            style="font-size: 3rem; margin-bottom: 2rem; color: #fff;"
+            style="font-size: 2.5rem; margin-bottom: 2rem;"
           >
-            Explorer le code
+            Impact du Projet
+          </h2>
+          <div class="stats-container">
+            <div>
+              <h3>100%</h3>
+              <span>Sécurisé</span>
+            </div>
+            <div>
+              <h3>3</h3>
+              <span>Mois de Dev</span>
+            </div>
+            <div>
+              <h3>A+</h3>
+              <span>Note Finale</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <section class="cta-wrapper">
+          <h2 class="font-serif" style="margin-bottom: 2rem; font-size: 3rem;">
+            Explorer le Code Source
           </h2>
           <a href="https://github.com/Polochon06/mt-conges" target="_blank">
-            Voir sur GitHub ↗
+            Voir le dépôt GitHub ↗
           </a>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
 
     <footer
-      style="text-align: center; padding: 2rem; opacity: 0.5; font-family: var(--font-mono); font-size: 0.8rem; color: #fff;"
+      style="text-align: center; padding: 2rem; opacity: 0.4; font-family: var(--font-mono); font-size: 0.8rem;"
     >
-      DESIGNED & DEVELOPED BY PAUL BLANC
+      DEVELOPED BY PAUL BLANC • 2024
     </footer>
   </body>
 </html>
