@@ -25,6 +25,8 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
       crossorigin="anonymous"
     />
     <style lang="scss" define:vars={{ bgImage }}>
+      @import url('https://fonts.cdnfonts.com/css/rumble-brave');
+
       @font-face {
         font-family: 'Editorial New';
         src: url('/fonts/PPEditorialNew-Regular.woff2') format('woff2');
@@ -46,7 +48,7 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
         --color-text-muted: #b2ebf2;
         --color-accent: #64ffda;
 
-        --font-serif: 'Editorial New', serif;
+        --font-serif: 'Rumble Brave', 'Editorial New', serif;
         --font-mono: 'PP Fraktion Mono', monospace;
 
         --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -258,14 +260,13 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
 
         h1 {
           font-family: var(--font-serif);
-          font-size: clamp(4rem, 12vw, 9rem);
-          line-height: 0.9;
-          letter-spacing: -0.02em;
+          font-size: clamp(4rem, 15vw, 11rem);
+          line-height: 1.1;
+          letter-spacing: 0em;
           margin-bottom: 2rem;
-
-          /* Solid text for better readability */
           color: #fff;
-          text-shadow: 0 4px 30px rgba(100, 255, 218, 0.3);
+
+          text-shadow: 0 0 20px rgba(100, 255, 218, 0.15);
 
           animation: fadeUp 1.2s var(--ease-out) forwards;
           opacity: 0;
