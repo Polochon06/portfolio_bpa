@@ -550,17 +550,19 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
         <div class="section-row">
           <div class="section-content">
             <div class="tag">Le Défi</div>
-            <h2>Sécuriser la Gestion du Temps</h2>
+            <h2>Système RH Multi-Rôles</h2>
             <p>
-              Dans un environnement d'entreprise où la confidentialité est
-              primordiale, comment centraliser la gestion des congés sans
-              compromettre les données sensibles des employés ?
+              Dans un contexte professionnel impliquant plusieurs projets (CNP, Cyber),
+              comment gérer efficacement les congés de tous les employés avec une
+              hiérarchie à 4 niveaux de permissions : Super-Administrateur, Administrateur,
+              Responsable et Employé ?
             </p>
             <p>
-              MT-Congés n'est pas qu'un simple calendrier. C'est une forteresse
-              numérique conçue pour orchestrer les validations hiérarchiques
-              (Managers, RH, Employés) avec une traçabilité auditée et une
-              protection contre les injections SQL.
+              MT-Congés est une solution d'entreprise complète intégrant un système
+              de notifications en temps réel, une validation hiérarchique des demandes,
+              et une traçabilité totale avec audit logs. Le système gère automatiquement
+              les soldes de congés (30 jours/an par défaut) et prévient les conflits
+              de dates.
             </p>
           </div>
           <div class="glass-panel">
@@ -573,17 +575,21 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
             <div class="tech-stack">
               <span>Java 17</span>
               <span>Java Swing (UI)</span>
-              <span>MySQL 8</span>
+              <span>MySQL 8.0</span>
               <span>JDBC & DAO</span>
               <span>BCrypt Encryption</span>
               <span>MVC Pattern</span>
+              <span>Git Version Control</span>
             </div>
-            <div style="margin-top: 2rem; font-size: 1.25rem;">
+            <div style="margin-top: 2rem; font-size: 1.15rem; line-height: 1.8;">
               <span style="display:block; margin-bottom:0.5rem;">
-                🔒 <strong>Auth:</strong> SHA-256 & Salt
+                🔒 <strong>Sécurité:</strong> PreparedStatements + Hash BCrypt
+              </span>
+              <span style="display:block; margin-bottom:0.5rem;">
+                🔔 <strong>Notifications:</strong> Système d'alertes temps réel
               </span>
               <span style="display:block;">
-                ⚡ <strong>Perf:</strong> Connexions Poolées
+                📊 <strong>Base:</strong> 7 tables relationnelles + indices
               </span>
             </div>
           </div>
@@ -593,42 +599,53 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
         <div class="section-row reversed">
           <div class="section-content">
             <div class="tag">Architecture</div>
-            <h2>Design Pattern MVC Strict</h2>
+            <h2>Modèle de Données Robuste</h2>
             <p>
-              La maintenance est la clé de la longévité logicielle. J'ai conçu
-              MT-Congés en découplant strictement la logique métier (Modèle),
-              l'interface utilisateur (Vue) et le pilotage des interactions
-              (Contrôleur).
+              La base de données <strong>adpv1</strong> utilise 7 tables relationnelles
+              interconnectées avec des contraintes d'intégrité strictes. Le schéma
+              implémente des DELETE CASCADE pour maintenir la cohérence des données,
+              des indices optimisés pour les requêtes fréquentes, et des contraintes
+              UNIQUE sur les identifiants critiques.
             </p>
             <p>
-              Ce choix garantit un code modulaire, testable et évolutif. Chaque
-              couche a une responsabilité unique, permettant des mises à jour de
-              l'UI sans risque de régression sur la logique de sécurité.
+              L'architecture MVC découple strictement : <strong>Models</strong> (DAO + entités),
+              <strong>Views</strong> (interfaces Swing adaptatives par rôle),
+              et <strong>Controllers</strong> (orchestration logique). Cette séparation
+              garantit une maintenabilité optimale et une évolutivité sans régression.
             </p>
           </div>
           <div
             class="glass-panel"
-            style="font-family: var(--font-mono); font-size: 0.9rem; line-height: 1.8;"
+            style="font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.7;"
           >
-            <div style="opacity: 0.7">// Structure du Projet</div>
-            <div>src/</div>
-            <div style="padding-left: 1rem;">
-              ├── controllers/ <span style="color: #64ffda;">
-                # Gestion des events
-              </span>
+            <div style="opacity: 0.7; margin-bottom: 1rem;">-- Schéma Base de Données</div>
+            <div style="color: #64ffda;">📊 utilisateur</div>
+            <div style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;">
+              IdUtilisateur, Nom, Prénom, Email, MotDePasse<br/>
+              NombreCongeRestant (défaut: 30), IdRole, IdProjet
             </div>
-            <div style="padding-left: 1rem;">
-              ├── models/ <span style="color: #64ffda;">
-                # Logique métier & DAO
-              </span>
+
+            <div style="color: #64ffda; margin-top: 1rem;">📝 demandeconge</div>
+            <div style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;">
+              IdConge, DureeConge, DateDebutConge<br/>
+              EtatConge (En attente/Validé/Refusé), Motif
             </div>
-            <div style="padding-left: 1rem;">
-              ├── views/ <span style="color: #64ffda;"># Interface Swing</span>
+
+            <div style="color: #64ffda; margin-top: 1rem;">👥 role</div>
+            <div style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;">
+              Super-Admin (1), Admin (2), Responsable (3), Employé (4)
             </div>
-            <div style="padding-left: 1rem;">
-              └── utils/ <span style="color: #64ffda;">
-                # Helpers & Sécurité
-              </span>
+
+            <div style="color: #64ffda; margin-top: 1rem;">🔔 notification</div>
+            <div style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;">
+              Système d'alertes temps réel<br/>
+              Statut ouvert/non-ouvert + timestamps
+            </div>
+
+            <div style="color: #64ffda; margin-top: 1rem;">🏢 projet + projet_utilisateur</div>
+            <div style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;">
+              Projets CNP & Cyber<br/>
+              Association many-to-many avec flag responsable
             </div>
           </div>
         </div>
@@ -644,56 +661,78 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
 
           <div class="challenges-grid">
             <div class="challenge-card">
-              <span class="badge problem">Danger</span>
+              <span class="badge problem">Sécurité</span>
               <h3>Injections SQL</h3>
               <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
-                Les données RH sont critiques. Une simple concaténation de
-                chaînes SQL exposerait toute la base.
+                Les données RH contiennent des informations sensibles (emails, mots de passe,
+                soldes de congés). Une seule faille d'injection SQL pourrait compromettre
+                l'intégralité de la base de données.
               </p>
               <div
                 style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
               >
                 <span class="badge solution">Solution</span>
                 <p style="opacity:0.8; font-size:0.9rem;">
-                  Utilisation systématique de <strong>
-                    PreparedStatements
-                  </strong> pour typer et échapper toutes les entrées.
+                  Utilisation <strong>exclusive</strong> de PreparedStatements JDBC pour toutes
+                  les requêtes. Chiffrement des mots de passe avec BCrypt. Validation stricte
+                  des entrées utilisateur en amont.
+                </p>
+              </div>
+            </div>
+
+            <div class="challenge-card">
+              <span class="badge problem">Architecture</span>
+              <h3>Hiérarchie 4 Niveaux</h3>
+              <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
+                Gérer un système RBAC (Role-Based Access Control) avec 4 niveaux de permissions
+                différents : Super-Admin, Admin, Responsable de projet et Employé standard.
+              </p>
+              <div
+                style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
+              >
+                <span class="badge solution">Solution</span>
+                <p style="opacity:0.8; font-size:0.9rem;">
+                  Table <strong>role</strong> avec colonne Permission (1-4). SessionManager
+                  singleton côté Java. Vues Swing adaptatives selon le rôle connecté.
+                  Contrôles d'accès au niveau DAO.
+                </p>
+              </div>
+            </div>
+
+            <div class="challenge-card">
+              <span class="badge problem">Data Integrity</span>
+              <h3>Gestion des Conflits</h3>
+              <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
+                Empêcher les chevauchements de congés, les soldes négatifs, et maintenir
+                la cohérence entre demandes, utilisateurs et projets sur plusieurs tables.
+              </p>
+              <div
+                style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
+              >
+                <span class="badge solution">Solution</span>
+                <p style="opacity:0.8; font-size:0.9rem;">
+                  Contraintes SQL : DELETE CASCADE sur clés étrangères, contraintes UNIQUE
+                  sur les associations projet-utilisateur, indices optimisés. Validation
+                  métier côté Java avant insertion.
                 </p>
               </div>
             </div>
 
             <div class="challenge-card">
               <span class="badge problem">UX</span>
-              <h3>Complexité Hiérarchique</h3>
+              <h3>Notifications Temps Réel</h3>
               <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
-                Gérer les droits d'accès dynamiques pour 3 niveaux de rôles sans
-                spaghetti code.
+                Alerter instantanément les utilisateurs concernés lors de changements
+                d'état des demandes de congés (validation, refus, nouvelles demandes).
               </p>
               <div
                 style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
               >
                 <span class="badge solution">Solution</span>
                 <p style="opacity:0.8; font-size:0.9rem;">
-                  Implémentation d'un <strong>SessionManager</strong> singleton et
-                  de vues adaptatives selon le rôle (RBAC).
-                </p>
-              </div>
-            </div>
-
-            <div class="challenge-card">
-              <span class="badge problem">Data</span>
-              <h3>Intégrité des Dates</h3>
-              <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
-                Éviter les chevauchements de congés et les soldes négatifs
-                impossibles.
-              </p>
-              <div
-                style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
-              >
-                <span class="badge solution">Solution</span>
-                <p style="opacity:0.8; font-size:0.9rem;">
-                  Triggers SQL et validation métier côté Java avant même
-                  l'insertion en base.
+                  Table <strong>notification</strong> avec statut ouvert/non-ouvert, timestamps
+                  de création et lecture. Liens vers événements, congés ou utilisateurs pour
+                  un suivi contextuel complet.
                 </p>
               </div>
             </div>
@@ -706,21 +745,31 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
             class="font-serif"
             style="font-size: 2.5rem; margin-bottom: 2rem;"
           >
-            Impact du Projet
+            Chiffres Clés
           </h2>
           <div class="stats-container">
             <div>
+              <h3>7</h3>
+              <span>Tables SQL</span>
+            </div>
+            <div>
+              <h3>4</h3>
+              <span>Niveaux Rôles</span>
+            </div>
+            <div>
               <h3>100%</h3>
-              <span>Sécurisé</span>
+              <span>PreparedStatements</span>
             </div>
             <div>
               <h3>3</h3>
               <span>Mois de Dev</span>
             </div>
-            <div>
-              <h3>A+</h3>
-              <span>Note Finale</span>
-            </div>
+          </div>
+          <div style="margin-top: 3rem; font-family: var(--font-mono); font-size: 0.9rem; opacity: 0.7;">
+            <p>🔐 Authentification BCrypt + Session Management</p>
+            <p>📊 MVC Pattern + DAO Layer + JDBC Pooling</p>
+            <p>🔔 Système de Notifications Intégré</p>
+            <p>📁 2 Projets (CNP, Cyber) + Multi-Responsables</p>
           </div>
         </div>
 
