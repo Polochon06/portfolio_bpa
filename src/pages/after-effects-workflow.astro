@@ -1,0 +1,572 @@
+---
+import '../styles/global.scss'
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>After Effects Workflow - Paul Blanc</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Découvrez mon workflow After Effects et les plugins que j'utilise pour créer du motion design et des effets visuels."
+    />
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+
+    <style>
+      :root {
+        --font-serif: 'PP Editorial New', Georgia, serif;
+        --font-mono: 'PP Fraktion Mono', 'Courier New', monospace;
+        --bg: #0a0a0a;
+        --fg: #ffffff;
+        --accent: #f40c3f;
+        --accent-dim: rgba(244, 12, 63, 0.1);
+        --glass: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-mono);
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      .hero {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        padding: 8rem 2rem 4rem;
+      }
+
+      .back-link {
+        position: fixed;
+        top: 2rem;
+        left: 2rem;
+        z-index: 100;
+        color: var(--fg);
+        text-decoration: none;
+        font-size: 0.9rem;
+        padding: 0.75rem 1.5rem;
+        border: 1px solid var(--glass-border);
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+      }
+
+      .back-link:hover {
+        background: var(--accent);
+        border-color: var(--accent);
+        transform: translateX(-4px);
+      }
+
+      .tag {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: var(--accent-dim);
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        font-size: 0.75rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-bottom: 2rem;
+      }
+
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(3rem, 8vw, 6rem);
+        font-weight: 200;
+        margin-bottom: 1.5rem;
+        line-height: 1.1;
+      }
+
+      h1 span {
+        color: var(--accent);
+      }
+
+      .hero p {
+        font-size: 1.1rem;
+        max-width: 700px;
+        margin: 0 auto 3rem;
+        opacity: 0.8;
+      }
+
+      h2 {
+        font-family: var(--font-serif);
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        font-weight: 200;
+        margin-bottom: 2rem;
+      }
+
+      h3 {
+        font-family: var(--font-serif);
+        font-size: 1.75rem;
+        font-weight: 400;
+        margin-bottom: 1rem;
+      }
+
+      .section-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        margin: 8rem 0;
+        align-items: start;
+      }
+
+      .section-row.reversed {
+        direction: rtl;
+      }
+
+      .section-row.reversed > * {
+        direction: ltr;
+      }
+
+      @media (max-width: 968px) {
+        .section-row {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+      }
+
+      .section-content p {
+        margin-bottom: 1.5rem;
+        opacity: 0.9;
+        font-size: 1rem;
+      }
+
+      .glass-panel {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(10px);
+        padding: 3rem;
+        border-radius: 8px;
+      }
+
+      .plugins-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin: 4rem 0;
+      }
+
+      .plugin-card {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        padding: 2rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .plugin-card:hover {
+        border-color: var(--accent);
+        transform: translateY(-4px);
+        background: rgba(244, 12, 63, 0.05);
+      }
+
+      .plugin-card h3 {
+        color: var(--accent);
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .plugin-category {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        opacity: 0.6;
+        margin-bottom: 1rem;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+      }
+
+      .badge.essential {
+        background: rgba(244, 12, 63, 0.2);
+        color: var(--accent);
+        border: 1px solid var(--accent);
+      }
+
+      .badge.creative {
+        background: rgba(100, 255, 218, 0.2);
+        color: #64ffda;
+        border: 1px solid #64ffda;
+      }
+
+      .tech-list {
+        list-style: none;
+        padding: 0;
+      }
+
+      .tech-list li {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .tech-list li:last-child {
+        border-bottom: none;
+      }
+
+      .tech-name {
+        font-weight: 600;
+      }
+
+      .tech-usage {
+        font-size: 0.85rem;
+        opacity: 0.6;
+      }
+
+      .workflow-steps {
+        counter-reset: step-counter;
+        list-style: none;
+        padding: 0;
+      }
+
+      .workflow-steps li {
+        counter-increment: step-counter;
+        position: relative;
+        padding-left: 4rem;
+        margin-bottom: 2.5rem;
+      }
+
+      .workflow-steps li::before {
+        content: counter(step-counter);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 2.5rem;
+        height: 2.5rem;
+        background: var(--accent);
+        color: var(--bg);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+
+      .workflow-steps strong {
+        color: var(--accent);
+        display: block;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .cta-wrapper {
+        text-align: center;
+        padding: 6rem 2rem;
+        margin: 8rem 0 4rem;
+      }
+
+      .cta-wrapper a {
+        display: inline-block;
+        padding: 1.25rem 3rem;
+        background: var(--accent);
+        color: var(--bg);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+        border: 2px solid var(--accent);
+      }
+
+      .cta-wrapper a:hover {
+        background: transparent;
+        color: var(--accent);
+        transform: translateY(-2px);
+      }
+
+      .scroll-indicator {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        opacity: 0.4;
+        animation: bounce 2s infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateX(-50%) translateY(0);
+        }
+        50% {
+          transform: translateX(-50%) translateY(10px);
+        }
+      }
+
+      footer {
+        text-align: center;
+        padding: 2rem;
+        opacity: 0.4;
+        font-size: 0.8rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <a href="/portfolio_bpa/#work" class="back-link">← Retour Portfolio</a>
+
+    <main>
+      <section class="hero">
+        <div class="tag">Motion Design • VFX • Post-Production</div>
+        <h1>
+          <span>After Effects</span><br />Workflow
+        </h1>
+        <p>
+          Mon processus créatif et les outils que j'utilise pour créer du motion design,
+          des effets visuels et de l'animation. De la préproduction à l'export final.
+        </p>
+        <div class="scroll-indicator">SCROLL TO EXPLORE</div>
+      </section>
+
+      <div class="container">
+        <!-- Section: Overview -->
+        <div class="section-row">
+          <div class="section-content">
+            <div class="tag">Le Logiciel</div>
+            <h2>Adobe After Effects</h2>
+            <p>
+              <strong>After Effects</strong> est mon outil principal pour créer du motion design,
+              des animations et des effets visuels. C'est un logiciel de composition et d'animation
+              qui permet de combiner des éléments 2D et 3D, d'ajouter des effets visuels complexes
+              et de créer des animations sophistiquées.
+            </p>
+            <p>
+              J'utilise After Effects pour tous mes projets de motion design, que ce soit pour
+              créer des génériques, des transitions, des effets de texte animés, ou des compositions
+              visuelles complexes. Le logiciel offre une flexibilité créative inégalée grâce à
+              son système de calques, ses expressions JavaScript et sa vaste bibliothèque d'effets.
+            </p>
+            <p>
+              <strong>Pourquoi After Effects ?</strong><br />
+              • Workflow non-destructif avec système de calques<br />
+              • Expressions et scripts pour automatiser les tâches<br />
+              • Intégration parfaite avec Adobe Creative Suite<br />
+              • Support de plugins tiers pour étendre les fonctionnalités<br />
+              • Rendu haute qualité avec export vers de nombreux formats
+            </p>
+          </div>
+          <div class="glass-panel">
+            <h3 style="margin-bottom: 2rem;">Technologies & Formats</h3>
+            <ul class="tech-list">
+              <li>
+                <span class="tech-name">After Effects CC 2024</span>
+                <span class="tech-usage">Logiciel principal</span>
+              </li>
+              <li>
+                <span class="tech-name">Adobe Photoshop</span>
+                <span class="tech-usage">Préparation assets</span>
+              </li>
+              <li>
+                <span class="tech-name">Adobe Illustrator</span>
+                <span class="tech-usage">Graphiques vectoriels</span>
+              </li>
+              <li>
+                <span class="tech-name">Media Encoder</span>
+                <span class="tech-usage">Export & compression</span>
+              </li>
+              <li>
+                <span class="tech-name">Cinema 4D Lite</span>
+                <span class="tech-usage">Éléments 3D</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Section: Plugins -->
+        <div style="margin: 10rem 0;">
+          <div style="text-align: center; margin-bottom: 4rem;">
+            <div class="tag">Extensions Professionnelles</div>
+            <h2>Plugins Essentiels</h2>
+            <p style="max-width: 700px; margin: 1rem auto; opacity: 0.8;">
+              Ces plugins étendent considérablement les capacités d'After Effects et
+              accélèrent mon workflow créatif.
+            </p>
+          </div>
+
+          <div class="plugins-grid">
+            <div class="plugin-card">
+              <span class="badge essential">Essential</span>
+              <h3>Element 3D</h3>
+              <div class="plugin-category">Video Copilot</div>
+              <p style="opacity: 0.9; line-height: 1.8;">
+                Plugin 3D ultra-performant qui permet d'importer et d'animer des modèles 3D
+                directement dans After Effects. Utilisé pour créer des titres 3D, des logos
+                animés et des environnements complexes avec un rendu rapide.
+              </p>
+            </div>
+
+            <div class="plugin-card">
+              <span class="badge essential">Essential</span>
+              <h3>Optical Flares</h3>
+              <div class="plugin-category">Video Copilot</div>
+              <p style="opacity: 0.9; line-height: 1.8;">
+                Génère des lens flares photoréalistes et des effets de lumière. Parfait pour
+                ajouter du dynamisme et de l'énergie aux compositions, avec contrôle total
+                sur la forme, les couleurs et l'intensité des flares.
+              </p>
+            </div>
+
+            <div class="plugin-card">
+              <span class="badge creative">Creative</span>
+              <h3>Trapcode Suite</h3>
+              <div class="plugin-category">Red Giant</div>
+              <p style="opacity: 0.9; line-height: 1.8;">
+                Suite complète pour créer des effets de particules (Particular), des formes
+                géométriques organiques (Form), et des textures procédurales (Mir). Essentiel
+                pour les effets visuels abstraits et les backgrounds animés.
+              </p>
+            </div>
+
+            <div class="plugin-card">
+              <span class="badge creative">Creative</span>
+              <h3>Plexus</h3>
+              <div class="plugin-category">Rowbyte</div>
+              <p style="opacity: 0.9; line-height: 1.8;">
+                Crée des réseaux de points et de lignes interconnectés en 3D. Idéal pour
+                générer des visualisations de données, des backgrounds technologiques et
+                des effets de connexion entre éléments.
+              </p>
+            </div>
+
+            <div class="plugin-card">
+              <span class="badge essential">Essential</span>
+              <h3>Saber</h3>
+              <div class="plugin-category">Video Copilot - Gratuit</div>
+              <p style="opacity: 0.9; line-height: 1.8;">
+                Plugin gratuit pour créer des effets de lumière néon, des faisceaux laser
+                et des lueurs énergétiques. Très utilisé pour les effets sci-fi et les
+                transitions dynamiques avec contrôle précis des courbes.
+              </p>
+            </div>
+
+            <div class="plugin-card">
+              <span class="badge creative">Creative</span>
+              <h3>Twixtor</h3>
+              <div class="plugin-category">RE:Vision Effects</div>
+              <p style="opacity: 0.9; line-height: 1.8;">
+                Ralentissement et accélération de vidéos avec interpolation avancée. Permet
+                de créer des slow-motion fluides même à partir de footage à 24fps, en générant
+                des frames intermédiaires de haute qualité.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Workflow -->
+        <div class="section-row reversed">
+          <div class="section-content">
+            <div class="tag">Processus Créatif</div>
+            <h2>Mon Workflow</h2>
+            <ol class="workflow-steps">
+              <li>
+                <strong>Concept & Storyboard</strong>
+                Définition de l'idée créative, création d'un moodboard et esquisse du storyboard
+                pour visualiser les différentes séquences et transitions.
+              </li>
+              <li>
+                <strong>Préparation Assets</strong>
+                Création ou collecte des éléments visuels : graphiques vectoriels (Illustrator),
+                textures (Photoshop), modèles 3D (Cinema 4D), footages vidéo et audio.
+              </li>
+              <li>
+                <strong>Composition & Animation</strong>
+                Import des assets dans After Effects, mise en place de la composition principale,
+                animation des calques avec keyframes et expressions, ajout de caméras 3D.
+              </li>
+              <li>
+                <strong>Effets & Post-Production</strong>
+                Application des plugins (Element 3D, Trapcode, Plexus), ajustements de couleurs
+                (color grading), ajout de particules, lens flares et effets de lumière.
+              </li>
+              <li>
+                <strong>Sound Design & Export</strong>
+                Synchronisation avec la musique et sound effects, optimisation du rendu,
+                export final via Media Encoder (H.264, ProRes) selon la destination.
+              </li>
+            </ol>
+          </div>
+          <div class="glass-panel">
+            <h3 style="margin-bottom: 2rem;">Techniques Favorites</h3>
+            <p style="opacity: 0.9; margin-bottom: 1rem;">
+              <strong style="color: var(--accent);">Expressions JavaScript</strong><br />
+              Utilisation d'expressions pour automatiser les animations et créer des mouvements
+              procéduraux (wiggle, loop, time remapping).
+            </p>
+            <p style="opacity: 0.9; margin-bottom: 1rem;">
+              <strong style="color: var(--accent);">Caméras & 3D Layers</strong><br />
+              Création de profondeur avec des caméras virtuelles et organisation des calques
+              en espace 3D pour des compositions immersives.
+            </p>
+            <p style="opacity: 0.9; margin-bottom: 1rem;">
+              <strong style="color: var(--accent);">Shape Layers & Motion Graphics</strong><br />
+              Conception de graphiques animés avec les shape layers, trim paths et gradients
+              pour des animations fluides et vectorielles.
+            </p>
+            <p style="opacity: 0.9; margin-bottom: 1rem;">
+              <strong style="color: var(--accent);">Color Grading</strong><br />
+              Ajustements de couleurs avec Lumetri Color, Curves et Color Balance pour
+              créer des ambiances spécifiques et une cohérence visuelle.
+            </p>
+            <p style="opacity: 0.9;">
+              <strong style="color: var(--accent);">Motion Blur & Frame Blending</strong><br />
+              Application de motion blur et frame blending pour des animations plus naturelles
+              et cinématiques.
+            </p>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <section class="cta-wrapper">
+          <h2 style="margin-bottom: 2rem;">Voir Mes Créations</h2>
+          <p style="max-width: 600px; margin: 0 auto 2rem; opacity: 0.8;">
+            Découvrez mes projets de motion design et VFX sur ma chaîne YouTube.
+          </p>
+          <a
+            href="https://www.youtube.com/@paulblanc-motion"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Visiter Ma Chaîne YouTube
+          </a>
+        </section>
+      </div>
+    </main>
+
+    <footer>DEVELOPED BY PAUL BLANC • 2024</footer>
+  </body>
+</html>
