@@ -526,8 +526,8 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
           <span>MT-Congés</span>
         </h1>
         <p>
-          Application de gestion des congés d'entreprise multi-projets avec système de validation hiérarchique. <br />
-          Développée en Java Swing avec une architecture MVC robuste et une sécurité renforcée.
+          Application de gestion des congés d'entreprise avec workflow de validation multi-niveaux. <br />
+          Développée en Java Swing pour simplifier les demandes et validations de congés au sein d'une entreprise.
         </p>
 
         <div
@@ -550,21 +550,26 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
         <div class="section-row">
           <div class="section-content">
             <div class="tag">Le Contexte</div>
-            <h2>Application RH Multi-Projets</h2>
+            <h2>Logiciel RH d'Entreprise</h2>
             <p>
-              MT-Congés est une application desktop développée pour gérer les demandes de congés
-              dans un environnement d'entreprise multi-projets (CNP et Cyber). L'application
-              permet aux employés de soumettre des demandes, aux responsables de les valider,
-              et aux administrateurs de superviser l'ensemble du système.
+              MT-Congés est une application desktop développée dans le cadre d'un atelier de professionnalisation.
+              Destinée à simplifier la gestion des congés en entreprise, elle propose <strong>trois profils
+              utilisateurs distincts</strong> (Administrateur, Responsable, Employé) avec des fonctionnalités
+              adaptées à chaque rôle métier.
             </p>
             <p>
-              <strong>Fonctionnalités principales :</strong><br/>
-              • Gestion des demandes de congés avec workflow de validation<br/>
-              • Système de rôles à 4 niveaux (Super-Admin, Admin, Responsable, Employé)<br/>
-              • Suivi des soldes de congés (30 jours/an par défaut)<br/>
-              • Notifications en temps réel pour les changements d'état<br/>
-              • Association des employés aux projets avec gestion des responsables<br/>
-              • Historique complet et traçabilité des demandes
+              <strong>Fonctionnalités par profil :</strong><br/>
+              <strong>Employé :</strong> Sélection de dates via calendrier interactif, soumission de demandes
+              avec motif facultatif, visualisation du solde de congés restant, signature électronique<br/>
+              <strong>Responsable :</strong> Validation/refus des demandes avec notification automatique,
+              création d'événements, détection des congés simultanés, visualisation des demandes en attente<br/>
+              <strong>Administrateur :</strong> Création et suppression de comptes utilisateurs, gestion
+              des rôles et permissions, recherche et tri d'utilisateurs, paramétrage système
+            </p>
+            <p>
+              <strong>Système de notifications intégré :</strong> badge rouge avec compteur de notifications
+              non lues, notifications automatiques lors de demandes/décisions, filtrage lues/non lues,
+              marquage automatique à la lecture.
             </p>
           </div>
           <div class="glass-panel">
@@ -604,20 +609,29 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
         <div class="section-row reversed">
           <div class="section-content">
             <div class="tag">Architecture</div>
-            <h2>Modèle de Données & Structure</h2>
+            <h2>Architecture & Technologies</h2>
             <p>
-              L'application repose sur une <strong>architecture MVC stricte</strong> avec une base
-              de données MySQL composée de 7 tables interconnectées : utilisateur, demandeconge,
-              role, projet, projet_utilisateur, notification et evenement.
+              L'application repose sur une <strong>architecture MVC stricte</strong> développée en
+              <strong>Java SE-22</strong> avec interface graphique Swing. La base de données MySQL 8.0
+              comprend 7 tables interconnectées : utilisateur, demandeconge, role, projet,
+              projet_utilisateur, notification et evenement.
             </p>
             <p>
-              <strong>Points clés de l'architecture :</strong><br/>
-              • Pattern DAO pour l'accès aux données avec PreparedStatements<br/>
-              • Contraintes d'intégrité référentielle (DELETE CASCADE, UNIQUE)<br/>
-              • Indices optimisés sur les colonnes fréquemment requêtées<br/>
-              • SessionManager singleton pour la gestion des sessions utilisateur<br/>
-              • Interfaces Swing adaptatives selon le rôle connecté<br/>
-              • Système de notifications avec timestamps et statuts
+              <strong>Workflow de validation :</strong><br/>
+              1. L'employé soumet une demande via le calendrier interactif<br/>
+              2. Une notification est automatiquement créée pour le responsable<br/>
+              3. Le responsable valide ou refuse avec notification à l'employé<br/>
+              4. Le solde de congés est automatiquement mis à jour après acceptation<br/>
+              5. Détection automatique des conflits entre demandes simultanées
+            </p>
+            <p>
+              <strong>Sécurité & Performance :</strong><br/>
+              • Hachage des mots de passe avec BCrypt<br/>
+              • PreparedStatements JDBC pour prévenir les injections SQL<br/>
+              • Vérification des permissions selon les rôles (RBAC)<br/>
+              • Gestion des erreurs de connexion à la base de données<br/>
+              • SessionManager singleton pour les sessions utilisateur<br/>
+              • Interfaces adaptatives selon le profil connecté
             </p>
           </div>
           <div
@@ -732,19 +746,19 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
 
             <div class="challenge-card">
               <span class="badge problem">UX</span>
-              <h3>Notifications Temps Réel</h3>
+              <h3>Système de Notifications</h3>
               <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
-                Alerter instantanément les utilisateurs concernés lors de changements
-                d'état des demandes (validation, refus, nouvelles demandes).
+                Créer un système de notifications automatique avec compteur visuel (badge rouge),
+                génération lors de demandes/décisions, marquage à la lecture, et filtrage lues/non lues.
               </p>
               <div
                 style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
               >
                 <span class="badge solution">Solution</span>
                 <p style="opacity:0.8; font-size:0.9rem;">
-                  Table <strong>notification</strong> avec statut ouvert/non-ouvert et
-                  timestamps (création, lecture). Liens contextuels vers événements,
-                  congés ou utilisateurs.
+                  Table <strong>notification</strong> avec statut (ouvert/non-ouvert), timestamps
+                  (création/lecture), liens contextuels (événement/congé/utilisateur). Badge UI
+                  affichant le nombre de notifications non lues. Système d'onglets pour filtrage.
                 </p>
               </div>
             </div>
@@ -778,10 +792,11 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
             </div>
           </div>
           <div style="margin-top: 3rem; font-family: var(--font-mono); font-size: 0.9rem; opacity: 0.7; line-height: 1.8;">
-            <p>📊 Architecture: MVC + DAO Pattern + JDBC</p>
-            <p>🔐 Sécurité: BCrypt + PreparedStatements + Session Management</p>
-            <p>🔔 Features: Notifications + Workflow Validation + Multi-Projets</p>
-            <p>🏢 Projets: CNP & Cyber avec gestion des responsables</p>
+            <p>📊 Architecture: MVC Strict + DAO Pattern + Java Swing UI</p>
+            <p>🔐 Sécurité: BCrypt Hash + PreparedStatements + RBAC</p>
+            <p>🔔 Features: Workflow Validation + Notifications + Calendrier Interactif</p>
+            <p>👥 Profils: Administrateur, Responsable, Employé (permissions adaptatives)</p>
+            <p>🎓 Contexte: Atelier de Professionnalisation BTS SIO (Équipe de 4)</p>
           </div>
         </div>
 
