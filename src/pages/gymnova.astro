@@ -1,0 +1,766 @@
+---
+import SiteHead from '../components/SiteHead.astro'
+import SiteFoot from '../components/SiteFoot.astro'
+import SiteScrollbar from '../components/SiteScrollbar.astro'
+import logo from '../assets/logo.png'
+import '../styles/global.scss'
+
+const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
+---
+
+<html lang="fr" class="is-scroll-blocked theme-contrasted">
+  <head>
+    <meta charset="utf-8" />
+    <title>Gymnova | Gestion de Compétitions</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Application web de gestion de compétitions de gymnastique. Scoring en temps réel, gestion des juges et génération de palmarès."
+    />
+    <link rel="icon" type="image/png" href="/icons/favicon-48x48.png" />
+
+    <!-- Fonts -->
+    <link
+      rel="preload"
+      href="/fonts/PPEditorialNew-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="/fonts/PPEditorialNew-Ultralight.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="/fonts/PPFraktionMono-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="/fonts/PPFraktionMono-Bold.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="/fonts/Bigger-Display.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+
+    <style lang="scss" define:vars={{ bgImage }}>
+      @import url('https://fonts.googleapis.com/css2?family=Italiana&display=swap');
+
+      /* Custom Styles for Gymnova */
+      :root {
+        --gym-bg: #0f172a;
+        --gym-text: #e2e8f0;
+        --gym-accent: #38bdf8; /* Sky Blue */
+        --gym-accent-dim: rgba(56, 189, 248, 0.1);
+        --gym-glass: rgba(15, 23, 42, 0.6);
+        --gym-glass-border: rgba(255, 255, 255, 0.1);
+
+        --font-serif: 'Italiana', serif;
+        --font-mono: 'PP Fraktion Mono', monospace;
+      }
+
+      .gymnova-page {
+        background-color: var(--gym-bg);
+        color: var(--gym-text);
+        font-family: var(--font-mono);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* Hero */
+      .hero {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding-top: 4rem;
+        position: relative;
+      }
+
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(4rem, 15vw, 10rem);
+        line-height: 0.9;
+        letter-spacing: -0.02em;
+        margin-bottom: 2rem;
+        color: #fff;
+        text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      h1 span {
+        color: var(--gym-accent);
+      }
+
+      .hero p {
+        font-size: clamp(1.1rem, 2vw, 1.4rem);
+        max-width: 600px;
+        color: #94a3b8;
+        line-height: 1.5;
+        margin-bottom: 3rem;
+      }
+
+      .tag {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: var(--gym-accent-dim);
+        border: 1px solid var(--gym-accent);
+        color: var(--gym-accent);
+        font-size: 0.75rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-bottom: 2rem;
+        border-radius: 50px;
+      }
+
+      /* Glass Panels */
+      .glass-panel {
+        background: var(--gym-glass);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--gym-glass-border);
+        border-radius: 24px;
+        padding: 3rem;
+        transition:
+          transform 0.4s ease,
+          border-color 0.3s ease;
+
+        &:hover {
+          transform: translateY(-5px);
+          border-color: var(--gym-accent);
+        }
+      }
+
+      /* Grid Layouts */
+      .section-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6rem;
+        align-items: center;
+        margin: 10rem 0;
+
+        &.reversed {
+          direction: rtl;
+          .section-content,
+          .glass-panel {
+            direction: ltr;
+          }
+        }
+
+        @media (max-width: 900px) {
+          grid-template-columns: 1fr;
+          gap: 3rem;
+          margin: 6rem 0;
+          &.reversed {
+            direction: ltr;
+          }
+        }
+      }
+
+      .section-content h2 {
+        font-family: var(--font-serif);
+        font-size: 3rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.1;
+      }
+
+      .section-content p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: #cbd5e1;
+        margin-bottom: 2rem;
+      }
+
+      /* Features Grid */
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-top: 4rem;
+      }
+
+      .feature-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 2.5rem;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.08);
+          transform: translateY(-5px);
+        }
+
+        h3 {
+          font-family: var(--font-serif);
+          font-size: 1.8rem;
+          margin-bottom: 1rem;
+          color: var(--gym-accent);
+        }
+      }
+
+      /* Tech Stack */
+      .tech-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+
+      .tech-pill {
+        padding: 0.5rem 1.2rem;
+        background: rgba(56, 189, 248, 0.1);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        border-radius: 100px;
+        font-size: 0.9rem;
+        color: var(--gym-accent);
+      }
+
+      /* Back Link */
+      .back-link {
+        position: fixed;
+        top: 6rem;
+        left: 2rem;
+        z-index: 40;
+        color: #fff;
+        text-decoration: none;
+        font-size: 0.9rem;
+        padding: 0.75rem 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: var(--gym-accent);
+          border-color: var(--gym-accent);
+          color: #000;
+        }
+      }
+
+      .scroll-indicator {
+        position: absolute;
+        bottom: 3rem;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        opacity: 0.5;
+        animation: bounce 2s infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translate(-50%, 0);
+        }
+        50% {
+          transform: translate(-50%, 10px);
+        }
+      }
+
+      /* Global Site Wrapper */
+      .site-wrapper {
+        position: relative;
+        z-index: 2;
+        background: #000;
+        min-height: 100vh;
+      }
+      .site-intro {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 50;
+        width: 100%;
+        height: 100%;
+        background: #f40c3f;
+        .sb-logo {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 16rem;
+          height: 16rem;
+          transform: translate3d(-50%, -50%, 0);
+        }
+        &__border {
+          position: absolute;
+          background: #000;
+          &--top {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1rem;
+            transform-origin: 50% 0;
+          }
+          &--left {
+            top: 0;
+            left: 0;
+            width: 1rem;
+            height: 100%;
+            transform-origin: 0 50%;
+          }
+          &--right {
+            top: 0;
+            right: 0;
+            width: 1rem;
+            height: 100%;
+            transform-origin: 100% 50%;
+          }
+        }
+      }
+      .site-mount {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        border: 1rem solid #000;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .site-contrast-mask {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 20;
+        width: 100%;
+        height: 100%;
+        background: #f40c3f;
+        border-right: 1rem solid #000;
+        mix-blend-mode: darken;
+        transform: translate3d(-100%, 0, 0);
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="site-wrapper js-site-wrapper" style="opacity: 0;">
+      <SiteHead />
+
+      <main class="gymnova-page">
+        <a href="/portfolio_bpa/#work" class="back-link">← Retour Portfolio</a>
+
+        <section class="hero">
+          <div class="tag">Symfony 6 • Web Application</div>
+          <h1>Gymnova<br /><span>Compétition</span></h1>
+          <p>
+            Plateforme web complète de gestion de compétitions de gymnastique.
+            De l'inscription des gymnastes à la génération automatique des
+            palmarès.
+          </p>
+          <div class="scroll-indicator">SCROLL TO EXPLORE</div>
+        </section>
+
+        <div class="container">
+          <!-- Overview -->
+          <div class="section-row">
+            <div class="section-content">
+              <div class="tag">Le Projet</div>
+              <h2>Digitalisation des Compétitions</h2>
+              <p>
+                Gymnova est une solution web développée pour moderniser la
+                gestion des événements sportifs de gymnastique. Elle remplace
+                les fichiers Excel complexes et les saisies manuelles par une
+                interface centralisée et sécurisée.
+              </p>
+              <p>
+                L'application permet aux organisateurs de créer des événements,
+                de gérer les inscriptions des clubs et des athlètes, et
+                d'assurer le suivi des scores en temps réel lors des agrès.
+              </p>
+            </div>
+            <div class="glass-panel">
+              <h3
+                class="font-serif"
+                style="font-size: 2rem; margin-bottom: 1.5rem; color: #fff;"
+              >
+                Fonctionnalités Clés
+              </h3>
+              <ul
+                style="list-style: none; padding: 0; font-size: 1.1rem; line-height: 2;"
+              >
+                <li>
+                  🏆 <strong>Live Scoring:</strong> Saisie des notes par les juges
+                  sur tablette
+                </li>
+                <li>
+                  📄 <strong>Palmarès Auto:</strong> Calcul immédiat des classements
+                  et podiums
+                </li>
+                <li>
+                  👥 <strong>Gestion Clubs:</strong> Espace dédié pour les inscriptions
+                </li>
+                <li>
+                  📊 <strong>Tableaux de Bord:</strong> Vue globale pour le directeur
+                  de compétition
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Architecture & Stack -->
+          <div class="section-row reversed">
+            <div class="section-content">
+              <div class="tag">Technique</div>
+              <h2>Architecture Symfony</h2>
+              <p>
+                Développé avec le framework <strong>Symfony 6</strong> (PHP 8.2),
+                le projet suit une architecture MVC stricte. L'utilisation de <strong
+                >
+                  Doctrine ORM
+                </strong> assure une gestion robuste de la base de données relationnelle.
+              </p>
+              <p>
+                L'interface utilisateur est rendue via le moteur de template <strong
+                >
+                  Twig
+                </strong>, enrichie par JavaScript pour les intéractions
+                dynamiques (filtres, modales, live search).
+              </p>
+              <div class="tech-list">
+                <span class="tech-pill">PHP 8.2</span>
+                <span class="tech-pill">Symfony 6</span>
+                <span class="tech-pill">Doctrine ORM</span>
+                <span class="tech-pill">MySQL</span>
+                <span class="tech-pill">Twig</span>
+                <span class="tech-pill">Bootstrap 5</span>
+                <span class="tech-pill">Git</span>
+              </div>
+            </div>
+            <div class="glass-panel">
+              <h3
+                class="font-serif"
+                style="font-size: 2rem; margin-bottom: 1.5rem; color: #fff;"
+              >
+                Base de Données
+              </h3>
+              <div
+                style="font-family: var(--font-mono); font-size: 0.9rem; opacity: 0.8; line-height: 1.8;"
+              >
+                <p style="color: var(--gym-accent);">-- Entités Principales</p>
+                <br />
+                ▪ <strong>Competition:</strong> Date, Lieu, Catégorie<br />
+                ▪ <strong>Gymnaste:</strong> Nom, Club, Niveau, Age<br />
+                ▪ <strong>Note:</strong> Juge, Agrès (Sol, Saut, Barre...), Valeur<br
+                />
+                ▪ <strong>Juge:</strong> Agrément, Table de notation<br />
+                ▪ <strong>Club:</strong> Ville, Responsable, Effectif
+              </div>
+            </div>
+          </div>
+
+          <!-- Challenges Grid -->
+          <div style="margin: 10rem 0;">
+            <div style="text-align: center; margin-bottom: 4rem;">
+              <div class="tag">Ingénierie</div>
+              <h2 class="font-serif" style="font-size: 3.5rem;">
+                Défis Techniques
+              </h2>
+            </div>
+
+            <div class="features-grid">
+              <div class="feature-card">
+                <h3>Calculs Complexes</h3>
+                <p>
+                  Implémentation d'algorithmes de calcul de notes spécifiques à
+                  la gymnastique (note de départ + exécution - pénalités), avec
+                  gestion des égalités et règles par catégorie.
+                </p>
+              </div>
+
+              <div class="feature-card">
+                <h3>Sécurité & Rôles</h3>
+                <p>
+                  Gestion fine des droits utilisateurs via le composant Security
+                  de Symfony. Séparation stricte entre Administrateurs, Juges
+                  (saisie uniquement), et Coachs (lecture seule).
+                </p>
+              </div>
+
+              <div class="feature-card">
+                <h3>Performance PDF</h3>
+                <p>
+                  Génération optimisée de fichiers PDF pour les feuilles de
+                  match et les diplômes utilisant <strong>DomPDF</strong>,
+                  capable de traiter des centaines d'athlètes en quelques
+                  secondes.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- CTA -->
+          <div style="text-align: center; margin: 8rem 0;">
+            <a
+              href="https://github.com/Polochon06/gymnova"
+              target="_blank"
+              style="display: inline-block; font-family: var(--font-serif); font-size: 2rem; color: #fff; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 0.5rem; transition: 0.3s;"
+            >
+              Voir le Code Source ↗
+            </a>
+          </div>
+        </div>
+      </main>
+
+      <SiteFoot />
+    </div>
+
+    <!-- Intro Overlays -->
+    <div
+      class="site-intro js-intro"
+      style="opacity: 1; position: fixed; top: 0; left: 0; z-index: 50; width: 100%; height: 100%; background: #F40C3F;"
+    >
+      <div class="sb-logo js-logo">
+        <img
+          src={logo.src}
+          alt="Paul Blanc"
+          class="js-intro-logo"
+          style="width: 100%; height: 100%; object-fit: contain;"
+        />
+      </div>
+      <div class="site-intro__border site-intro__border--top js-border-top">
+      </div>
+      <div class="site-intro__border site-intro__border--left js-border-left">
+      </div>
+      <div class="site-intro__border site-intro__border--right js-border-right">
+      </div>
+    </div>
+    <div class="site-mount js-mount"></div>
+    <div class="site-contrast-mask js-contrast-mask"></div>
+    <SiteScrollbar />
+  </body>
+
+  <script>
+    import Emitter from '../utils/Emitter'
+    import Ticker from '../utils/Ticker'
+    import Lenis from 'lenis'
+    import { gsap } from 'gsap'
+    import { ScrollTrigger } from 'gsap/ScrollTrigger'
+    gsap.registerPlugin(ScrollTrigger)
+
+    declare global {
+      interface Window {
+        safeWidth: number
+        safeHeight: number
+        maxScrollTop: number
+        scrollProgress: number
+        lenis: any
+      }
+    }
+
+    class Site {
+      timeouts: any = { resizeThrottle: null }
+      windowWidth: number
+      windowHeight: number
+      clientWidth: number
+      clientHeight: number
+      isScrolling: boolean = false
+      lenis: any
+
+      constructor() {
+        let os = 'unknown'
+        if (navigator.userAgent.indexOf('Win') !== -1) os = 'windows'
+        else if (navigator.userAgent.indexOf('Android') !== -1) os = 'android'
+        else if (navigator.userAgent.indexOf('Mac') !== -1) os = 'mac'
+        else if (navigator.userAgent.indexOf('Linux') !== -1) os = 'linux'
+        document.documentElement.classList.add(`is-${os}`)
+
+        let browser = 'unknown'
+        if (navigator.userAgent.indexOf('Firefox') !== -1) browser = 'firefox'
+        else if (navigator.userAgent.indexOf('Chrome') !== -1)
+          browser = 'chrome'
+        else if (navigator.userAgent.indexOf('Safari') !== -1)
+          browser = 'safari'
+        document.documentElement.classList.add(`is-${browser}`)
+
+        this.bindEvents()
+      }
+
+      init() {
+        this.initLenis()
+        Ticker.init()
+        this.onResize()
+        Ticker.nextTick(this.intro, this)
+      }
+
+      bindEvents() {
+        window.addEventListener('resize', this.resizeThrottle.bind(this))
+        window.addEventListener('scroll', this.onScroll.bind(this), {
+          passive: true,
+        })
+        window.addEventListener('mousemove', this.onMouseMove.bind(this), {
+          passive: true,
+        })
+        Emitter.on('updateViewport', this.onResize, this, true)
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              entry.target.dispatchEvent(
+                new CustomEvent('intersect', {
+                  detail: { isIntersecting: entry.isIntersecting },
+                }),
+              )
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-in-view')
+                entry.target.classList.remove(
+                  'is-out-of-view',
+                  'is-out-of-view-top',
+                  'is-out-of-view-bottom',
+                )
+              } else {
+                entry.target.classList.remove('is-in-view')
+                entry.target.classList.add('is-out-of-view')
+              }
+            })
+          },
+          { threshold: 0 },
+        )
+
+        document
+          .querySelectorAll('[data-intersect]')
+          .forEach((el) => observer.observe(el))
+
+        if (document.readyState === 'complete') this.siteLoaded()
+        else window.addEventListener('load', this.siteLoaded, { once: true })
+        this.onScroll()
+      }
+
+      initLenis() {
+        const lenis = new Lenis()
+        lenis.on('scroll', ScrollTrigger.update)
+        gsap.ticker.add((time) => lenis.raf(time * 1000))
+        gsap.ticker.lagSmoothing(0)
+        window.lenis = lenis
+        this.lenis = lenis
+      }
+
+      siteLoaded() {
+        document.documentElement.classList.add('is-loaded')
+        Emitter.emit('siteLoaded')
+      }
+
+      resizeThrottle() {
+        clearTimeout(this.timeouts.resizeThrottle)
+        this.timeouts.resizeThrottle = setTimeout(
+          () => Ticker.nextTick(this.onResize, this),
+          200,
+        )
+      }
+
+      onResize() {
+        const newWidth = window.innerWidth
+        let widthChanged = false
+        if (this.windowWidth !== newWidth) {
+          if (this.windowWidth !== undefined) widthChanged = true
+          this.windowWidth = newWidth
+          this.clientWidth = document.body.clientWidth
+        }
+        const newHeight = window.innerHeight
+        let heightChanged = false
+        if (this.windowHeight !== newHeight) {
+          if (this.windowHeight !== undefined) heightChanged = true
+          this.windowHeight = newHeight
+          this.clientHeight = document.body.clientHeight
+        }
+        window.safeWidth = newWidth
+        window.safeHeight = newHeight
+        window.maxScrollTop = document.body.scrollHeight - window.safeHeight
+        this.setScrollProgress()
+        Emitter.emit('resize', widthChanged, heightChanged)
+      }
+
+      onScroll() {
+        this.setScrollProgress()
+        Ticker.nextTick(() => Emitter.emit('scroll', window.scrollY))
+      }
+
+      setScrollProgress() {
+        window.scrollProgress = window.scrollY / window.maxScrollTop
+      }
+
+      onMouseMove(e) {
+        Emitter.emit('mousemove', e.clientX, e.clientY)
+      }
+
+      intro() {
+        const wrapper = document.querySelector(
+          '.js-site-wrapper',
+        ) as HTMLElement
+        const intro = document.querySelector('.js-intro') as HTMLElement
+        const mount = document.querySelector('.js-mount') as HTMLElement
+        const introLogo = intro.querySelector('.js-intro-logo') as HTMLElement
+        const borderTop = intro.querySelector('.js-border-top') as HTMLElement
+        const borderLeft = intro.querySelector('.js-border-left') as HTMLElement
+        const borderRight = intro.querySelector(
+          '.js-border-right',
+        ) as HTMLElement
+
+        const tl = gsap.timeline()
+        tl.set(wrapper, { opacity: '' })
+        tl.set(intro, { background: 'transparent' })
+        tl.fromTo(
+          introLogo,
+          { scale: 0.8, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 1.5, ease: 'expo.out' },
+          0,
+        )
+        tl.to(
+          introLogo,
+          { opacity: 0, scale: 1.1, duration: 0.8, ease: 'power2.in' },
+          2.5,
+        )
+        tl.from(borderTop, { scaleY: 0, duration: 3, ease: 'power3.inOut' }, 1)
+        tl.from(
+          [borderLeft, borderRight],
+          { scaleX: 0, duration: 3, ease: 'power3.inOut' },
+          1,
+        )
+        tl.call(
+          () => document.dispatchEvent(new CustomEvent('intro')),
+          null,
+          '-=1.85',
+        )
+        tl.call(
+          () => {
+            if (mount) mount.style.opacity = '1'
+            if (intro) intro.remove()
+            document.documentElement.classList.remove('is-scroll-blocked')
+            Ticker.nextTick(() => Emitter.emit('updateViewport'))
+          },
+          null,
+          5,
+        )
+      }
+    }
+
+    const site = new Site()
+    if (document.readyState === 'loading')
+      document.addEventListener('DOMContentLoaded', site.init, { once: true })
+    else site.init()
+  </script>
+</html>
