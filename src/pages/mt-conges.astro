@@ -1,18 +1,35 @@
 ---
+import SiteHead from '../components/SiteHead.astro'
+import SiteFoot from '../components/SiteFoot.astro'
+import SiteScrollbar from '../components/SiteScrollbar.astro'
+import logo from '../assets/logo.png'
 import '../styles/global.scss'
+
+import vid1 from '../assets/works/Pen-4.mp4'
+import vid2 from '../assets/works/Pen-5.mp4'
+import vid3 from '../assets/works/Pen-6.mp4'
 
 const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
 ---
 
-<html lang="fr" class="theme-contrasted">
+<html lang="fr" class="is-scroll-blocked theme-contrasted">
   <head>
     <meta charset="utf-8" />
     <title>MT-CONGÉS | Architecture Java & Sécurité</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/png" href="/icons/favicon-48x48.png" />
+
+    <!-- Fonts from index.astro -->
     <link
       rel="preload"
       href="/fonts/PPEditorialNew-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="/fonts/PPEditorialNew-Ultralight.woff2"
       as="font"
       type="font/woff2"
       crossorigin="anonymous"
@@ -24,24 +41,25 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
       type="font/woff2"
       crossorigin="anonymous"
     />
+    <link
+      rel="preload"
+      href="/fonts/PPFraktionMono-Bold.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="/fonts/Bigger-Display.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+
     <style lang="scss" define:vars={{ bgImage }}>
       @import url('https://fonts.googleapis.com/css2?family=Italiana&display=swap');
 
-      @font-face {
-        font-family: 'Editorial New';
-        src: url('/fonts/PPEditorialNew-Regular.woff2') format('woff2');
-        font-weight: normal;
-        font-style: normal;
-        font-display: swap;
-      }
-      @font-face {
-        font-family: 'PP Fraktion Mono';
-        src: url('/fonts/PPFraktionMono-Regular.woff2') format('woff2');
-        font-weight: normal;
-        font-style: normal;
-        font-display: swap;
-      }
-
+      /* Custom Styles for MT-Conges */
       :root {
         --color-bg: #001220;
         --color-text: #e0f7fa;
@@ -61,7 +79,8 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
         --glass-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
       }
 
-      :global(body) {
+      /* Apply background to a specific container instead of body global */
+      .mt-conges-container {
         margin: 0;
         background-color: var(--color-bg);
         color: var(--color-text);
@@ -75,6 +94,7 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
         background-position: center;
         background-attachment: fixed;
         background-repeat: no-repeat;
+        padding-bottom: 4rem; /* Space for footer */
       }
 
       /* Animated Gradient Mesh (Optional subtle overlay) */
@@ -221,9 +241,9 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
         color: var(--color-accent);
       }
 
-      /* Navigation */
-      header {
-        position: fixed;
+      /* Navigation override */
+      header.mt-header {
+        position: absolute;
         width: 100%;
         padding: 2rem 3rem;
         display: flex;
@@ -455,7 +475,7 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
       /* CTA */
       .cta-wrapper {
         text-align: center;
-        padding: 10rem 0;
+        padding: 5rem 0;
 
         a {
           display: inline-block;
@@ -484,338 +504,886 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
           transform: translateY(0);
         }
       }
+
+      /* Video Section */
+      .video-showcase {
+        margin: 5rem 0;
+        text-align: center;
+      }
+      .video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+      }
+      .video-card {
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--glass-border);
+        background: var(--glass-bg);
+      }
+      .video-card video {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      /* Global Site styles needed for structure */
+      .site-wrapper {
+        position: relative;
+        z-index: 2;
+        background: map.get($theme-colors, 'default', 'primary');
+        /* Fallback if map not avail: */
+        background-color: #000;
+
+        /* Ensure it covers */
+        min-height: 100vh;
+      }
+
+      .site-intro {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 50;
+        width: 100%;
+        height: 100%;
+        background: #f40c3f; /* Primary red */
+
+        .sb-logo {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 16rem;
+          height: 16rem;
+          transform: translate3d(-50%, -50%, 0);
+        }
+
+        &__border {
+          position: absolute;
+          background: #000; /* Secondary */
+
+          &--top {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1rem;
+            transform-origin: 50% 0;
+          }
+          &--left {
+            top: 0;
+            left: 0;
+            width: 1rem;
+            height: 100%;
+            transform-origin: 0 50%;
+          }
+          &--right {
+            top: 0;
+            right: 0;
+            width: 1rem;
+            height: 100%;
+            transform-origin: 100% 50%;
+          }
+        }
+      }
+
+      .site-mount {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        border: 1rem solid #000;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .site-contrast-mask {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 20;
+        width: 100%;
+        height: 100%;
+        background: #f40c3f;
+        border-right: 1rem solid #000;
+        mix-blend-mode: darken;
+        transform: translate3d(-100%, 0, 0);
+        pointer-events: none;
+      }
     </style>
   </head>
 
   <body>
-    <div class="ambient-light"></div>
-    <div class="bubbles">
-      {/* 15 animated bubbles with random props */}
-      {
-        [...Array(15)].map(() => {
-          const size = 20 + Math.random() * 80
-          return (
+    <div class="site-wrapper js-site-wrapper" style="opacity: 0;">
+      <SiteHead />
+
+      <!-- MT Conges Container -->
+      <div class="mt-conges-container">
+        <div class="ambient-light"></div>
+        <div class="bubbles">
+          {
+            [...Array(15)].map(() => {
+              const size = 20 + Math.random() * 80
+              return (
+                <div
+                  class="bubble"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    width: `${size}px`,
+                    height: `${size}px`,
+                    '--duration': `${15 + Math.random() * 15}s`,
+                    '--sway': `${-20 + Math.random() * 40}px`,
+                  }}
+                />
+              )
+            })
+          }
+        </div>
+
+        <header class="mt-header">
+          <a href="/portfolio_bpa/">Paul Blanc ©24</a>
+          <div style="display: flex; gap: 2rem;">
+            <a href="https://github.com/Polochon06/mt-conges" target="_blank">
+              Source Code ↗
+            </a>
+          </div>
+        </header>
+
+        <main>
+          <section class="hero">
+            <div class="tag">Java Swing • MVC Architecture</div>
+            <h1>
+              <span>MT-Congés</span>
+            </h1>
+            <p>
+              Application de gestion des congés d'entreprise avec workflow de
+              validation multi-niveaux. <br />
+              Développée en Java Swing pour simplifier les demandes et validations
+              de congés au sein d'une entreprise.
+            </p>
+
             <div
-              class="bubble"
-              style={{
-                left: `${Math.random() * 100}%`,
-                width: `${size}px`,
-                height: `${size}px`,
-                '--duration': `${15 + Math.random() * 15}s`,
-                '--sway': `${-20 + Math.random() * 40}px`,
-              }}
-            />
-          )
+              class="glass-panel"
+              style="padding: 2rem; border-radius: 16px; margin-top: 3rem; max-width: 1200px; width: 100%; text-align: center;"
+            >
+              <img
+                src="/portfolio_bpa/images/works/mt-conges-login.png"
+                alt="Interface Login MT Conges"
+                class="showcase-img"
+                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: inline-block;"
+              />
+            </div>
+
+            <div class="scroll-indicator">SCROLL TO EXPLORE</div>
+          </section>
+
+          <div class="container">
+            <!-- Section: The Challenge -->
+            <div class="section-row">
+              <div class="section-content">
+                <div class="tag">Le Contexte</div>
+                <h2>Logiciel RH d'Entreprise</h2>
+                <p>
+                  MT-Congés est une application desktop développée dans le cadre
+                  d'un atelier de professionnalisation. Destinée à simplifier la
+                  gestion des congés en entreprise, elle propose <strong>
+                    trois profils utilisateurs distincts
+                  </strong> (Administrateur, Responsable, Employé) avec des fonctionnalités
+                  adaptées à chaque rôle métier.
+                </p>
+                <p>
+                  <strong>Fonctionnalités par profil :</strong><br />
+                  <strong>Employé :</strong> Sélection de dates via calendrier interactif,
+                  soumission de demandes avec motif facultatif, visualisation du solde
+                  de congés restant, signature électronique<br />
+                  <strong>Responsable :</strong> Validation/refus des demandes avec
+                  notification automatique, création d'événements, détection des congés
+                  simultanés, visualisation des demandes en attente<br />
+                  <strong>Administrateur :</strong> Création et suppression de comptes
+                  utilisateurs, gestion des rôles et permissions, recherche et tri
+                  d'utilisateurs, paramétrage système
+                </p>
+                <p>
+                  <strong>Système de notifications intégré :</strong> badge rouge
+                  avec compteur de notifications non lues, notifications automatiques
+                  lors de demandes/décisions, filtrage lues/non lues, marquage automatique
+                  à la lecture.
+                </p>
+              </div>
+              <div class="glass-panel">
+                <h3
+                  class="font-serif"
+                  style="font-size: 2rem; margin-bottom: 1.5rem;"
+                >
+                  Stack Technique
+                </h3>
+                <div class="tech-stack">
+                  <span>Java 17</span>
+                  <span>Java Swing (UI)</span>
+                  <span>MySQL 8.0</span>
+                  <span>JDBC & DAO Pattern</span>
+                  <span>BCrypt Encryption</span>
+                  <span>MVC Architecture</span>
+                  <span>Git</span>
+                </div>
+                <div
+                  style="margin-top: 2rem; font-size: 1.1rem; line-height: 1.8;"
+                >
+                  <span style="display:block; margin-bottom:0.5rem;">
+                    🗄️ <strong>Base de données:</strong> 7 tables relationnelles
+                  </span>
+                  <span style="display:block; margin-bottom:0.5rem;">
+                    🔒 <strong>Sécurité:</strong> PreparedStatements + BCrypt
+                  </span>
+                  <span style="display:block; margin-bottom:0.5rem;">
+                    👥 <strong>Rôles:</strong> 4 niveaux de permissions (RBAC)
+                  </span>
+                  <span style="display:block;">
+                    🔔 <strong>Notifications:</strong> Système d'alertes intégré
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section: Architecture -->
+            <div class="section-row reversed">
+              <div class="section-content">
+                <div class="tag">Architecture</div>
+                <h2>Architecture & Technologies</h2>
+                <p>
+                  L'application repose sur une <strong>
+                    architecture MVC stricte
+                  </strong> développée en
+                  <strong>Java SE-22</strong> avec interface graphique Swing. La base
+                  de données MySQL 8.0 comprend 7 tables interconnectées : utilisateur,
+                  demandeconge, role, projet, projet_utilisateur, notification et
+                  evenement.
+                </p>
+                <p>
+                  <strong>Workflow de validation :</strong><br />
+                  1. L'employé soumet une demande via le calendrier interactif<br
+                  />
+                  2. Une notification est automatiquement créée pour le responsable<br
+                  />
+                  3. Le responsable valide ou refuse avec notification à l'employé<br
+                  />
+                  4. Le solde de congés est automatiquement mis à jour après acceptation<br
+                  />
+                  5. Détection automatique des conflits entre demandes simultanées
+                </p>
+                <p>
+                  <strong>Sécurité & Performance :</strong><br />
+                  • Hachage des mots de passe avec BCrypt<br />
+                  • PreparedStatements JDBC pour prévenir les injections SQL<br
+                  />
+                  • Vérification des permissions selon les rôles (RBAC)<br />
+                  • Gestion des erreurs de connexion à la base de données<br />
+                  • SessionManager singleton pour les sessions utilisateur<br />
+                  • Interfaces adaptatives selon le profil connecté
+                </p>
+              </div>
+              <div
+                class="glass-panel"
+                style="font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.7;"
+              >
+                <div style="opacity: 0.7; margin-bottom: 1rem;">
+                  -- Schéma Base de Données (adpv1)
+                </div>
+
+                <div style="color: #64ffda;">📊 utilisateur</div>
+                <div
+                  style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;"
+                >
+                  IdUtilisateur, NomUtilisateur, Nom, Prénom<br />
+                  Email, MotDePasse (BCrypt)<br />
+                  NombreCongeRestant (défaut: 30 jours)<br />
+                  IdRole, IdProjet
+                </div>
+
+                <div style="color: #64ffda; margin-top: 1rem;">
+                  📝 demandeconge
+                </div>
+                <div
+                  style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;"
+                >
+                  IdConge, DureeConge, DateDebutConge<br />
+                  EtatConge (En attente / Validé / Refusé)<br />
+                  Motif, IdUtilisateur (FK CASCADE)
+                </div>
+
+                <div style="color: #64ffda; margin-top: 1rem;">👥 role</div>
+                <div
+                  style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;"
+                >
+                  IdRole, NomRole, Permission (1-4)<br />
+                  Super-Admin, Admin, Responsable, Employé
+                </div>
+
+                <div style="color: #64ffda; margin-top: 1rem;">
+                  🔔 notification
+                </div>
+                <div
+                  style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;"
+                >
+                  IdNotification, Message, Statut<br />
+                  DateCreation, DateLecture<br />
+                  Liens: IdEvenement, IdConge, IdUtilisateur
+                </div>
+
+                <div style="color: #64ffda; margin-top: 1rem;">
+                  🏢 projet + projet_utilisateur
+                </div>
+                <div
+                  style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;"
+                >
+                  Projets: CNP, Cyber<br />
+                  Association many-to-many<br />
+                  Flag est_responsable (booléen)
+                </div>
+              </div>
+            </div>
+
+            <!-- Section: Deep Dive (Grid) -->
+            <div style="margin: 10rem 0;">
+              <div style="text-align: center; margin-bottom: 4rem;">
+                <div class="tag">Problèmes & Solutions</div>
+                <h2 class="font-serif" style="font-size: 3.5rem;">
+                  Ingénierie Logicielle
+                </h2>
+              </div>
+
+              <div class="challenges-grid">
+                <div class="challenge-card">
+                  <span class="badge problem">Sécurité</span>
+                  <h3>Protection contre les Injections SQL</h3>
+                  <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
+                    Les données RH (emails, mots de passe, soldes de congés)
+                    sont sensibles. Une seule faille d'injection SQL pourrait
+                    compromettre l'intégralité de la base.
+                  </p>
+                  <div
+                    style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
+                  >
+                    <span class="badge solution">Solution</span>
+                    <p style="opacity:0.8; font-size:0.9rem;">
+                      Utilisation <strong>exclusive</strong> de PreparedStatements
+                      JDBC pour toutes les requêtes. Mots de passe chiffrés avec BCrypt.
+                      Validation stricte des entrées utilisateur en amont.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="challenge-card">
+                  <span class="badge problem">Architecture</span>
+                  <h3>Système RBAC à 4 Niveaux</h3>
+                  <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
+                    Gérer un système de permissions Role-Based Access Control
+                    avec 4 niveaux différents : Super-Admin, Admin, Responsable
+                    de projet et Employé standard.
+                  </p>
+                  <div
+                    style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
+                  >
+                    <span class="badge solution">Solution</span>
+                    <p style="opacity:0.8; font-size:0.9rem;">
+                      Table <strong>role</strong> avec colonne Permission (1-4). SessionManager
+                      singleton pour la gestion de session. Interfaces Swing adaptatives
+                      selon le rôle connecté. Contrôles d'accès au niveau DAO.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="challenge-card">
+                  <span class="badge problem">Data Integrity</span>
+                  <h3>Cohérence Multi-Tables</h3>
+                  <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
+                    Maintenir l'intégrité référentielle entre 7 tables
+                    interconnectées. Empêcher les chevauchements de congés et
+                    les soldes négatifs.
+                  </p>
+                  <div
+                    style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
+                  >
+                    <span class="badge solution">Solution</span>
+                    <p style="opacity:0.8; font-size:0.9rem;">
+                      Contraintes SQL : DELETE CASCADE sur clés étrangères,
+                      contraintes UNIQUE sur projet-utilisateur, indices
+                      optimisés. Validation métier côté Java avant insertion.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="challenge-card">
+                  <span class="badge problem">UX</span>
+                  <h3>Système de Notifications</h3>
+                  <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
+                    Créer un système de notifications automatique avec compteur
+                    visuel (badge rouge), génération lors de demandes/décisions,
+                    marquage à la lecture, et filtrage lues/non lues.
+                  </p>
+                  <div
+                    style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
+                  >
+                    <span class="badge solution">Solution</span>
+                    <p style="opacity:0.8; font-size:0.9rem;">
+                      Table <strong>notification</strong> avec statut (ouvert/non-ouvert),
+                      timestamps (création/lecture), liens contextuels (événement/congé/utilisateur).
+                      Badge UI affichant le nombre de notifications non lues. Système
+                      d'onglets pour filtrage.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- VIDEO SECTION -->
+            <div class="video-showcase">
+              <div class="tag">Mes Edits</div>
+              <h2 class="font-serif" style="font-size: 3rem; color: #fff;">
+                Showcase Vidéo
+              </h2>
+              <div class="video-grid">
+                <div class="video-card">
+                  <video src={vid1} controls loop muted playsinline></video>
+                </div>
+                <div class="video-card">
+                  <video src={vid2} controls loop muted playsinline></video>
+                </div>
+                <div class="video-card">
+                  <video src={vid3} controls loop muted playsinline></video>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats -->
+            <div
+              class="glass-panel"
+              style="text-align:center; padding: 4rem 2rem;"
+            >
+              <h2
+                class="font-serif"
+                style="font-size: 2.5rem; margin-bottom: 2rem;"
+              >
+                Impact du Projet
+              </h2>
+              <div class="stats-container">
+                <div>
+                  <h3>7</h3>
+                  <span>Tables SQL</span>
+                </div>
+                <div>
+                  <h3>4</h3>
+                  <span>Niveaux Rôles</span>
+                </div>
+                <div>
+                  <h3>100%</h3>
+                  <span>PreparedStatements</span>
+                </div>
+                <div>
+                  <h3>3</h3>
+                  <span>Mois Projet</span>
+                </div>
+              </div>
+              <div
+                style="margin-top: 3rem; font-family: var(--font-mono); font-size: 0.9rem; opacity: 0.7; line-height: 1.8;"
+              >
+                <p>📊 Architecture: MVC Strict + DAO Pattern + Java Swing UI</p>
+                <p>🔐 Sécurité: BCrypt Hash + PreparedStatements + RBAC</p>
+                <p>
+                  🔔 Features: Workflow Validation + Notifications + Calendrier
+                  Interactif
+                </p>
+                <p>
+                  👥 Profils: Administrateur, Responsable, Employé (permissions
+                  adaptatives)
+                </p>
+                <p>
+                  🎓 Contexte: Atelier de Professionnalisation BTS SIO (Équipe
+                  de 4)
+                </p>
+              </div>
+            </div>
+
+            <div class="cta-wrapper">
+              <a href="/portfolio_bpa/">← Retour au Portfolio</a>
+            </div>
+          </div>
+        </main>
+      </div>
+
+      <SiteFoot />
+    </div><!-- .site-wrapper -->
+
+    <div
+      class="site-intro js-intro"
+      style="opacity: 1; position: fixed; top: 0; left: 0; z-index: 50; width: 100%; height: 100%; background: #F40C3F;"
+    >
+      <div class="sb-logo js-logo">
+        <img
+          src={logo.src}
+          alt="Paul Blanc"
+          class="js-intro-logo"
+          style="width: 100%; height: 100%; object-fit: contain;"
+        />
+      </div><!-- .sb-logo -->
+
+      <div class="site-intro__border site-intro__border--top js-border-top">
+      </div>
+      <div class="site-intro__border site-intro__border--left js-border-left">
+      </div>
+      <div class="site-intro__border site-intro__border--right js-border-right">
+      </div>
+    </div><!-- .site-intro -->
+
+    <div class="site-mount js-mount"></div>
+    <div class="site-contrast-mask js-contrast-mask"></div>
+
+    <SiteScrollbar />
+  </body>
+
+  <script>
+    import Emitter from '../utils/Emitter'
+    import Ticker from '../utils/Ticker'
+    import Lenis from 'lenis'
+    import { gsap } from 'gsap'
+    import { ScrollTrigger } from 'gsap/ScrollTrigger'
+    gsap.registerPlugin(ScrollTrigger)
+
+    declare global {
+      interface Window {
+        safeWidth: number
+        safeHeight: number
+        maxScrollTop: number
+        scrollProgress: number
+        lenis: any
+      }
+    }
+
+    class Site {
+      timeouts: any = {
+        resizeThrottle: null,
+      }
+
+      windowWidth: number
+      windowHeight: number
+      clientWidth: number
+      clientHeight: number
+
+      isScrolling: boolean = false
+
+      lenis: any
+
+      /**
+       * Constructor
+       */
+      constructor() {
+        // OS class
+        let os = 'unknown'
+        if (navigator.userAgent.indexOf('Win') !== -1) {
+          os = 'windows'
+        } else if (navigator.userAgent.indexOf('Android') !== -1) {
+          os = 'android'
+        } else if (navigator.userAgent.indexOf('Mac') !== -1) {
+          os = 'mac'
+        } else if (navigator.userAgent.indexOf('Linux') !== -1) {
+          os = 'linux'
+        }
+        document.documentElement.classList.add(`is-${os}`)
+
+        // Browser class
+        let browser = 'unknown'
+        if (navigator.userAgent.indexOf('Firefox') !== -1) {
+          browser = 'firefox'
+        } else if (navigator.userAgent.indexOf('Chrome') !== -1) {
+          browser = 'chrome'
+        } else if (navigator.userAgent.indexOf('Safari') !== -1) {
+          browser = 'safari'
+        }
+        document.documentElement.classList.add(`is-${browser}`)
+
+        this.bindEvents()
+      }
+
+      /**
+       * Initialization
+       */
+      init() {
+        this.initLenis()
+
+        Ticker.init()
+
+        this.onResize()
+        Ticker.nextTick(this.intro, this)
+      }
+
+      /**
+       * Bind events
+       */
+      bindEvents() {
+        window.addEventListener('resize', this.resizeThrottle.bind(this))
+        window.addEventListener('scroll', this.onScroll.bind(this), {
+          passive: true,
+        })
+        window.addEventListener('mousemove', this.onMouseMove.bind(this), {
+          passive: true,
+        })
+
+        Emitter.on('updateViewport', this.onResize, this, true)
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              entry.target.dispatchEvent(
+                new CustomEvent('intersect', {
+                  detail: { isIntersecting: entry.isIntersecting },
+                }),
+              )
+
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-in-view')
+                entry.target.classList.remove(
+                  'is-out-of-view',
+                  'is-out-of-view-top',
+                  'is-out-of-view-bottom',
+                )
+              } else {
+                entry.target.classList.remove('is-in-view')
+                entry.target.classList.add('is-out-of-view')
+
+                entry.target.classList.toggle(
+                  'is-out-of-view-top',
+                  entry.boundingClientRect.top < 0,
+                )
+                entry.target.classList.toggle(
+                  'is-out-of-view-bottom',
+                  entry.boundingClientRect.top > 0,
+                )
+              }
+            })
+          },
+          {
+            threshold: 0,
+          },
+        )
+
+        document.querySelectorAll('[data-intersect]').forEach((el) => {
+          observer.observe(el)
+        })
+
+        // Site loaded event
+        if (document.readyState === 'complete') {
+          this.siteLoaded()
+        } else {
+          window.addEventListener('load', this.siteLoaded, { once: true })
+        }
+
+        this.onScroll()
+      }
+
+      /**
+       * Init lenis
+       */
+      initLenis() {
+        // Only valid if wrapper matches standard flow
+        const lenis = new Lenis()
+
+        lenis.on('scroll', ScrollTrigger.update)
+
+        gsap.ticker.add((time) => {
+          lenis.raf(time * 1000)
+        })
+
+        gsap.ticker.lagSmoothing(0)
+
+        window.lenis = lenis
+        this.lenis = lenis
+      }
+
+      /**
+       * Set loaded class
+       */
+      siteLoaded() {
+        document.documentElement.classList.add('is-loaded')
+
+        Emitter.emit('siteLoaded')
+      }
+
+      /**
+       * Resize throttle
+       */
+      resizeThrottle() {
+        clearTimeout(this.timeouts.resizeThrottle)
+
+        this.timeouts.resizeThrottle = setTimeout(() => {
+          Ticker.nextTick(this.onResize, this)
+        }, 200)
+      }
+
+      /**
+       * Resize handler
+       */
+      onResize() {
+        const newWidth = window.innerWidth
+        let widthChanged = false
+        if (this.windowWidth !== newWidth) {
+          if (this.windowWidth !== undefined) {
+            widthChanged = true
+          }
+
+          this.windowWidth = newWidth
+          this.clientWidth = document.body.clientWidth
+        }
+
+        const newHeight = window.innerHeight
+        let heightChanged = false
+        if (this.windowHeight !== newHeight) {
+          if (this.windowHeight !== undefined) {
+            heightChanged = true
+          }
+
+          this.windowHeight = newHeight
+          this.clientHeight = document.body.clientHeight
+        }
+
+        window.safeWidth = newWidth
+        window.safeHeight = newHeight
+
+        window.maxScrollTop = document.body.scrollHeight - window.safeHeight
+
+        this.setScrollProgress()
+
+        Emitter.emit('resize', widthChanged, heightChanged)
+      }
+
+      /**
+       * Scroll handler
+       */
+      onScroll() {
+        this.setScrollProgress()
+
+        Ticker.nextTick(() => {
+          Emitter.emit('scroll', window.scrollY)
         })
       }
-    </div>
 
-    <header>
-      <a href="/portfolio_bpa/">Paul Blanc ©24</a>
-      <div style="display: flex; gap: 2rem;">
-        <a href="https://github.com/Polochon06/mt-conges" target="_blank">
-          Source Code ↗
-        </a>
-      </div>
-    </header>
+      /**
+       * Set scroll progress
+       */
+      setScrollProgress() {
+        window.scrollProgress = window.scrollY / window.maxScrollTop
+      }
 
-    <main>
-      <section class="hero">
-        <div class="tag">Java Swing • MVC Architecture</div>
-        <h1>
-          <span>MT-Congés</span>
-        </h1>
-        <p>
-          Application de gestion des congés d'entreprise avec workflow de validation multi-niveaux. <br />
-          Développée en Java Swing pour simplifier les demandes et validations de congés au sein d'une entreprise.
-        </p>
+      /**
+       * Mouse move handler
+       */
+      onMouseMove(e) {
+        Emitter.emit('mousemove', e.clientX, e.clientY)
+      }
 
-        <div
-          class="glass-panel"
-          style="padding: 2rem; border-radius: 16px; margin-top: 3rem; max-width: 1200px; width: 100%; text-align: center;"
-        >
-          <img
-            src="/portfolio_bpa/images/works/mt-conges-login.png"
-            alt="Interface Login MT Conges"
-            class="showcase-img"
-            style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: inline-block;"
-          />
-        </div>
+      /**
+       * Intro
+       */
+      intro() {
+        // Selectors
+        const wrapper: HTMLElement = document.querySelector('.js-site-wrapper')
+        const intro: HTMLElement = document.querySelector('.js-intro')
+        const mount: HTMLElement = document.querySelector('.js-mount')
+        const introLogo: HTMLElement = intro.querySelector('.js-intro-logo')
+        const borderTop: HTMLElement = intro.querySelector('.js-border-top')
+        const borderLeft: HTMLElement = intro.querySelector('.js-border-left')
+        const borderRight: HTMLElement = intro.querySelector('.js-border-right')
 
-        <div class="scroll-indicator">SCROLL TO EXPLORE</div>
-      </section>
+        // Timeline
+        const tl = gsap.timeline()
 
-      <div class="container">
-        <!-- Section: The Challenge -->
-        <div class="section-row">
-          <div class="section-content">
-            <div class="tag">Le Contexte</div>
-            <h2>Logiciel RH d'Entreprise</h2>
-            <p>
-              MT-Congés est une application desktop développée dans le cadre d'un atelier de professionnalisation.
-              Destinée à simplifier la gestion des congés en entreprise, elle propose <strong>trois profils
-              utilisateurs distincts</strong> (Administrateur, Responsable, Employé) avec des fonctionnalités
-              adaptées à chaque rôle métier.
-            </p>
-            <p>
-              <strong>Fonctionnalités par profil :</strong><br/>
-              <strong>Employé :</strong> Sélection de dates via calendrier interactif, soumission de demandes
-              avec motif facultatif, visualisation du solde de congés restant, signature électronique<br/>
-              <strong>Responsable :</strong> Validation/refus des demandes avec notification automatique,
-              création d'événements, détection des congés simultanés, visualisation des demandes en attente<br/>
-              <strong>Administrateur :</strong> Création et suppression de comptes utilisateurs, gestion
-              des rôles et permissions, recherche et tri d'utilisateurs, paramétrage système
-            </p>
-            <p>
-              <strong>Système de notifications intégré :</strong> badge rouge avec compteur de notifications
-              non lues, notifications automatiques lors de demandes/décisions, filtrage lues/non lues,
-              marquage automatique à la lecture.
-            </p>
-          </div>
-          <div class="glass-panel">
-            <h3
-              class="font-serif"
-              style="font-size: 2rem; margin-bottom: 1.5rem;"
-            >
-              Stack Technique
-            </h3>
-            <div class="tech-stack">
-              <span>Java 17</span>
-              <span>Java Swing (UI)</span>
-              <span>MySQL 8.0</span>
-              <span>JDBC & DAO Pattern</span>
-              <span>BCrypt Encryption</span>
-              <span>MVC Architecture</span>
-              <span>Git</span>
-            </div>
-            <div style="margin-top: 2rem; font-size: 1.1rem; line-height: 1.8;">
-              <span style="display:block; margin-bottom:0.5rem;">
-                🗄️ <strong>Base de données:</strong> 7 tables relationnelles
-              </span>
-              <span style="display:block; margin-bottom:0.5rem;">
-                🔒 <strong>Sécurité:</strong> PreparedStatements + BCrypt
-              </span>
-              <span style="display:block; margin-bottom:0.5rem;">
-                👥 <strong>Rôles:</strong> 4 niveaux de permissions (RBAC)
-              </span>
-              <span style="display:block;">
-                🔔 <strong>Notifications:</strong> Système d'alertes intégré
-              </span>
-            </div>
-          </div>
-        </div>
+        tl.set(wrapper, {
+          opacity: '',
+        })
 
-        <!-- Section: Architecture -->
-        <div class="section-row reversed">
-          <div class="section-content">
-            <div class="tag">Architecture</div>
-            <h2>Architecture & Technologies</h2>
-            <p>
-              L'application repose sur une <strong>architecture MVC stricte</strong> développée en
-              <strong>Java SE-22</strong> avec interface graphique Swing. La base de données MySQL 8.0
-              comprend 7 tables interconnectées : utilisateur, demandeconge, role, projet,
-              projet_utilisateur, notification et evenement.
-            </p>
-            <p>
-              <strong>Workflow de validation :</strong><br/>
-              1. L'employé soumet une demande via le calendrier interactif<br/>
-              2. Une notification est automatiquement créée pour le responsable<br/>
-              3. Le responsable valide ou refuse avec notification à l'employé<br/>
-              4. Le solde de congés est automatiquement mis à jour après acceptation<br/>
-              5. Détection automatique des conflits entre demandes simultanées
-            </p>
-            <p>
-              <strong>Sécurité & Performance :</strong><br/>
-              • Hachage des mots de passe avec BCrypt<br/>
-              • PreparedStatements JDBC pour prévenir les injections SQL<br/>
-              • Vérification des permissions selon les rôles (RBAC)<br/>
-              • Gestion des erreurs de connexion à la base de données<br/>
-              • SessionManager singleton pour les sessions utilisateur<br/>
-              • Interfaces adaptatives selon le profil connecté
-            </p>
-          </div>
-          <div
-            class="glass-panel"
-            style="font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.7;"
-          >
-            <div style="opacity: 0.7; margin-bottom: 1rem;">-- Schéma Base de Données (adpv1)</div>
+        tl.set(intro, {
+          background: 'transparent',
+        })
 
-            <div style="color: #64ffda;">📊 utilisateur</div>
-            <div style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;">
-              IdUtilisateur, NomUtilisateur, Nom, Prénom<br/>
-              Email, MotDePasse (BCrypt)<br/>
-              NombreCongeRestant (défaut: 30 jours)<br/>
-              IdRole, IdProjet
-            </div>
+        tl.fromTo(
+          introLogo,
+          {
+            scale: 0.8,
+            opacity: 0,
+          },
+          {
+            scale: 1,
+            opacity: 1,
+            duration: 1.5,
+            ease: 'expo.out',
+          },
+          0,
+        )
 
-            <div style="color: #64ffda; margin-top: 1rem;">📝 demandeconge</div>
-            <div style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;">
-              IdConge, DureeConge, DateDebutConge<br/>
-              EtatConge (En attente / Validé / Refusé)<br/>
-              Motif, IdUtilisateur (FK CASCADE)
-            </div>
+        tl.to(
+          introLogo,
+          {
+            opacity: 0,
+            scale: 1.1,
+            duration: 0.8,
+            ease: 'power2.in',
+          },
+          2.5,
+        )
 
-            <div style="color: #64ffda; margin-top: 1rem;">👥 role</div>
-            <div style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;">
-              IdRole, NomRole, Permission (1-4)<br/>
-              Super-Admin, Admin, Responsable, Employé
-            </div>
+        tl.from(
+          borderTop,
+          {
+            scaleY: 0,
+            duration: 3,
+            ease: 'power3.inOut',
+          },
+          1,
+        )
 
-            <div style="color: #64ffda; margin-top: 1rem;">🔔 notification</div>
-            <div style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;">
-              IdNotification, Message, Statut<br/>
-              DateCreation, DateLecture<br/>
-              Liens: IdEvenement, IdConge, IdUtilisateur
-            </div>
+        tl.from(
+          [borderLeft, borderRight],
+          {
+            scaleX: 0,
+            duration: 3,
+            ease: 'power3.inOut',
+          },
+          1,
+        )
 
-            <div style="color: #64ffda; margin-top: 1rem;">🏢 projet + projet_utilisateur</div>
-            <div style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;">
-              Projets: CNP, Cyber<br/>
-              Association many-to-many<br/>
-              Flag est_responsable (booléen)
-            </div>
-          </div>
-        </div>
+        tl.call(
+          () => {
+            document.dispatchEvent(new CustomEvent('intro'))
+          },
+          null,
+          '-=1.85',
+        )
 
-        <!-- Section: Deep Dive (Grid) -->
-        <div style="margin: 10rem 0;">
-          <div style="text-align: center; margin-bottom: 4rem;">
-            <div class="tag">Problèmes & Solutions</div>
-            <h2 class="font-serif" style="font-size: 3.5rem;">
-              Ingénierie Logicielle
-            </h2>
-          </div>
+        tl.call(
+          () => {
+            // Check if mount exists (it should)
+            if (mount) mount.style.opacity = '1'
+            if (intro) intro.remove()
 
-          <div class="challenges-grid">
-            <div class="challenge-card">
-              <span class="badge problem">Sécurité</span>
-              <h3>Protection contre les Injections SQL</h3>
-              <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
-                Les données RH (emails, mots de passe, soldes de congés) sont sensibles.
-                Une seule faille d'injection SQL pourrait compromettre l'intégralité de la base.
-              </p>
-              <div
-                style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
-              >
-                <span class="badge solution">Solution</span>
-                <p style="opacity:0.8; font-size:0.9rem;">
-                  Utilisation <strong>exclusive</strong> de PreparedStatements JDBC pour toutes
-                  les requêtes. Mots de passe chiffrés avec BCrypt. Validation stricte des
-                  entrées utilisateur en amont.
-                </p>
-              </div>
-            </div>
+            document.documentElement.classList.remove('is-scroll-blocked')
 
-            <div class="challenge-card">
-              <span class="badge problem">Architecture</span>
-              <h3>Système RBAC à 4 Niveaux</h3>
-              <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
-                Gérer un système de permissions Role-Based Access Control avec 4 niveaux
-                différents : Super-Admin, Admin, Responsable de projet et Employé standard.
-              </p>
-              <div
-                style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
-              >
-                <span class="badge solution">Solution</span>
-                <p style="opacity:0.8; font-size:0.9rem;">
-                  Table <strong>role</strong> avec colonne Permission (1-4). SessionManager
-                  singleton pour la gestion de session. Interfaces Swing adaptatives selon
-                  le rôle connecté. Contrôles d'accès au niveau DAO.
-                </p>
-              </div>
-            </div>
+            Ticker.nextTick(() => {
+              Emitter.emit('updateViewport')
+            })
+          },
+          null,
+          5,
+        )
+      }
+    }
 
-            <div class="challenge-card">
-              <span class="badge problem">Data Integrity</span>
-              <h3>Cohérence Multi-Tables</h3>
-              <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
-                Maintenir l'intégrité référentielle entre 7 tables interconnectées.
-                Empêcher les chevauchements de congés et les soldes négatifs.
-              </p>
-              <div
-                style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
-              >
-                <span class="badge solution">Solution</span>
-                <p style="opacity:0.8; font-size:0.9rem;">
-                  Contraintes SQL : DELETE CASCADE sur clés étrangères, contraintes UNIQUE
-                  sur projet-utilisateur, indices optimisés. Validation métier côté Java
-                  avant insertion.
-                </p>
-              </div>
-            </div>
+    const site = new Site()
 
-            <div class="challenge-card">
-              <span class="badge problem">UX</span>
-              <h3>Système de Notifications</h3>
-              <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
-                Créer un système de notifications automatique avec compteur visuel (badge rouge),
-                génération lors de demandes/décisions, marquage à la lecture, et filtrage lues/non lues.
-              </p>
-              <div
-                style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
-              >
-                <span class="badge solution">Solution</span>
-                <p style="opacity:0.8; font-size:0.9rem;">
-                  Table <strong>notification</strong> avec statut (ouvert/non-ouvert), timestamps
-                  (création/lecture), liens contextuels (événement/congé/utilisateur). Badge UI
-                  affichant le nombre de notifications non lues. Système d'onglets pour filtrage.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="glass-panel" style="text-align:center; padding: 4rem 2rem;">
-          <h2
-            class="font-serif"
-            style="font-size: 2.5rem; margin-bottom: 2rem;"
-          >
-            Impact du Projet
-          </h2>
-          <div class="stats-container">
-            <div>
-              <h3>7</h3>
-              <span>Tables SQL</span>
-            </div>
-            <div>
-              <h3>4</h3>
-              <span>Niveaux Rôles</span>
-            </div>
-            <div>
-              <h3>100%</h3>
-              <span>PreparedStatements</span>
-            </div>
-            <div>
-              <h3>3</h3>
-              <span>Mois Projet</span>
-            </div>
-          </div>
-          <div style="margin-top: 3rem; font-family: var(--font-mono); font-size: 0.9rem; opacity: 0.7; line-height: 1.8;">
-            <p>📊 Architecture: MVC Strict + DAO Pattern + Java Swing UI</p>
-            <p>🔐 Sécurité: BCrypt Hash + PreparedStatements + RBAC</p>
-            <p>🔔 Features: Workflow Validation + Notifications + Calendrier Interactif</p>
-            <p>👥 Profils: Administrateur, Responsable, Employé (permissions adaptatives)</p>
-            <p>🎓 Contexte: Atelier de Professionnalisation BTS SIO (Équipe de 4)</p>
-          </div>
-        </div>
-
-        <!-- CTA -->
-        <section class="cta-wrapper">
-          <h2 class="font-serif" style="margin-bottom: 2rem; font-size: 3rem;">
-            Explorer le Code Source
-          </h2>
-          <a href="https://github.com/Polochon06/mt-conges" target="_blank">
-            Voir le dépôt GitHub ↗
-          </a>
-        </section>
-      </div>
-    </main>
-
-    <footer
-      style="text-align: center; padding: 2rem; opacity: 0.4; font-family: var(--font-mono); font-size: 0.8rem;"
-    >
-      DEVELOPED BY PAUL BLANC • 2024
-    </footer>
-  </body>
+    // Site init on DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', site.init, { once: true })
+    } else {
+      site.init()
+    }
+  </script>
 </html>
