@@ -759,8 +759,13 @@ const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
     }
 
     const site = new Site()
-    if (document.readyState === 'loading')
-      document.addEventListener('DOMContentLoaded', site.init, { once: true })
-    else site.init()
+    // Site init on DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => site.init(), {
+        once: true,
+      })
+    } else {
+      site.init()
+    }
   </script>
 </html>
