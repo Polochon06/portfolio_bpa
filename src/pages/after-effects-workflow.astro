@@ -2,11 +2,10 @@
 import SiteHead from '../components/SiteHead.astro'
 import SiteFoot from '../components/SiteFoot.astro'
 import SiteScrollbar from '../components/SiteScrollbar.astro'
-import logo from '../assets/logo.png'
 import '../styles/global.scss'
 ---
 
-<html lang="fr" class="is-scroll-blocked theme-contrasted">
+<html lang="fr" class="theme-contrasted">
   <head>
     <meta charset="utf-8" />
     <title>After Effects Workflow | Paul Blanc</title>
@@ -61,10 +60,8 @@ import '../styles/global.scss'
         --ae-bg: #0a0a0f;
         --ae-text: #e8e8f0;
         --ae-text-muted: #a0a0b8;
-        --ae-accent: #f40c3f;
-        --ae-accent-dim: rgba(244, 12, 63, 0.12);
-        --ae-purple: #9b59b6;
-        --ae-purple-dim: rgba(155, 89, 182, 0.15);
+        --ae-accent: #9b59b6;
+        --ae-accent-dim: rgba(155, 89, 182, 0.12);
 
         --font-serif: 'Italiana', serif;
         --font-mono: 'PP Fraktion Mono', monospace;
@@ -98,7 +95,7 @@ import '../styles/global.scss'
         height: 100%;
         background:
           radial-gradient(circle at 20% 20%, rgba(155, 89, 182, 0.06), transparent 50%),
-          radial-gradient(circle at 80% 80%, rgba(244, 12, 63, 0.04), transparent 50%);
+          radial-gradient(circle at 80% 80%, rgba(155, 89, 182, 0.04), transparent 50%);
         pointer-events: none;
         z-index: 1;
       }
@@ -292,7 +289,7 @@ import '../styles/global.scss'
           font-family: var(--font-mono);
           font-size: 0.9rem;
           padding: 0.6rem 1.2rem;
-          border: 1px solid rgba(244, 12, 63, 0.25);
+          border: 1px solid rgba(155, 89, 182, 0.25);
           background: var(--ae-accent-dim);
           color: var(--ae-accent);
           border-radius: 50px;
@@ -344,8 +341,8 @@ import '../styles/global.scss'
           border-radius: 4px;
           margin-bottom: 0.75rem;
 
-          &.essential { background: rgba(244, 12, 63, 0.2); color: var(--ae-accent); }
-          &.creative { background: rgba(155, 89, 182, 0.2); color: var(--ae-purple); }
+          &.essential { background: rgba(155, 89, 182, 0.2); color: var(--ae-accent); }
+          &.creative { background: rgba(100, 200, 255, 0.2); color: #64c8ff; }
         }
 
         .plugin-category {
@@ -499,51 +496,11 @@ import '../styles/global.scss'
         background-color: #000;
         min-height: 100vh;
       }
-
-      .site-intro {
-        position: fixed;
-        top: 0; left: 0; z-index: 50;
-        width: 100%; height: 100%;
-        background: #f40c3f;
-        .sb-logo {
-          position: absolute;
-          top: 50%; left: 50%;
-          width: 16rem; height: 16rem;
-          transform: translate3d(-50%, -50%, 0);
-        }
-        &__border {
-          position: absolute;
-          background: #000;
-          &--top { top: 0; left: 0; width: 100%; height: 1rem; transform-origin: 50% 0; }
-          &--left { top: 0; left: 0; width: 1rem; height: 100%; transform-origin: 0 50%; }
-          &--right { top: 0; right: 0; width: 1rem; height: 100%; transform-origin: 100% 50%; }
-        }
-      }
-
-      .site-mount {
-        position: absolute;
-        top: 0; left: 0; z-index: 1;
-        width: 100%; height: 100%;
-        border: 1rem solid #000;
-        opacity: 0;
-        pointer-events: none;
-      }
-
-      .site-contrast-mask {
-        position: fixed;
-        top: 0; left: 0; z-index: 20;
-        width: 100%; height: 100%;
-        background: #f40c3f;
-        border-right: 1rem solid #000;
-        mix-blend-mode: darken;
-        transform: translate3d(-100%, 0, 0);
-        pointer-events: none;
-      }
     </style>
   </head>
 
   <body>
-    <div class="site-wrapper js-site-wrapper" style="opacity: 0;">
+    <div class="site-wrapper js-site-wrapper">
       <SiteHead />
 
       <main class="ae-page">
@@ -862,25 +819,6 @@ import '../styles/global.scss'
       <SiteFoot />
     </div>
 
-    <!-- Intro Overlays -->
-    <div
-      class="site-intro js-intro"
-      style="opacity: 1; position: fixed; top: 0; left: 0; z-index: 50; width: 100%; height: 100%; background: #F40C3F;"
-    >
-      <div class="sb-logo js-logo">
-        <img
-          src={logo.src}
-          alt="Paul Blanc"
-          class="js-intro-logo"
-          style="width: 100%; height: 100%; object-fit: contain;"
-        />
-      </div>
-      <div class="site-intro__border site-intro__border--top js-border-top"></div>
-      <div class="site-intro__border site-intro__border--left js-border-left"></div>
-      <div class="site-intro__border site-intro__border--right js-border-right"></div>
-    </div>
-    <div class="site-mount js-mount"></div>
-    <div class="site-contrast-mask js-contrast-mask"></div>
     <SiteScrollbar />
   </body>
 
@@ -932,7 +870,8 @@ import '../styles/global.scss'
         this.initLenis()
         Ticker.init()
         this.onResize()
-        Ticker.nextTick(this.intro, this)
+        document.dispatchEvent(new CustomEvent('intro'))
+        Ticker.nextTick(() => Emitter.emit('updateViewport'))
       }
 
       bindEvents() {
@@ -1020,34 +959,6 @@ import '../styles/global.scss'
         Emitter.emit('mousemove', e.clientX, e.clientY)
       }
 
-      intro() {
-        const wrapper = document.querySelector('.js-site-wrapper') as HTMLElement
-        const intro = document.querySelector('.js-intro') as HTMLElement
-        const mount = document.querySelector('.js-mount') as HTMLElement
-        const introLogo = intro.querySelector('.js-intro-logo') as HTMLElement
-        const borderTop = intro.querySelector('.js-border-top') as HTMLElement
-        const borderLeft = intro.querySelector('.js-border-left') as HTMLElement
-        const borderRight = intro.querySelector('.js-border-right') as HTMLElement
-
-        const tl = gsap.timeline()
-        tl.set(wrapper, { opacity: '' })
-        tl.set(intro, { background: 'transparent' })
-        tl.fromTo(introLogo, { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.5, ease: 'expo.out' }, 0)
-        tl.to(introLogo, { opacity: 0, scale: 1.1, duration: 0.8, ease: 'power2.in' }, 2.5)
-        tl.from(borderTop, { scaleY: 0, duration: 3, ease: 'power3.inOut' }, 1)
-        tl.from([borderLeft, borderRight], { scaleX: 0, duration: 3, ease: 'power3.inOut' }, 1)
-        tl.call(() => document.dispatchEvent(new CustomEvent('intro')), null, '-=1.85')
-        tl.call(
-          () => {
-            if (mount) mount.style.opacity = '1'
-            if (intro) intro.remove()
-            document.documentElement.classList.remove('is-scroll-blocked')
-            Ticker.nextTick(() => Emitter.emit('updateViewport'))
-          },
-          null,
-          5,
-        )
-      }
     }
 
     const site = new Site()
