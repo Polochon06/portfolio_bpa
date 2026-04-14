@@ -1,8 +1,6 @@
 ---
 import AWork from './AWork.astro'
 import dummyVideo from '/src/assets/works/Dummy.mp4'
-import mtCongesLoginImg from '../assets/works/mt-conges-login.png'
-import mtCongesDashboardImg from '../assets/works/mt-conges-dashboard.png'
 
 // Custom Project List for Paul Blanc
 const base = import.meta.env.BASE_URL
@@ -11,8 +9,8 @@ const myProjects = [
   {
     caption: 'MT-CONGÉS • Architecture Java',
     site: `${base}mt-conges`,
-    src: mtCongesLoginImg.src,
-    type: 'image',
+    src: dummyVideo,
+    type: 'video',
     description: `CONTEXTE: Projet scolaire (3 mois - 2024). Gestion efficace des congés et sécurité des données.
 TECH: Java 17, Swing, MySQL, MVC, DAO, Git.
 FONCTIONNALITÉS: Auth sécurisée, Rôles RBAC, Audit Logs.
@@ -21,8 +19,8 @@ DÉFIS: Sécurité (Injections SQL), Architecture (MVC), RGPD.`,
   {
     caption: 'GYMNOVA SHOP • E-Commerce React',
     site: `${base}gymnova`,
-    src: mtCongesDashboardImg.src,
-    type: 'image',
+    src: dummyVideo,
+    type: 'video',
     description: `CONTEXTE: Site e-commerce de matériel de gymnastique (BTS SIO SLAM).
 TECH: React 18, Node.js, Express, MySQL, Stripe, JWT, Axios.
 FONCTIONNALITÉS: Catalogue 50 produits, Panier, Paiement Stripe, Auth JWT.
