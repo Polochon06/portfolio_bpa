@@ -3,11 +3,13 @@ import AWork from './AWork.astro'
 import dummyVideo from '/src/assets/works/Dummy.mp4'
 
 // Custom Project List for Paul Blanc
+const base = import.meta.env.BASE_URL
+
 const myProjects = [
   {
     caption: 'MT-CONGÉS • Architecture Java',
-    site: '/portfolio_bpa/mt-conges',
-    src: '/portfolio_bpa/images/works/mt-conges-login.png',
+    site: `${base}mt-conges`,
+    src: `${base}images/works/mt-conges-login.png`,
     type: 'image',
     description: `CONTEXTE: Projet scolaire (3 mois - 2024). Gestion efficace des congés et sécurité des données.
 TECH: Java 17, Swing, MySQL, MVC, DAO, Git.
@@ -16,8 +18,8 @@ DÉFIS: Sécurité (Injections SQL), Architecture (MVC), RGPD.`,
   },
   {
     caption: 'GYMNOVA SHOP • E-Commerce React',
-    site: '/portfolio_bpa/gymnova',
-    src: '/portfolio_bpa/images/works/mt-conges-dashboard.png',
+    site: `${base}gymnova`,
+    src: `${base}images/works/mt-conges-dashboard.png`,
     type: 'image',
     description: `CONTEXTE: Site e-commerce de matériel de gymnastique (BTS SIO SLAM).
 TECH: React 18, Node.js, Express, MySQL, Stripe, JWT, Axios.
@@ -26,7 +28,7 @@ DÉFIS: Intégration Stripe, API REST 5 routes, Gestion commandes Admin.`,
   },
   {
     caption: 'VFX_LAB • Motion Design',
-    site: '/portfolio_bpa/after-effects-workflow',
+    site: `${base}after-effects-workflow`,
     src: 'https://www.youtube.com/embed/-diwAEusMBA?autoplay=1&mute=1&controls=0&loop=1&playlist=-diwAEusMBA&playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&fs=0&disablekb=1&showinfo=0',
     type: 'youtube',
     description: `Projet de Motion Design et VFX.
@@ -34,7 +36,7 @@ Réalisé avec Adobe After Effects et plugins professionnels.`,
   },
   {
     caption: 'CYBER_CORE • Digital Art',
-    site: '/portfolio_bpa/after-effects-workflow',
+    site: `${base}after-effects-workflow`,
     src: 'https://www.youtube.com/embed/olD2CUUyhqI?start=0&end=33&autoplay=1&mute=1&controls=0&loop=1&playlist=olD2CUUyhqI&playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&fs=0&disablekb=1&showinfo=0',
     type: 'youtube',
     description: `Expérience visuelle et sonore.
