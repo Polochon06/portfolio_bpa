@@ -1,0 +1,136 @@
+---
+---
+
+<div class="site-tutorial js-site-tutorial">
+  <div class="site-tutorial__inner">
+    <div class="site-tutorial__icon">
+      <div class="site-tutorial__mouse">
+        <div class="site-tutorial__wheel"></div>
+      </div>
+    </div>
+    <div class="site-tutorial__text">
+      <span>Scrollez pour explorer</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  import Emitter from '../utils/Emitter'
+
+  class SiteTutorial {
+    el: HTMLElement
+    hasScrolled: boolean
+
+    constructor() {
+      this.el = document.querySelector('.js-site-tutorial')
+      this.hasScrolled = false
+
+      if (this.el) {
+        this.bindEvents()
+      }
+    }
+
+    bindEvents() {
+      Emitter.on('scroll', this.onScroll, this)
+      
+      window.addEventListener('wheel', this.onInteraction.bind(this), { passive: true })
+      window.addEventListener('touchmove', this.onInteraction.bind(this), { passive: true })
+      window.addEventListener('keydown', this.onInteraction.bind(this), { passive: true })
+      
+      document.addEventListener('intro', () => {
+        setTimeout(() => {
+          if (!this.hasScrolled) {
+            this.el.classList.add('is-visible')
+          }
+        }, 1000)
+      }, { once: true })
+    }
+
+    onScroll(scrollY) {
+      if (scrollY > 10) {
+        this.hide()
+      }
+    }
+
+    onInteraction() {
+        this.hide()
+    }
+
+    hide() {
+      if (!this.hasScrolled) {
+        this.hasScrolled = true
+        this.el.classList.remove('is-visible')
+        setTimeout(() => {
+            this.el.style.display = 'none'
+        }, 500)
+      }
+    }
+  }
+
+  new SiteTutorial()
+</script>
+
+<style lang="scss">
+  .site-tutorial {
+    position: fixed;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    
+    &.is-visible {
+      opacity: 1;
+    }
+    
+    &__inner {
+      @include flex(row, center, center);
+      gap: 1.5rem;
+      
+      background: color(primary);
+      padding: 1rem 2rem;
+      border: 1px solid color(secondary);
+      border-radius: 3rem;
+    }
+    
+    &__mouse {
+      width: 22px;
+      height: 34px;
+      border: 2px solid color(secondary);
+      border-radius: 11px;
+      position: relative;
+    }
+    
+    &__wheel {
+      width: 4px;
+      height: 8px;
+      background: color(secondary);
+      border-radius: 2px;
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: scroll 1.5s infinite;
+    }
+    
+    &__text {
+      color: color(secondary);
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+      
+      @include mq(phone) {
+        font-size: 0.8rem;
+      }
+    }
+    
+    @keyframes scroll {
+      0% { top: 6px; opacity: 1; }
+      100% { top: 18px; opacity: 0; }
+    }
+  }
+</style>
