@@ -1,971 +1,251 @@
 ---
-import SiteHead from '../components/SiteHead.astro'
-import SiteFoot from '../components/SiteFoot.astro'
-import SiteScrollbar from '../components/SiteScrollbar.astro'
-import '../styles/global.scss'
+import ProjectLayout from '../layouts/ProjectLayout.astro'
 ---
 
-<html lang="fr" class="theme-contrasted">
-  <head>
-    <meta charset="utf-8" />
-    <title>After Effects Workflow | Paul Blanc</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="Découvrez mon workflow After Effects et les plugins que j'utilise pour créer du motion design et des effets visuels."
-    />
-    <link rel="icon" type="image/png" href="/icons/favicon-48x48.png" />
-
-    <!-- Fonts -->
-    <link
-      rel="preload"
-      href="/fonts/PPEditorialNew-Regular.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/fonts/PPEditorialNew-Ultralight.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/fonts/PPFraktionMono-Regular.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/fonts/PPFraktionMono-Bold.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/fonts/Bigger-Display.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-
-    <style lang="scss">
-      @import url('https://fonts.googleapis.com/css2?family=Italiana&display=swap');
-
-      :root {
-        --ae-bg: #8b5cf6;
-        --ae-text: #e8e8f0;
-        --ae-text-muted: #a0a0b8;
-        --ae-accent: #9b59b6;
-        --ae-accent-dim: rgba(155, 89, 182, 0.12);
-
-        --font-serif: 'Italiana', serif;
-        --font-mono: 'PP Fraktion Mono', monospace;
-
-        --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-
-        --glass-bg: rgba(18, 18, 28, 0.5);
-        --glass-border: rgba(255, 255, 255, 0.08);
-        --glass-highlight: rgba(255, 255, 255, 0.03);
-        --glass-blur: blur(20px);
-        --glass-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
-      }
-
-      .ae-page {
-        margin: 0;
-        background-color: var(--ae-bg);
-        color: var(--ae-text);
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        overflow-x: hidden;
-        -webkit-font-smoothing: antialiased;
-        min-height: 100vh;
-        padding-bottom: 4rem;
-      }
-
-      /* Ambient gradient */
-      .ambient-light {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background:
-          radial-gradient(circle at 20% 20%, rgba(155, 89, 182, 0.06), transparent 50%),
-          radial-gradient(circle at 80% 80%, rgba(155, 89, 182, 0.04), transparent 50%);
-        pointer-events: none;
-        z-index: 1;
-      }
-
-      /* Floating particles */
-      .particles {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-        pointer-events: none;
-        overflow: hidden;
-      }
-
-      .particle {
-        position: absolute;
-        bottom: -20px;
-        width: 4px;
-        height: 4px;
-        background: var(--ae-accent);
-        border-radius: 50%;
-        opacity: 0;
-        animation: float var(--duration) infinite ease-in-out;
-        animation-delay: var(--delay);
-      }
-
-      @keyframes float {
-        0% { bottom: -20px; opacity: 0; transform: translateX(0); }
-        20% { opacity: 0.6; }
-        100% { bottom: 110%; opacity: 0; transform: translateX(var(--sway)); }
-      }
-
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 2rem;
-        position: relative;
-        z-index: 2;
-      }
-
-      h1, h2, h3 { margin: 0; font-weight: normal; }
-
-      .font-serif { font-family: var(--font-serif); }
-      .font-mono { font-family: var(--font-mono); }
-
-      /* Glass Panel */
-      .glass-panel {
-        background: var(--glass-bg);
-        backdrop-filter: var(--glass-blur);
-        -webkit-backdrop-filter: var(--glass-blur);
-        border: 1px solid var(--glass-border);
-        border-radius: 24px;
-        padding: 3rem;
-        box-shadow: var(--glass-shadow);
-        transition: transform 0.6s var(--ease-out), border-color 0.4s ease;
-        position: relative;
-        overflow: hidden;
-
-        &::before {
-          content: '';
-          position: absolute;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: linear-gradient(135deg, var(--glass-highlight) 0%, transparent 40%);
-          pointer-events: none;
-        }
-
-        &:hover {
-          transform: translateY(-5px);
-          border-color: rgba(255, 255, 255, 0.2);
-        }
-      }
-
-      .tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-family: var(--font-mono);
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        padding: 0.5rem 1rem;
-        border: 1px solid var(--glass-border);
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 100px;
-        backdrop-filter: blur(4px);
-        margin-bottom: 1.5rem;
-        color: var(--ae-accent);
-      }
-
-      /* Hero */
-      .hero {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        padding-top: 4rem;
-        position: relative;
-        z-index: 2;
-
-        h1 {
-          font-family: var(--font-serif);
-          font-size: clamp(4rem, 15vw, 10rem);
-          line-height: 0.9;
-          letter-spacing: -0.02em;
-          margin-bottom: 2rem;
-          color: #fff;
-          text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-          animation: fadeUp 1.2s var(--ease-out) forwards;
-          opacity: 0;
-        }
-
-        p {
-          font-size: clamp(1.1rem, 2vw, 1.4rem);
-          max-width: 650px;
-          color: var(--ae-text-muted);
-          line-height: 1.5;
-          margin-bottom: 3rem;
-          animation: fadeUp 1.2s var(--ease-out) 0.2s forwards;
-          opacity: 0;
-        }
-      }
-
-      .scroll-indicator {
-        position: absolute;
-        bottom: 3rem;
-        left: 50%;
-        transform: translateX(-50%);
-        font-family: var(--font-mono);
-        font-size: 0.75rem;
-        opacity: 0.5;
-        animation: bounce 2s infinite;
-      }
-
-      @keyframes bounce {
-        0%, 100% { transform: translate(-50%, 0); }
-        50% { transform: translate(-50%, 10px); }
-      }
-
-      @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(40px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-
-      /* Sections */
-      .section-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 6rem;
-        align-items: center;
-        margin: 10rem 0;
-
-        &.reversed {
-          direction: rtl;
-          .section-content, .glass-panel { direction: ltr; }
-        }
-
-        @media (max-width: 900px) {
-          grid-template-columns: 1fr;
-          gap: 3rem;
-          margin: 6rem 0;
-          &.reversed { direction: ltr; }
-        }
-      }
-
-      .section-content {
-        h2 {
-          font-family: var(--font-serif);
-          font-size: 3.5rem;
-          margin-bottom: 2rem;
-          line-height: 1.05;
-        }
-        p {
-          font-size: 1.15rem;
-          line-height: 1.6;
-          color: var(--ae-text-muted);
-          margin-bottom: 2rem;
-        }
-      }
-
-      /* Tech Pills */
-      .tech-stack {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.8rem;
-
-        span {
-          font-family: var(--font-mono);
-          font-size: 0.9rem;
-          padding: 0.6rem 1.2rem;
-          border: 1px solid rgba(155, 89, 182, 0.25);
-          background: var(--ae-accent-dim);
-          color: var(--ae-accent);
-          border-radius: 50px;
-          transition: 0.3s;
-
-          &:hover {
-            background: var(--ae-accent);
-            color: #fff;
-            cursor: default;
-          }
-        }
-      }
-
-      /* Plugins Grid */
-      .plugins-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 2rem;
-        margin-top: 4rem;
-      }
-
-      .plugin-card {
-        padding: 2.5rem;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 16px;
-        transition: 0.4s var(--ease-out);
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.06);
-          transform: translateY(-5px);
-          border-color: var(--ae-accent);
-        }
-
-        h3 {
-          font-family: var(--font-serif);
-          font-size: 1.8rem;
-          margin-bottom: 1rem;
-          color: #fff;
-        }
-
-        .badge {
-          display: inline-block;
-          font-size: 0.7rem;
-          font-weight: bold;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          padding: 0.3rem 0.6rem;
-          border-radius: 4px;
-          margin-bottom: 0.75rem;
-
-          &.essential { background: rgba(155, 89, 182, 0.2); color: var(--ae-accent); }
-          &.creative { background: rgba(100, 200, 255, 0.2); color: #64c8ff; }
-        }
-
-        .plugin-category {
-          font-family: var(--font-mono);
-          font-size: 0.75rem;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          opacity: 0.5;
-          margin-bottom: 1rem;
-        }
-      }
-
-      /* Workflow Steps */
-      .flow-steps {
-        counter-reset: flow;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
-
-      .flow-steps li {
-        counter-increment: flow;
-        position: relative;
-        padding: 1.5rem 0 1.5rem 4rem;
-        border-left: 1px solid var(--glass-border);
-        margin-left: 1rem;
-
-        &::before {
-          content: counter(flow);
-          position: absolute;
-          left: -1.25rem;
-          top: 1.5rem;
-          width: 2.5rem;
-          height: 2.5rem;
-          background: var(--ae-accent);
-          color: #fff;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 700;
-          font-size: 1rem;
-          font-family: var(--font-mono);
-        }
-
-        &:last-child { border-left: none; }
-
-        strong {
-          color: #fff;
-          display: block;
-          font-size: 1.1rem;
-          margin-bottom: 0.25rem;
-        }
-
-        span {
-          font-size: 0.95rem;
-          color: var(--ae-text-muted);
-          line-height: 1.5;
-        }
-      }
-
-      /* Video Section */
-      .video-showcase {
-        margin: 10rem 0 5rem;
-        text-align: center;
-      }
-
-      .video-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-        gap: 2rem;
-        margin-top: 3rem;
-      }
-
-      .video-card {
-        border-radius: 16px;
-        overflow: hidden;
-        border: 1px solid var(--glass-border);
-        background: var(--glass-bg);
-        aspect-ratio: 16/9;
-        transition: 0.4s var(--ease-out);
-
-        &:hover {
-          border-color: var(--ae-accent);
-          transform: translateY(-5px);
-        }
-
-        iframe {
-          width: 100%;
-          height: 100%;
-          border: none;
-          display: block;
-        }
-      }
-
-      /* Stats */
-      .stats-container {
-        display: flex;
-        justify-content: space-around;
-        gap: 2rem;
-        margin-top: 3rem;
-        flex-wrap: wrap;
-
-        div { text-align: center; }
-
-        h3 {
-          font-family: var(--font-serif);
-          font-size: 5rem;
-          background: linear-gradient(180deg, #fff 0%, rgba(255, 255, 255, 0.5) 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          margin-bottom: 0.5rem;
-        }
-        span {
-          font-family: var(--font-mono);
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          color: var(--ae-accent);
-          font-size: 0.9rem;
-        }
-      }
-
-      /* CTA */
-      .cta-wrapper {
-        text-align: center;
-        padding: 5rem 0;
-
-        a {
-          display: inline-block;
-          font-family: var(--font-serif);
-          font-size: 2rem;
-          color: #fff;
-          text-decoration: none;
-          padding-bottom: 0.5rem;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-          transition: 0.3s;
-
-          &:hover {
-            border-color: var(--ae-accent);
-            color: var(--ae-accent);
-            transform: scale(1.05);
-          }
-        }
-      }
-
-      /* Site Structure */
-      .site-wrapper {
-        position: relative;
-        z-index: 2;
-        background: map.get($theme-colors, 'default', 'primary');
-        background-color: #000;
-        min-height: 100vh;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="site-wrapper js-site-wrapper">
-      <SiteHead />
-
-      <main class="ae-page">
-        <div class="ambient-light"></div>
-        <div class="particles">
-          {
-            [...Array(20)].map(() => (
-              <div
-                class="particle"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  '--duration': `${12 + Math.random() * 18}s`,
-                  '--delay': `${Math.random() * 10}s`,
-                  '--sway': `${-30 + Math.random() * 60}px`,
-                }}
-              />
-            ))
-          }
-        </div>
-
-        <section class="hero">
-          <div class="tag">Motion Design - VFX - Post-Production</div>
-          <h1>
-            After<br /><span style="color: var(--ae-accent);">Effects</span>
-          </h1>
-          <p>
-            Mon processus creatif et les outils que j'utilise pour creer du
-            motion design, des effets visuels et de l'animation. De la
-            preproduction a l'export final.
-          </p>
-          <div class="scroll-indicator">SCROLL TO EXPLORE</div>
-        </section>
-
-        <div class="container">
-          <!-- Section: Overview -->
-          <div class="section-row">
-            <div class="section-content">
-              <div class="tag">Le Logiciel</div>
-              <h2>Adobe After Effects</h2>
-              <p>
-                <strong>After Effects</strong> est mon outil principal pour creer
-                du motion design, des animations et des effets visuels. C'est un logiciel
-                de composition et d'animation qui permet de combiner des elements
-                2D et 3D, d'ajouter des effets visuels complexes et de creer des animations
-                sophistiquees.
-              </p>
-              <p>
-                J'utilise After Effects pour tous mes projets de motion design,
-                que ce soit pour creer des generiques, des transitions, des
-                effets de texte animes, ou des compositions visuelles complexes.
-                Le logiciel offre une flexibilite creative inegalee grace a son
-                systeme de calques, ses expressions JavaScript et sa vaste
-                bibliotheque d'effets.
-              </p>
-            </div>
-            <div class="glass-panel">
-              <h3 class="font-serif" style="font-size: 2rem; margin-bottom: 1.5rem;">
-                Technologies & Formats
-              </h3>
-              <div class="tech-stack">
-                <span>After Effects CC 2024</span>
-                <span>Adobe Photoshop</span>
-                <span>Adobe Illustrator</span>
-                <span>Media Encoder</span>
-                <span>Cinema 4D Lite</span>
-              </div>
-              <div style="margin-top: 2rem; font-size: 1.1rem; line-height: 1.8;">
-                <span style="display:block; margin-bottom:0.5rem;">
-                  <strong style="color: var(--ae-accent);">Principal:</strong> After Effects CC 2024
-                </span>
-                <span style="display:block; margin-bottom:0.5rem;">
-                  <strong style="color: var(--ae-accent);">Assets:</strong> Photoshop + Illustrator
-                </span>
-                <span style="display:block; margin-bottom:0.5rem;">
-                  <strong style="color: var(--ae-accent);">3D:</strong> Cinema 4D Lite
-                </span>
-                <span style="display:block;">
-                  <strong style="color: var(--ae-accent);">Export:</strong> Media Encoder (H.264, ProRes)
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section: Plugins -->
-          <div style="margin: 10rem 0;">
-            <div style="text-align: center; margin-bottom: 4rem;">
-              <div class="tag">Extensions Professionnelles</div>
-              <h2 class="font-serif" style="font-size: 3.5rem;">
-                Plugins Essentiels
-              </h2>
-              <p style="max-width: 600px; margin: 1rem auto; color: var(--ae-text-muted); font-size: 1.1rem;">
-                Ces plugins etendent considerablement les capacites d'After
-                Effects et accelerent mon workflow creatif.
-              </p>
-            </div>
-
-            <div class="plugins-grid">
-              <div class="plugin-card">
-                <span class="badge essential">Essential</span>
-                <h3>Element 3D</h3>
-                <div class="plugin-category">Video Copilot</div>
-                <p style="margin-top: 1rem; opacity: 0.8; line-height: 1.6;">
-                  Plugin 3D ultra-performant qui permet d'importer et d'animer
-                  des modeles 3D directement dans After Effects. Utilise pour
-                  creer des titres 3D, des logos animes et des environnements
-                  complexes avec un rendu rapide.
-                </p>
-              </div>
-
-              <div class="plugin-card">
-                <span class="badge essential">Essential</span>
-                <h3>Optical Flares</h3>
-                <div class="plugin-category">Video Copilot</div>
-                <p style="margin-top: 1rem; opacity: 0.8; line-height: 1.6;">
-                  Genere des lens flares photorealistes et des effets de
-                  lumiere. Parfait pour ajouter du dynamisme et de l'energie aux
-                  compositions, avec controle total sur la forme, les couleurs
-                  et l'intensite des flares.
-                </p>
-              </div>
-
-              <div class="plugin-card">
-                <span class="badge creative">Creative</span>
-                <h3>Trapcode Suite</h3>
-                <div class="plugin-category">Red Giant</div>
-                <p style="margin-top: 1rem; opacity: 0.8; line-height: 1.6;">
-                  Suite complete pour creer des effets de particules
-                  (Particular), des formes geometriques organiques (Form), et
-                  des textures procedurales (Mir). Essentiel pour les effets
-                  visuels abstraits et les backgrounds animes.
-                </p>
-              </div>
-
-              <div class="plugin-card">
-                <span class="badge creative">Creative</span>
-                <h3>Plexus</h3>
-                <div class="plugin-category">Rowbyte</div>
-                <p style="margin-top: 1rem; opacity: 0.8; line-height: 1.6;">
-                  Cree des reseaux de points et de lignes interconnectes en 3D.
-                  Ideal pour generer des visualisations de donnees, des
-                  backgrounds technologiques et des effets de connexion entre
-                  elements.
-                </p>
-              </div>
-
-              <div class="plugin-card">
-                <span class="badge essential">Essential</span>
-                <h3>Saber</h3>
-                <div class="plugin-category">Video Copilot - Gratuit</div>
-                <p style="margin-top: 1rem; opacity: 0.8; line-height: 1.6;">
-                  Plugin gratuit pour creer des effets de lumiere neon, des
-                  faisceaux laser et des lueurs energetiques. Tres utilise pour
-                  les effets sci-fi et les transitions dynamiques avec controle
-                  precis des courbes.
-                </p>
-              </div>
-
-              <div class="plugin-card">
-                <span class="badge creative">Creative</span>
-                <h3>Twixtor</h3>
-                <div class="plugin-category">RE:Vision Effects</div>
-                <p style="margin-top: 1rem; opacity: 0.8; line-height: 1.6;">
-                  Ralentissement et acceleration de videos avec interpolation
-                  avancee. Permet de creer des slow-motion fluides meme a partir
-                  de footage a 24fps, en generant des frames intermediaires de
-                  haute qualite.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section: Workflow -->
-          <div class="section-row reversed">
-            <div class="section-content">
-              <div class="tag">Processus Creatif</div>
-              <h2>Mon Workflow</h2>
-              <ol class="flow-steps">
-                <li>
-                  <strong>Concept & Storyboard</strong>
-                  <span>Definition de l'idee creative, creation d'un moodboard et esquisse
-                  du storyboard pour visualiser les differentes sequences et transitions.</span>
-                </li>
-                <li>
-                  <strong>Preparation Assets</strong>
-                  <span>Creation ou collecte des elements visuels : graphiques vectoriels
-                  (Illustrator), textures (Photoshop), modeles 3D (Cinema 4D), footages
-                  video et audio.</span>
-                </li>
-                <li>
-                  <strong>Composition & Animation</strong>
-                  <span>Import des assets dans After Effects, mise en place de la composition
-                  principale, animation des calques avec keyframes et expressions,
-                  ajout de cameras 3D.</span>
-                </li>
-                <li>
-                  <strong>Effets & Post-Production</strong>
-                  <span>Application des plugins (Element 3D, Trapcode, Plexus), ajustements
-                  de couleurs (color grading), ajout de particules, lens flares et
-                  effets de lumiere.</span>
-                </li>
-                <li>
-                  <strong>Sound Design & Export</strong>
-                  <span>Synchronisation avec la musique et sound effects, optimisation du
-                  rendu, export final via Media Encoder (H.264, ProRes) selon la destination.</span>
-                </li>
-              </ol>
-            </div>
-            <div class="glass-panel">
-              <h3 class="font-serif" style="font-size: 2rem; margin-bottom: 1.5rem;">
-                Techniques Favorites
-              </h3>
-              <div style="font-size: 1.05rem; line-height: 1.8;">
-                <p style="opacity: 0.9; margin-bottom: 1.5rem;">
-                  <strong style="color: var(--ae-accent);">Expressions JavaScript</strong><br />
-                  Utilisation d'expressions pour automatiser les animations et creer
-                  des mouvements proceduraux (wiggle, loop, time remapping).
-                </p>
-                <p style="opacity: 0.9; margin-bottom: 1.5rem;">
-                  <strong style="color: var(--ae-accent);">Cameras & 3D Layers</strong><br />
-                  Creation de profondeur avec des cameras virtuelles et organisation
-                  des calques en espace 3D pour des compositions immersives.
-                </p>
-                <p style="opacity: 0.9; margin-bottom: 1.5rem;">
-                  <strong style="color: var(--ae-accent);">Shape Layers & Motion Graphics</strong><br />
-                  Conception de graphiques animes avec les shape layers, trim paths
-                  et gradients pour des animations fluides et vectorielles.
-                </p>
-                <p style="opacity: 0.9; margin-bottom: 1.5rem;">
-                  <strong style="color: var(--ae-accent);">Color Grading</strong><br />
-                  Ajustements de couleurs avec Lumetri Color, Curves et Color Balance
-                  pour creer des ambiances specifiques et une coherence visuelle.
-                </p>
-                <p style="opacity: 0.9;">
-                  <strong style="color: var(--ae-accent);">Motion Blur & Frame Blending</strong><br />
-                  Application de motion blur et frame blending pour des animations plus
-                  naturelles et cinematiques.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- VIDEO SECTION -->
-          <div class="video-showcase">
-            <div class="tag">Mes Edits VFX</div>
-            <h2 class="font-serif" style="font-size: 3.5rem; color: #fff;">
-              Galerie Video
-            </h2>
-            <p style="max-width: 600px; margin: 1rem auto; color: var(--ae-text-muted); font-size: 1.1rem;">
-              Quelques-unes de mes creations en motion design et effets visuels.
-            </p>
-            <div class="video-grid">
-              <div class="video-card">
-                <iframe
-                  src="https://www.youtube.com/embed/Q_S17sojDvc?autoplay=0&rel=0&modestbranding=1"
-                  title="Edit VFX 1"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowfullscreen
-                ></iframe>
-              </div>
-              <div class="video-card">
-                <iframe
-                  src="https://www.youtube.com/embed/CLxq07EHI-o?autoplay=0&rel=0&modestbranding=1"
-                  title="Edit VFX 2"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowfullscreen
-                ></iframe>
-              </div>
-              <div class="video-card">
-                <iframe
-                  src="https://www.youtube.com/embed/-diwAEusMBA?autoplay=0&rel=0&modestbranding=1"
-                  title="Edit VFX 3"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowfullscreen
-                ></iframe>
-              </div>
-            </div>
-          </div>
-
-          <!-- Stats -->
-          <div class="glass-panel" style="text-align: center; padding: 4rem 2rem;">
-            <h2 class="font-serif" style="font-size: 2.5rem; margin-bottom: 2rem;">
-              Mon Setup Creatif
-            </h2>
-            <div class="stats-container">
-              <div>
-                <h3>6</h3>
-                <span>Plugins Pro</span>
-              </div>
-              <div>
-                <h3>5</h3>
-                <span>Etapes Workflow</span>
-              </div>
-              <div>
-                <h3>3</h3>
-                <span>Logiciels Adobe</span>
-              </div>
-              <div>
-                <h3>4K</h3>
-                <span>Resolution Export</span>
-              </div>
-            </div>
-            <div style="margin-top: 3rem; font-family: var(--font-mono); font-size: 0.9rem; opacity: 0.7; line-height: 1.8;">
-              <p><strong style="color: var(--ae-accent);">Principal:</strong> After Effects CC 2024 + Cinema 4D Lite</p>
-              <p><strong style="color: var(--ae-accent);">Plugins:</strong> Element 3D, Optical Flares, Trapcode, Plexus, Saber, Twixtor</p>
-              <p><strong style="color: var(--ae-accent);">Assets:</strong> Photoshop + Illustrator + Media Encoder</p>
-              <p><strong style="color: var(--ae-accent);">Techniques:</strong> Expressions JS, 3D Layers, Shape Layers, Color Grading</p>
-            </div>
-          </div>
-
-          <div class="cta-wrapper">
-            <a href="/portfolio_bpa/">← Retour au Portfolio</a>
-          </div>
-        </div>
-      </main>
-
-      <SiteFoot />
+<ProjectLayout
+  title="VFX_LAB | After Effects & Motion Design"
+  description="Workflow After Effects, motion design et VFX. Element 3D, Trapcode Suite, Optical Flares, Plexus."
+  heroLabel="Créations · Motion Design & VFX"
+  heroSub="Mon processus créatif en motion design et effets visuels — de la préproduction à l'export final."
+  techTags={["After Effects CC 2024", "Cinema 4D", "Trapcode Suite", "Element 3D", "Plexus", "Saber"]}
+>
+  <Fragment slot="hero-title">VFX_<br/>LAB</Fragment>
+
+  <!-- ═══ 01 · LE LOGICIEL ═════════════════════════════════════════ -->
+  <section class="p-section" data-reveal>
+    <div class="p-section__header">
+      <span class="p-section__num">01</span>
+      <h2 class="p-section__title">Adobe After Effects</h2>
+      <div class="p-section__line"></div>
     </div>
 
-    <SiteScrollbar />
-  </body>
+    <div class="p-grid">
+      <div class="p-body">
+        <p>
+          <strong>After Effects</strong> est mon outil principal pour créer du
+          motion design, des animations et des effets visuels. Logiciel de
+          composition et d'animation qui combine des éléments 2D et 3D avec
+          des effets visuels complexes.
+        </p>
+        <p>
+          J'utilise AE pour tous mes projets — génériques, transitions, effets
+          de texte animés, compositions visuelles complexes. Le système de
+          calques, les <strong>expressions JavaScript</strong> et la bibliothèque
+          d'effets offrent une flexibilité créative inégalée.
+        </p>
 
-  <script>
-    import Emitter from '../utils/Emitter'
-    import Ticker from '../utils/Ticker'
-    import Lenis from 'lenis'
-    import { gsap } from 'gsap'
-    import { ScrollTrigger } from 'gsap/ScrollTrigger'
-    gsap.registerPlugin(ScrollTrigger)
+        <div class="p-stack" style="margin-top: 2rem;">
+          {["After Effects CC 2024", "Cinema 4D Lite", "Adobe Photoshop", "Adobe Illustrator", "Media Encoder"].map(t => (
+            <span class="p-tag">{t}</span>
+          ))}
+        </div>
+      </div>
 
-    declare global {
-      interface Window {
-        safeWidth: number
-        safeHeight: number
-        maxScrollTop: number
-        scrollProgress: number
-        lenis: any
-      }
-    }
+      <div class="p-card">
+        <span class="p-card__label">Outils & Formats</span>
+        <div class="p-mono-block">
+          <div class="p-mono-block__group">
+            <div class="p-mono-block__title">Principal</div>
+            <div>After Effects CC 2024</div>
+          </div>
+          <div class="p-mono-block__group">
+            <div class="p-mono-block__title">Assets</div>
+            <div>Photoshop + Illustrator</div>
+          </div>
+          <div class="p-mono-block__group">
+            <div class="p-mono-block__title">3D Intégré</div>
+            <div>Cinema 4D Lite</div>
+          </div>
+          <div class="p-mono-block__group">
+            <div class="p-mono-block__title">Export</div>
+            <div>Media Encoder — H.264, ProRes, 4K</div>
+          </div>
+          <div class="p-mono-block__group">
+            <div class="p-mono-block__title">Scripting</div>
+            <div>Expressions JavaScript (wiggle, loop, time)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    class Site {
-      timeouts: any = { resizeThrottle: null }
-      windowWidth: number
-      windowHeight: number
-      clientWidth: number
-      clientHeight: number
-      isScrolling: boolean = false
-      lenis: any
+  <!-- ═══ 02 · PLUGINS ════════════════════════════════════════════ -->
+  <section class="p-section" data-reveal>
+    <div class="p-section__header">
+      <span class="p-section__num">02</span>
+      <h2 class="p-section__title">Plugins Essentiels</h2>
+      <div class="p-section__line"></div>
+    </div>
 
-      constructor() {
-        let os = 'unknown'
-        if (navigator.userAgent.indexOf('Win') !== -1) os = 'windows'
-        else if (navigator.userAgent.indexOf('Android') !== -1) os = 'android'
-        else if (navigator.userAgent.indexOf('Mac') !== -1) os = 'mac'
-        else if (navigator.userAgent.indexOf('Linux') !== -1) os = 'linux'
-        document.documentElement.classList.add(`is-${os}`)
+    <p class="p-body" style="max-width:600px; margin-bottom:3.5rem;">
+      <span style="opacity:0.6">Ces plugins étendent considérablement les capacités d'After Effects et accélèrent le workflow créatif.</span>
+    </p>
 
-        let browser = 'unknown'
-        if (navigator.userAgent.indexOf('Firefox') !== -1) browser = 'firefox'
-        else if (navigator.userAgent.indexOf('Chrome') !== -1) browser = 'chrome'
-        else if (navigator.userAgent.indexOf('Safari') !== -1) browser = 'safari'
-        document.documentElement.classList.add(`is-${browser}`)
+    <div class="p-features">
+      <div class="p-plugin">
+        <div class="p-plugin__vendor">Video Copilot</div>
+        <span class="p-badge p-badge--arch">Essential</span>
+        <h3>Element 3D</h3>
+        <p class="p-card__body">Plugin 3D ultra-performant pour importer et animer des modèles directement dans AE. Titres 3D, logos animés, environnements complexes avec rendu rapide.</p>
+      </div>
 
-        this.bindEvents()
-      }
+      <div class="p-plugin">
+        <div class="p-plugin__vendor">Video Copilot</div>
+        <span class="p-badge p-badge--arch">Essential</span>
+        <h3>Optical Flares</h3>
+        <p class="p-card__body">Lens flares photoréalistes et effets de lumière. Contrôle total sur la forme, les couleurs et l'intensité pour ajouter du dynamisme aux compositions.</p>
+      </div>
 
-      init() {
-        this.initLenis()
-        Ticker.init()
-        this.onResize()
-        document.dispatchEvent(new CustomEvent('intro'))
-        Ticker.nextTick(() => Emitter.emit('updateViewport'))
-      }
+      <div class="p-plugin">
+        <div class="p-plugin__vendor">Red Giant</div>
+        <span class="p-badge p-badge--ux">Creative</span>
+        <h3>Trapcode Suite</h3>
+        <p class="p-card__body">Suite complète : particules (Particular), formes géométriques (Form), textures procédurales (Mir). Essentiel pour les VFX abstraits et backgrounds animés.</p>
+      </div>
 
-      bindEvents() {
-        window.addEventListener('resize', this.resizeThrottle.bind(this))
-        window.addEventListener('scroll', this.onScroll.bind(this), { passive: true })
-        window.addEventListener('mousemove', this.onMouseMove.bind(this), { passive: true })
-        Emitter.on('updateViewport', this.onResize, this, true)
+      <div class="p-plugin">
+        <div class="p-plugin__vendor">Rowbyte</div>
+        <span class="p-badge p-badge--ux">Creative</span>
+        <h3>Plexus</h3>
+        <p class="p-card__body">Réseaux de points et lignes interconnectés en 3D. Visualisations de données, backgrounds technologiques, effets de connexion entre éléments.</p>
+      </div>
 
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              entry.target.dispatchEvent(
-                new CustomEvent('intersect', { detail: { isIntersecting: entry.isIntersecting } }),
-              )
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-in-view')
-                entry.target.classList.remove('is-out-of-view', 'is-out-of-view-top', 'is-out-of-view-bottom')
-              } else {
-                entry.target.classList.remove('is-in-view')
-                entry.target.classList.add('is-out-of-view')
-              }
-            })
-          },
-          { threshold: 0 },
-        )
+      <div class="p-plugin">
+        <div class="p-plugin__vendor">Video Copilot — Gratuit</div>
+        <span class="p-badge p-badge--arch">Essential</span>
+        <h3>Saber</h3>
+        <p class="p-card__body">Effets neon, faisceaux laser et lueurs énergétiques. Très utilisé pour les transitions sci-fi avec contrôle précis des courbes de lumière.</p>
+      </div>
 
-        document.querySelectorAll('[data-intersect]').forEach((el) => observer.observe(el))
+      <div class="p-plugin">
+        <div class="p-plugin__vendor">RE:Vision Effects</div>
+        <span class="p-badge p-badge--ux">Creative</span>
+        <h3>Twixtor</h3>
+        <p class="p-card__body">Slow-motion fluide même à partir de footage 24fps, par génération de frames intermédiaires haute qualité avec interpolation avancée.</p>
+      </div>
+    </div>
+  </section>
 
-        if (document.readyState === 'complete') this.siteLoaded()
-        else window.addEventListener('load', this.siteLoaded, { once: true })
-        this.onScroll()
-      }
+  <!-- ═══ 03 · WORKFLOW ════════════════════════════════════════════ -->
+  <section class="p-section" data-reveal>
+    <div class="p-section__header">
+      <span class="p-section__num">03</span>
+      <h2 class="p-section__title">Mon Workflow</h2>
+      <div class="p-section__line"></div>
+    </div>
 
-      initLenis() {
-        const lenis = new Lenis()
-        lenis.on('scroll', ScrollTrigger.update)
-        gsap.ticker.add((time) => lenis.raf(time * 1000))
-        gsap.ticker.lagSmoothing(0)
-        window.lenis = lenis
-        this.lenis = lenis
-      }
+    <div class="p-grid">
+      <div>
+        <ol class="p-steps">
+          <li>
+            <strong>Concept & Storyboard</strong>
+            <span>Définition de l'idée créative, moodboard et esquisse du storyboard pour visualiser les séquences et transitions.</span>
+          </li>
+          <li>
+            <strong>Préparation Assets</strong>
+            <span>Création des éléments visuels : graphiques vectoriels (Illustrator), textures (Photoshop), modèles 3D (Cinema 4D), footages vidéo et audio.</span>
+          </li>
+          <li>
+            <strong>Composition & Animation</strong>
+            <span>Import dans AE, mise en place de la composition principale, animation des calques avec keyframes, expressions et caméras 3D.</span>
+          </li>
+          <li>
+            <strong>Effets & Post-Production</strong>
+            <span>Application des plugins (Element 3D, Trapcode, Plexus), color grading, particules, lens flares et effets de lumière.</span>
+          </li>
+          <li>
+            <strong>Sound Design & Export</strong>
+            <span>Synchronisation audio, optimisation du rendu, export via Media Encoder (H.264, ProRes) selon la destination.</span>
+          </li>
+        </ol>
+      </div>
 
-      siteLoaded() {
-        document.documentElement.classList.add('is-loaded')
-        Emitter.emit('siteLoaded')
-      }
+      <div class="p-card">
+        <span class="p-card__label">Techniques Favorites</span>
+        <div class="p-body" style="font-size:0.95rem;">
+          <p>
+            <strong>Expressions JavaScript</strong><br/>
+            <span style="opacity:0.7">wiggle(), loop(), time remapping pour des mouvements procéduraux automatisés.</span>
+          </p>
+          <p>
+            <strong>Caméras & 3D Layers</strong><br/>
+            <span style="opacity:0.7">Profondeur avec caméras virtuelles, calques en espace 3D pour des compositions immersives.</span>
+          </p>
+          <p>
+            <strong>Shape Layers & Motion Graphics</strong><br/>
+            <span style="opacity:0.7">Trim paths, gradients et morphing pour des animations vectorielles fluides.</span>
+          </p>
+          <p>
+            <strong>Color Grading</strong><br/>
+            <span style="opacity:0.7">Lumetri Color, Curves et Color Balance pour des ambiances cinématiques cohérentes.</span>
+          </p>
+          <p style="margin-bottom:0">
+            <strong>Motion Blur & Frame Blending</strong><br/>
+            <span style="opacity:0.7">Blur et blending pour des animations naturelles et cinématiques.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      resizeThrottle() {
-        clearTimeout(this.timeouts.resizeThrottle)
-        this.timeouts.resizeThrottle = setTimeout(() => Ticker.nextTick(this.onResize, this), 200)
-      }
+  <!-- ═══ 04 · GALERIE VIDÉO ═══════════════════════════════════════ -->
+  <section class="p-section" data-reveal>
+    <div class="p-section__header">
+      <span class="p-section__num">04</span>
+      <h2 class="p-section__title">Galerie Vidéo</h2>
+      <div class="p-section__line"></div>
+    </div>
 
-      onResize() {
-        const newWidth = window.innerWidth
-        let widthChanged = false
-        if (this.windowWidth !== newWidth) {
-          if (this.windowWidth !== undefined) widthChanged = true
-          this.windowWidth = newWidth
-          this.clientWidth = document.body.clientWidth
-        }
-        const newHeight = window.innerHeight
-        let heightChanged = false
-        if (this.windowHeight !== newHeight) {
-          if (this.windowHeight !== undefined) heightChanged = true
-          this.windowHeight = newHeight
-          this.clientHeight = document.body.clientHeight
-        }
-        window.safeWidth = newWidth
-        window.safeHeight = newHeight
-        window.maxScrollTop = document.body.scrollHeight - window.safeHeight
-        this.setScrollProgress()
-        Emitter.emit('resize', widthChanged, heightChanged)
-      }
+    <p class="p-body" style="max-width:600px; margin-bottom:3rem;">
+      <span style="opacity:0.6">Quelques créations en motion design et effets visuels.</span>
+    </p>
 
-      onScroll() {
-        this.setScrollProgress()
-        Ticker.nextTick(() => Emitter.emit('scroll', window.scrollY))
-      }
+    <div class="p-videos">
+      <div class="p-video">
+        <iframe
+          src="https://www.youtube.com/embed/Q_S17sojDvc?rel=0&modestbranding=1"
+          title="Edit VFX 1"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+      <div class="p-video">
+        <iframe
+          src="https://www.youtube.com/embed/CLxq07EHI-o?rel=0&modestbranding=1"
+          title="Edit VFX 2"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+      <div class="p-video">
+        <iframe
+          src="https://www.youtube.com/embed/-diwAEusMBA?rel=0&modestbranding=1"
+          title="Edit VFX 3"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </div>
+  </section>
 
-      setScrollProgress() {
-        window.scrollProgress = window.scrollY / window.maxScrollTop
-      }
+  <!-- ═══ STATS ═════════════════════════════════════════════════════ -->
+  <div class="p-stats" data-reveal>
+    <div class="p-stat">
+      <div class="p-stat__num">6</div>
+      <div class="p-stat__label">Plugins Pro</div>
+    </div>
+    <div class="p-stat">
+      <div class="p-stat__num">5</div>
+      <div class="p-stat__label">Étapes Workflow</div>
+    </div>
+    <div class="p-stat">
+      <div class="p-stat__num">3</div>
+      <div class="p-stat__label">Logiciels Adobe</div>
+    </div>
+    <div class="p-stat">
+      <div class="p-stat__num">4K</div>
+      <div class="p-stat__label">Export Max</div>
+    </div>
+  </div>
 
-      onMouseMove(e) {
-        Emitter.emit('mousemove', e.clientX, e.clientY)
-      }
-
-    }
-
-    const site = new Site()
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => site.init(), { once: true })
-    } else {
-      site.init()
-    }
-  </script>
-</html>
+</ProjectLayout>

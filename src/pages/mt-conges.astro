@@ -1,1196 +1,249 @@
 ---
-import SiteHead from '../components/SiteHead.astro'
-import SiteFoot from '../components/SiteFoot.astro'
-import SiteScrollbar from '../components/SiteScrollbar.astro'
-import '../styles/global.scss'
+import ProjectLayout from '../layouts/ProjectLayout.astro'
 
 import vid1 from '../assets/works/Pen-4.mp4'
 import vid2 from '../assets/works/Pen-5.mp4'
 import vid3 from '../assets/works/Pen-6.mp4'
 
-const bgImage = `url('${import.meta.env.BASE_URL}images/aquarium-bg.png')`
+const base = import.meta.env.BASE_URL
 ---
 
-<html lang="fr" class="theme-contrasted">
-  <head>
-    <meta charset="utf-8" />
-    <title>MT-CONGÉS | Architecture Java & Sécurité</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/png" href="/icons/favicon-48x48.png" />
-
-    <!-- Fonts from index.astro -->
-    <link
-      rel="preload"
-      href="/fonts/PPEditorialNew-Regular.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/fonts/PPEditorialNew-Ultralight.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/fonts/PPFraktionMono-Regular.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/fonts/PPFraktionMono-Bold.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/fonts/Bigger-Display.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-
-    <style lang="scss" define:vars={{ bgImage }}>
-      @import url('https://fonts.googleapis.com/css2?family=Italiana&display=swap');
-
-      /* Custom Styles for MT-Conges */
-      :root {
-        --color-bg: #8b5cf6;
-        --color-text: #e0f7fa;
-        --color-text-muted: #b2ebf2;
-        --color-accent: #9b59b6;
-
-        --font-serif: 'Italiana', serif;
-        --font-mono: 'PP Fraktion Mono', monospace;
-
-        --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-
-        /* Ultra Premium Glass */
-        --glass-bg: rgba(20, 30, 40, 0.4);
-        --glass-border: rgba(255, 255, 255, 0.08);
-        --glass-highlight: rgba(255, 255, 255, 0.03);
-        --glass-blur: blur(20px);
-        --glass-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-      }
-
-      /* Apply background to a specific container instead of body global */
-      .mt-conges-container {
-        margin: 0;
-        background-color: var(--color-bg);
-        color: var(--color-text);
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        overflow-x: hidden;
-        -webkit-font-smoothing: antialiased;
-        min-height: 100vh;
-
-        background-image: var(--bgImage);
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        background-repeat: no-repeat;
-        padding-bottom: 4rem; /* Space for footer */
-      }
-
-      /* Animated Gradient Mesh (Optional subtle overlay) */
-      .ambient-light {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background:
-          radial-gradient(
-            circle at 50% 0%,
-            rgba(155, 89, 182, 0.05),
-            transparent 60%
-          ),
-          radial-gradient(
-            circle at 80% 80%,
-            rgba(0, 100, 255, 0.05),
-            transparent 50%
-          );
-        pointer-events: none;
-        z-index: 1;
-      }
-
-      /* Bubbles */
-      .bubbles {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-        pointer-events: none;
-        overflow: hidden;
-      }
-
-      .bubble {
-        position: absolute;
-        bottom: -50px;
-        background: radial-gradient(
-          circle at 30% 30%,
-          rgba(255, 255, 255, 0.1),
-          rgba(255, 255, 255, 0.02)
-        );
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-        animation: rise var(--duration) infinite ease-in;
-        backdrop-filter: blur(2px);
-      }
-
-      @keyframes rise {
-        0% {
-          bottom: -50px;
-          transform: translateX(0) scale(1);
-          opacity: 0;
-        }
-        20% {
-          opacity: 0.6;
-        }
-        50% {
-          transform: translateX(var(--sway)) scale(1.1);
-        }
-        100% {
-          bottom: 110%;
-          transform: translateX(calc(var(--sway) * -1)) scale(1.2);
-          opacity: 0;
-        }
-      }
-
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 2rem;
-        position: relative;
-        z-index: 2;
-      }
-
-      /* Typography */
-      h1,
-      h2,
-      h3 {
-        margin: 0;
-        font-weight: normal;
-      }
-
-      .font-serif {
-        font-family: var(--font-serif);
-      }
-      .font-mono {
-        font-family: var(--font-mono);
-      }
-
-      /* Components */
-      .glass-panel {
-        background: var(--glass-bg);
-        backdrop-filter: var(--glass-blur);
-        -webkit-backdrop-filter: var(--glass-blur);
-        border: 1px solid var(--glass-border);
-        border-radius: 24px;
-        padding: 3rem;
-        box-shadow: var(--glass-shadow);
-        transition:
-          transform 0.6s var(--ease-out),
-          border-color 0.4s ease;
-        position: relative;
-        overflow: hidden;
-
-        /* Inner subtle shine */
-        &::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(
-            135deg,
-            var(--glass-highlight) 0%,
-            transparent 40%
-          );
-          pointer-events: none;
-        }
-
-        &:hover {
-          transform: translateY(-5px);
-          border-color: rgba(255, 255, 255, 0.2);
-        }
-      }
-
-      .tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-family: var(--font-mono);
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        padding: 0.5rem 1rem;
-        border: 1px solid var(--glass-border);
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 100px;
-        backdrop-filter: blur(4px);
-        margin-bottom: 1.5rem;
-        color: var(--color-accent);
-      }
-
-      /* Navigation override */
-      header.mt-header {
-        position: absolute;
-        width: 100%;
-        padding: 2rem 3rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        z-index: 100;
-
-        a {
-          color: white;
-          text-decoration: none;
-          font-family: var(--font-mono);
-          text-transform: uppercase;
-          font-size: 0.85rem;
-          opacity: 0.8;
-          transition: opacity 0.3s;
-
-          &:hover {
-            opacity: 1;
-          }
-        }
-      }
-
-      /* Hero */
-      .hero {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        padding-top: 4rem;
-        position: relative;
-        z-index: 2;
-
-        h1 {
-          font-family: var(--font-serif);
-          font-size: clamp(4rem, 15vw, 10rem);
-          line-height: 0.9;
-          letter-spacing: -0.02em;
-          margin-bottom: 2rem;
-          color: #fff;
-
-          text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-
-          animation: fadeUp 1.2s var(--ease-out) forwards;
-          opacity: 0;
-        }
-
-        p {
-          font-size: clamp(1.1rem, 2vw, 1.4rem);
-          max-width: 600px;
-          color: var(--color-text-muted);
-          line-height: 1.5;
-          margin-bottom: 3rem;
-          animation: fadeUp 1.2s var(--ease-out) 0.2s forwards;
-          opacity: 0;
-        }
-      }
-
-      .scroll-indicator {
-        position: absolute;
-        bottom: 3rem;
-        left: 50%;
-        transform: translateX(-50%);
-        font-family: var(--font-mono);
-        font-size: 0.75rem;
-        opacity: 0.5;
-        animation: bounce 2s infinite;
-      }
-
-      @keyframes bounce {
-        0%,
-        100% {
-          transform: translate(-50%, 0);
-        }
-        50% {
-          transform: translate(-50%, 10px);
-        }
-      }
-
-      /* Alternating Sections */
-      .section-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 6rem;
-        align-items: center;
-        margin: 10rem 0;
-
-        &.reversed {
-          direction: rtl; // Hack for visual reverse, reset in children
-          .section-content {
-            direction: ltr;
-          }
-          .glass-panel {
-            direction: ltr;
-          }
-        }
-
-        @media (max-width: 900px) {
-          grid-template-columns: 1fr;
-          gap: 3rem;
-          margin: 6rem 0;
-          &.reversed {
-            direction: ltr;
-          }
-        }
-      }
-
-      .section-content {
-        h2 {
-          font-family: var(--font-serif);
-          font-size: 3.5rem;
-          margin-bottom: 2rem;
-          line-height: 1.05;
-        }
-        p {
-          font-size: 1.15rem;
-          line-height: 1.6;
-          color: var(--color-text-muted);
-          margin-bottom: 2rem;
-        }
-      }
-
-      /* Tech Stack Pills */
-      .tech-stack {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.8rem;
-
-        span {
-          font-family: var(--font-mono);
-          font-size: 0.9rem;
-          padding: 0.6rem 1.2rem;
-          border: 1px solid rgba(155, 89, 182, 0.2);
-          background: rgba(155, 89, 182, 0.05);
-          color: var(--color-accent);
-          border-radius: 50px;
-          transition: 0.3s;
-
-          &:hover {
-            background: var(--color-accent);
-            color: #000;
-            cursor: default;
-          }
-        }
-      }
-
-      /* Challenges Grid */
-      .challenges-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
-        margin-top: 4rem;
-      }
-
-      .challenge-card {
-        padding: 2.5rem;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        transition: 0.4s var(--ease-out);
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.06);
-          transform: translateY(-5px);
-        }
-
-        h3 {
-          font-family: var(--font-serif);
-          font-size: 1.8rem;
-          margin-bottom: 1rem;
-          color: #fff;
-        }
-
-        .badge {
-          display: inline-block;
-          font-size: 0.75rem;
-          font-weight: bold;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          padding: 0.25rem 0.5rem;
-          border-radius: 4px;
-          margin-bottom: 0.5rem;
-
-          &.problem {
-            background: rgba(255, 107, 107, 0.2);
-            color: #ff6b6b;
-          }
-          &.solution {
-            background: rgba(81, 207, 102, 0.2);
-            color: #51cf66;
-          }
-        }
-      }
-
-      /* Stats */
-      .stats-container {
-        display: flex;
-        justify-content: space-around;
-        gap: 2rem;
-        margin-top: 3rem;
-        flex-wrap: wrap;
-
-        div {
-          text-align: center;
-        }
-
-        h3 {
-          font-family: var(--font-serif);
-          font-size: 5rem;
-          background: linear-gradient(
-            180deg,
-            #fff 0%,
-            rgba(255, 255, 255, 0.5) 100%
-          );
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          margin-bottom: 0.5rem;
-        }
-        span {
-          font-family: var(--font-mono);
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          color: var(--color-accent);
-          font-size: 0.9rem;
-        }
-      }
-
-      /* CTA */
-      .cta-wrapper {
-        text-align: center;
-        padding: 5rem 0;
-
-        a {
-          display: inline-block;
-          font-family: var(--font-serif);
-          font-size: 2rem;
-          color: #fff;
-          text-decoration: none;
-          padding-bottom: 0.5rem;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-          transition: 0.3s;
-
-          &:hover {
-            border-color: #fff;
-            transform: scale(1.05);
-          }
-        }
-      }
-
-      @keyframes fadeUp {
-        from {
-          opacity: 0;
-          transform: translateY(40px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      /* Video Section */
-      .video-showcase {
-        margin: 5rem 0;
-        text-align: center;
-      }
-      .video-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
-        margin-top: 3rem;
-      }
-      .video-card {
-        border-radius: 16px;
-        overflow: hidden;
-        border: 1px solid var(--glass-border);
-        background: var(--glass-bg);
-      }
-      .video-card video {
-        width: 100%;
-        height: auto;
-        display: block;
-      }
-
-      /* Global Site styles needed for structure */
-      .site-wrapper {
-        position: relative;
-        z-index: 2;
-        background: map.get($theme-colors, 'default', 'primary');
-        background-color: #000;
-        min-height: 100vh;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="site-wrapper js-site-wrapper">
-      <SiteHead />
-
-      <!-- MT Conges Container -->
-      <div class="mt-conges-container">
-        <div class="ambient-light"></div>
-        <div class="bubbles">
-          {
-            [...Array(15)].map(() => {
-              const size = 20 + Math.random() * 80
-              return (
-                <div
-                  class="bubble"
-                  style={{
-                    left: `${Math.random() * 100}%`,
-                    width: `${size}px`,
-                    height: `${size}px`,
-                    '--duration': `${15 + Math.random() * 15}s`,
-                    '--sway': `${-20 + Math.random() * 40}px`,
-                  }}
-                />
-              )
-            })
-          }
-        </div>
-
-        <header class="mt-header">
-          <a href="/portfolio_bpa/">Paul Blanc ©24</a>
-          <div style="display: flex; gap: 2rem;">
-            <a href="https://github.com/Polochon06/mt-conges" target="_blank">
-              Source Code ↗
-            </a>
-          </div>
-        </header>
-
-        <main>
-          <section class="hero">
-            <div class="tag">Java Swing • MVC Architecture</div>
-            <h1>
-              <span>MT-Congés</span>
-            </h1>
-            <p>
-              Application de gestion des congés d'entreprise avec workflow de
-              validation multi-niveaux. <br />
-              Développée en Java Swing pour simplifier les demandes et validations
-              de congés au sein d'une entreprise.
-            </p>
-
-            <div
-              class="glass-panel"
-              style="padding: 2rem; border-radius: 16px; margin-top: 3rem; max-width: 1200px; width: 100%; text-align: center;"
-            >
-              <img
-                src="/portfolio_bpa/images/works/mt-conges-login.png"
-                alt="Interface Login MT Conges"
-                class="showcase-img"
-                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: inline-block;"
-              />
-            </div>
-
-            <div class="scroll-indicator">SCROLL TO EXPLORE</div>
-          </section>
-
-          <div class="container">
-            <!-- Section: The Challenge -->
-            <div class="section-row">
-              <div class="section-content">
-                <div class="tag">Le Contexte</div>
-                <h2>Logiciel RH d'Entreprise</h2>
-                <p>
-                  MT-Congés est une application desktop développée dans le cadre
-                  d'un atelier de professionnalisation. Destinée à simplifier la
-                  gestion des congés en entreprise, elle propose <strong>
-                    trois profils utilisateurs distincts
-                  </strong> (Administrateur, Responsable, Employé) avec des fonctionnalités
-                  adaptées à chaque rôle métier.
-                </p>
-                <p>
-                  <strong>Fonctionnalités par profil :</strong><br />
-                  <strong>Employé :</strong> Sélection de dates via calendrier interactif,
-                  soumission de demandes avec motif facultatif, visualisation du solde
-                  de congés restant, signature électronique<br />
-                  <strong>Responsable :</strong> Validation/refus des demandes avec
-                  notification automatique, création d'événements, détection des congés
-                  simultanés, visualisation des demandes en attente<br />
-                  <strong>Administrateur :</strong> Création et suppression de comptes
-                  utilisateurs, gestion des rôles et permissions, recherche et tri
-                  d'utilisateurs, paramétrage système
-                </p>
-                <p>
-                  <strong>Système de notifications intégré :</strong> badge rouge
-                  avec compteur de notifications non lues, notifications automatiques
-                  lors de demandes/décisions, filtrage lues/non lues, marquage automatique
-                  à la lecture.
-                </p>
-              </div>
-              <div class="glass-panel">
-                <h3
-                  class="font-serif"
-                  style="font-size: 2rem; margin-bottom: 1.5rem;"
-                >
-                  Stack Technique
-                </h3>
-                <div class="tech-stack">
-                  <span>Java 17</span>
-                  <span>Java Swing (UI)</span>
-                  <span>MySQL 8.0</span>
-                  <span>JDBC & DAO Pattern</span>
-                  <span>BCrypt Encryption</span>
-                  <span>MVC Architecture</span>
-                  <span>Git</span>
-                </div>
-                <div
-                  style="margin-top: 2rem; font-size: 1.1rem; line-height: 1.8;"
-                >
-                  <span style="display:block; margin-bottom:0.5rem;">
-                    🗄️ <strong>Base de données:</strong> 7 tables relationnelles
-                  </span>
-                  <span style="display:block; margin-bottom:0.5rem;">
-                    🔒 <strong>Sécurité:</strong> PreparedStatements + BCrypt
-                  </span>
-                  <span style="display:block; margin-bottom:0.5rem;">
-                    👥 <strong>Rôles:</strong> 4 niveaux de permissions (RBAC)
-                  </span>
-                  <span style="display:block;">
-                    🔔 <strong>Notifications:</strong> Système d'alertes intégré
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Section: Architecture -->
-            <div class="section-row reversed">
-              <div class="section-content">
-                <div class="tag">Architecture</div>
-                <h2>Architecture & Technologies</h2>
-                <p>
-                  L'application repose sur une <strong>
-                    architecture MVC stricte
-                  </strong> développée en
-                  <strong>Java SE-22</strong> avec interface graphique Swing. La base
-                  de données MySQL 8.0 comprend 7 tables interconnectées : utilisateur,
-                  demandeconge, role, projet, projet_utilisateur, notification et
-                  evenement.
-                </p>
-                <p>
-                  <strong>Workflow de validation :</strong><br />
-                  1. L'employé soumet une demande via le calendrier interactif<br
-                  />
-                  2. Une notification est automatiquement créée pour le responsable<br
-                  />
-                  3. Le responsable valide ou refuse avec notification à l'employé<br
-                  />
-                  4. Le solde de congés est automatiquement mis à jour après acceptation<br
-                  />
-                  5. Détection automatique des conflits entre demandes simultanées
-                </p>
-                <p>
-                  <strong>Sécurité & Performance :</strong><br />
-                  • Hachage des mots de passe avec BCrypt<br />
-                  • PreparedStatements JDBC pour prévenir les injections SQL<br
-                  />
-                  • Vérification des permissions selon les rôles (RBAC)<br />
-                  • Gestion des erreurs de connexion à la base de données<br />
-                  • SessionManager singleton pour les sessions utilisateur<br />
-                  • Interfaces adaptatives selon le profil connecté
-                </p>
-              </div>
-              <div
-                class="glass-panel"
-                style="font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.7;"
-              >
-                <div style="opacity: 0.7; margin-bottom: 1rem;">
-                  -- Schéma Base de Données (adpv1)
-                </div>
-
-                <div style="color: #9b59b6;">📊 utilisateur</div>
-                <div
-                  style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;"
-                >
-                  IdUtilisateur, NomUtilisateur, Nom, Prénom<br />
-                  Email, MotDePasse (BCrypt)<br />
-                  NombreCongeRestant (défaut: 30 jours)<br />
-                  IdRole, IdProjet
-                </div>
-
-                <div style="color: #9b59b6; margin-top: 1rem;">
-                  📝 demandeconge
-                </div>
-                <div
-                  style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;"
-                >
-                  IdConge, DureeConge, DateDebutConge<br />
-                  EtatConge (En attente / Validé / Refusé)<br />
-                  Motif, IdUtilisateur (FK CASCADE)
-                </div>
-
-                <div style="color: #9b59b6; margin-top: 1rem;">👥 role</div>
-                <div
-                  style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;"
-                >
-                  IdRole, NomRole, Permission (1-4)<br />
-                  Super-Admin, Admin, Responsable, Employé
-                </div>
-
-                <div style="color: #9b59b6; margin-top: 1rem;">
-                  🔔 notification
-                </div>
-                <div
-                  style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;"
-                >
-                  IdNotification, Message, Statut<br />
-                  DateCreation, DateLecture<br />
-                  Liens: IdEvenement, IdConge, IdUtilisateur
-                </div>
-
-                <div style="color: #9b59b6; margin-top: 1rem;">
-                  🏢 projet + projet_utilisateur
-                </div>
-                <div
-                  style="padding-left: 1.5rem; font-size: 0.8rem; opacity: 0.8;"
-                >
-                  Projets: CNP, Cyber<br />
-                  Association many-to-many<br />
-                  Flag est_responsable (booléen)
-                </div>
-              </div>
-            </div>
-
-            <!-- Section: Deep Dive (Grid) -->
-            <div style="margin: 10rem 0;">
-              <div style="text-align: center; margin-bottom: 4rem;">
-                <div class="tag">Problèmes & Solutions</div>
-                <h2 class="font-serif" style="font-size: 3.5rem;">
-                  Ingénierie Logicielle
-                </h2>
-              </div>
-
-              <div class="challenges-grid">
-                <div class="challenge-card">
-                  <span class="badge problem">Sécurité</span>
-                  <h3>Protection contre les Injections SQL</h3>
-                  <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
-                    Les données RH (emails, mots de passe, soldes de congés)
-                    sont sensibles. Une seule faille d'injection SQL pourrait
-                    compromettre l'intégralité de la base.
-                  </p>
-                  <div
-                    style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
-                  >
-                    <span class="badge solution">Solution</span>
-                    <p style="opacity:0.8; font-size:0.9rem;">
-                      Utilisation <strong>exclusive</strong> de PreparedStatements
-                      JDBC pour toutes les requêtes. Mots de passe chiffrés avec BCrypt.
-                      Validation stricte des entrées utilisateur en amont.
-                    </p>
-                  </div>
-                </div>
-
-                <div class="challenge-card">
-                  <span class="badge problem">Architecture</span>
-                  <h3>Système RBAC à 4 Niveaux</h3>
-                  <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
-                    Gérer un système de permissions Role-Based Access Control
-                    avec 4 niveaux différents : Super-Admin, Admin, Responsable
-                    de projet et Employé standard.
-                  </p>
-                  <div
-                    style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
-                  >
-                    <span class="badge solution">Solution</span>
-                    <p style="opacity:0.8; font-size:0.9rem;">
-                      Table <strong>role</strong> avec colonne Permission (1-4). SessionManager
-                      singleton pour la gestion de session. Interfaces Swing adaptatives
-                      selon le rôle connecté. Contrôles d'accès au niveau DAO.
-                    </p>
-                  </div>
-                </div>
-
-                <div class="challenge-card">
-                  <span class="badge problem">Data Integrity</span>
-                  <h3>Cohérence Multi-Tables</h3>
-                  <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
-                    Maintenir l'intégrité référentielle entre 7 tables
-                    interconnectées. Empêcher les chevauchements de congés et
-                    les soldes négatifs.
-                  </p>
-                  <div
-                    style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
-                  >
-                    <span class="badge solution">Solution</span>
-                    <p style="opacity:0.8; font-size:0.9rem;">
-                      Contraintes SQL : DELETE CASCADE sur clés étrangères,
-                      contraintes UNIQUE sur projet-utilisateur, indices
-                      optimisés. Validation métier côté Java avant insertion.
-                    </p>
-                  </div>
-                </div>
-
-                <div class="challenge-card">
-                  <span class="badge problem">UX</span>
-                  <h3>Système de Notifications</h3>
-                  <p style="margin-top:1rem; opacity:0.8; line-height:1.6;">
-                    Créer un système de notifications automatique avec compteur
-                    visuel (badge rouge), génération lors de demandes/décisions,
-                    marquage à la lecture, et filtrage lues/non lues.
-                  </p>
-                  <div
-                    style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);"
-                  >
-                    <span class="badge solution">Solution</span>
-                    <p style="opacity:0.8; font-size:0.9rem;">
-                      Table <strong>notification</strong> avec statut (ouvert/non-ouvert),
-                      timestamps (création/lecture), liens contextuels (événement/congé/utilisateur).
-                      Badge UI affichant le nombre de notifications non lues. Système
-                      d'onglets pour filtrage.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- VIDEO SECTION -->
-            <div class="video-showcase">
-              <div class="tag">Mes Edits</div>
-              <h2 class="font-serif" style="font-size: 3rem; color: #fff;">
-                Showcase Vidéo
-              </h2>
-              <div class="video-grid">
-                <div class="video-card">
-                  <video src={vid1} controls loop muted playsinline></video>
-                </div>
-                <div class="video-card">
-                  <video src={vid2} controls loop muted playsinline></video>
-                </div>
-                <div class="video-card">
-                  <video src={vid3} controls loop muted playsinline></video>
-                </div>
-              </div>
-            </div>
-
-            <!-- Stats -->
-            <div
-              class="glass-panel"
-              style="text-align:center; padding: 4rem 2rem;"
-            >
-              <h2
-                class="font-serif"
-                style="font-size: 2.5rem; margin-bottom: 2rem;"
-              >
-                Impact du Projet
-              </h2>
-              <div class="stats-container">
-                <div>
-                  <h3>7</h3>
-                  <span>Tables SQL</span>
-                </div>
-                <div>
-                  <h3>4</h3>
-                  <span>Niveaux Rôles</span>
-                </div>
-                <div>
-                  <h3>100%</h3>
-                  <span>PreparedStatements</span>
-                </div>
-                <div>
-                  <h3>3</h3>
-                  <span>Mois Projet</span>
-                </div>
-              </div>
-              <div
-                style="margin-top: 3rem; font-family: var(--font-mono); font-size: 0.9rem; opacity: 0.7; line-height: 1.8;"
-              >
-                <p>📊 Architecture: MVC Strict + DAO Pattern + Java Swing UI</p>
-                <p>🔐 Sécurité: BCrypt Hash + PreparedStatements + RBAC</p>
-                <p>
-                  🔔 Features: Workflow Validation + Notifications + Calendrier
-                  Interactif
-                </p>
-                <p>
-                  👥 Profils: Administrateur, Responsable, Employé (permissions
-                  adaptatives)
-                </p>
-                <p>
-                  🎓 Contexte: Atelier de Professionnalisation BTS SIO (Équipe
-                  de 4)
-                </p>
-              </div>
-            </div>
-
-            <div class="cta-wrapper">
-              <a href="/portfolio_bpa/">← Retour au Portfolio</a>
-            </div>
-          </div>
-        </main>
-      </div>
-
-      <SiteFoot />
+<ProjectLayout
+  title="MT-Congés | Architecture Java MVC"
+  description="Application desktop de gestion des congés. Java 17, Swing, MySQL, MVC, RBAC, BCrypt."
+  heroLabel="Projet 01 · Atelier Pro BTS SIO · 2024"
+  heroSub="Application desktop de gestion des congés avec workflow de validation multi-niveaux et système RBAC à 4 rôles."
+  techTags={["Java 17", "Java Swing", "MySQL 8", "MVC", "DAO", "BCrypt", "JDBC"]}
+>
+  <Fragment slot="hero-title">MT-<br/>CONGÉS</Fragment>
+
+  <!-- ═══ 01 · STACK & CONTEXTE ════════════════════════════════════ -->
+  <section class="p-section" data-reveal>
+    <div class="p-section__header">
+      <span class="p-section__num">01</span>
+      <h2 class="p-section__title">Stack & Contexte</h2>
+      <div class="p-section__line"></div>
     </div>
 
-    <SiteScrollbar />
-  </body>
+    <div class="p-grid">
+      <div>
+        <div class="p-showcase" style="margin-bottom: 2.5rem;">
+          <img
+            src={`${base}images/works/mt-conges-login.png`}
+            alt="Interface Login MT-Congés"
+            loading="lazy"
+          />
+        </div>
 
-  <script>
-    import Emitter from '../utils/Emitter'
-    import Ticker from '../utils/Ticker'
-    import Lenis from 'lenis'
-    import { gsap } from 'gsap'
-    import { ScrollTrigger } from 'gsap/ScrollTrigger'
-    gsap.registerPlugin(ScrollTrigger)
+        <div class="p-body">
+          <p>
+            MT-Congés est une application desktop développée dans le cadre d'un
+            <strong>atelier de professionnalisation BTS SIO</strong> (équipe de 4).
+            Elle simplifie la gestion des congés en entreprise avec
+            <strong>trois profils utilisateurs distincts</strong> :
+            Administrateur, Responsable et Employé.
+          </p>
+          <p>
+            Chaque rôle dispose d'une interface Swing adaptative :
+            l'employé soumet des demandes via calendrier, le responsable
+            valide/refuse avec notification automatique, l'admin gère les
+            comptes et permissions.
+          </p>
+        </div>
 
-    declare global {
-      interface Window {
-        safeWidth: number
-        safeHeight: number
-        maxScrollTop: number
-        scrollProgress: number
-        lenis: any
-      }
-    }
+        <div class="p-stack" style="margin-top: 2rem;">
+          {["Java SE-22", "Java Swing", "MySQL 8.0", "JDBC", "DAO Pattern", "BCrypt", "MVC", "Git", "SessionManager"].map(t => (
+            <span class="p-tag">{t}</span>
+          ))}
+        </div>
+      </div>
 
-    class Site {
-      timeouts: any = {
-        resizeThrottle: null,
-      }
+      <div class="p-card">
+        <span class="p-card__label">Base de Données — adpv1 (7 tables)</span>
+        <div>
+          <div class="p-db-table">
+            <div class="p-db-name">utilisateur</div>
+            <div class="p-db-fields">IdUtilisateur, NomUtilisateur, Nom, Prénom<br/>Email, MotDePasse (BCrypt), NombreCongeRestant (30j)<br/>IdRole, IdProjet</div>
+          </div>
+          <div class="p-db-table">
+            <div class="p-db-name">demandeconge</div>
+            <div class="p-db-fields">IdConge, DureeConge, DateDebutConge<br/>EtatConge (En attente / Validé / Refusé)<br/>Motif, IdUtilisateur (FK CASCADE)</div>
+          </div>
+          <div class="p-db-table">
+            <div class="p-db-name">role</div>
+            <div class="p-db-fields">IdRole, NomRole, Permission (1–4)<br/>Super-Admin, Admin, Responsable, Employé</div>
+          </div>
+          <div class="p-db-table">
+            <div class="p-db-name">notification</div>
+            <div class="p-db-fields">IdNotification, Message, Statut<br/>DateCreation, DateLecture<br/>Liens: IdEvenement, IdConge, IdUtilisateur</div>
+          </div>
+          <div class="p-db-table">
+            <div class="p-db-name">projet + projet_utilisateur</div>
+            <div class="p-db-fields">Projets: CNP, Cyber · Association many-to-many<br/>Flag est_responsable (booléen)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      windowWidth: number
-      windowHeight: number
-      clientWidth: number
-      clientHeight: number
+  <!-- ═══ 02 · ARCHITECTURE ════════════════════════════════════════ -->
+  <section class="p-section" data-reveal>
+    <div class="p-section__header">
+      <span class="p-section__num">02</span>
+      <h2 class="p-section__title">Architecture MVC</h2>
+      <div class="p-section__line"></div>
+    </div>
 
-      isScrolling: boolean = false
+    <div class="p-grid">
+      <div>
+        <div class="p-body">
+          <p>
+            L'application repose sur une <strong>architecture MVC stricte</strong>
+            en Java SE-22 avec interface graphique Swing. La couche DAO isole
+            entièrement l'accès base de données du reste de l'application.
+          </p>
+          <p>
+            <strong>Workflow de validation :</strong>
+          </p>
+        </div>
+        <ol class="p-steps" style="margin-top: 1.5rem;">
+          <li>
+            <strong>Soumission</strong>
+            <span>L'employé sélectionne les dates via le calendrier interactif et soumet sa demande</span>
+          </li>
+          <li>
+            <strong>Notification</strong>
+            <span>Une notification est automatiquement créée pour le responsable de projet</span>
+          </li>
+          <li>
+            <strong>Validation</strong>
+            <span>Le responsable valide ou refuse — une notification est envoyée à l'employé</span>
+          </li>
+          <li>
+            <strong>Mise à jour solde</strong>
+            <span>NombreCongeRestant mis à jour automatiquement après acceptation</span>
+          </li>
+          <li>
+            <strong>Détection conflits</strong>
+            <span>Détection automatique des chevauchements entre demandes simultanées</span>
+          </li>
+        </ol>
+      </div>
 
-      lenis: any
+      <div>
+        <div class="p-card" style="margin-bottom: 1.5rem;">
+          <span class="p-card__label">Sécurité</span>
+          <div class="p-mono-block">
+            <div>✓ PreparedStatements JDBC (anti-injections SQL)</div>
+            <div>✓ Hachage BCrypt des mots de passe</div>
+            <div>✓ Vérification RBAC au niveau DAO</div>
+            <div>✓ SessionManager singleton pour les sessions</div>
+            <div>✓ Contraintes FK DELETE CASCADE</div>
+            <div>✓ UNIQUE sur association projet-utilisateur</div>
+          </div>
+        </div>
 
-      /**
-       * Constructor
-       */
-      constructor() {
-        // OS class
-        let os = 'unknown'
-        if (navigator.userAgent.indexOf('Win') !== -1) {
-          os = 'windows'
-        } else if (navigator.userAgent.indexOf('Android') !== -1) {
-          os = 'android'
-        } else if (navigator.userAgent.indexOf('Mac') !== -1) {
-          os = 'mac'
-        } else if (navigator.userAgent.indexOf('Linux') !== -1) {
-          os = 'linux'
-        }
-        document.documentElement.classList.add(`is-${os}`)
+        <div class="p-showcase">
+          <img
+            src={`${base}images/works/mt-conges-dashboard.png`}
+            alt="Dashboard MT-Congés"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
 
-        // Browser class
-        let browser = 'unknown'
-        if (navigator.userAgent.indexOf('Firefox') !== -1) {
-          browser = 'firefox'
-        } else if (navigator.userAgent.indexOf('Chrome') !== -1) {
-          browser = 'chrome'
-        } else if (navigator.userAgent.indexOf('Safari') !== -1) {
-          browser = 'safari'
-        }
-        document.documentElement.classList.add(`is-${browser}`)
+  <!-- ═══ 03 · DÉFIS & SOLUTIONS ═══════════════════════════════════ -->
+  <section class="p-section" data-reveal>
+    <div class="p-section__header">
+      <span class="p-section__num">03</span>
+      <h2 class="p-section__title">Défis & Solutions</h2>
+      <div class="p-section__line"></div>
+    </div>
 
-        this.bindEvents()
-      }
+    <div class="p-features">
+      <div class="p-challenge">
+        <span class="p-badge p-badge--problem">Sécurité</span>
+        <h3>Injections SQL</h3>
+        <p class="p-card__body">Les données RH (emails, mots de passe, soldes) sont sensibles. Une faille SQL compromettrait l'intégralité de la base.</p>
+        <hr class="p-challenge__sep" />
+        <span class="p-badge p-badge--solution">Solution</span>
+        <p class="p-card__body">Utilisation <strong style="color:var(--p-text)">exclusive</strong> de PreparedStatements JDBC pour toutes les requêtes. Mots de passe chiffrés avec BCrypt.</p>
+      </div>
 
-      /**
-       * Initialization
-       */
-      init() {
-        this.initLenis()
+      <div class="p-challenge">
+        <span class="p-badge p-badge--arch">Architecture</span>
+        <h3>RBAC 4 Niveaux</h3>
+        <p class="p-card__body">Gérer un système de permissions à 4 niveaux : Super-Admin, Admin, Responsable de projet et Employé standard.</p>
+        <hr class="p-challenge__sep" />
+        <span class="p-badge p-badge--solution">Solution</span>
+        <p class="p-card__body">Table <strong style="color:var(--p-text)">role</strong> avec colonne Permission (1–4). SessionManager singleton. Interfaces Swing adaptatives selon le rôle.</p>
+      </div>
 
-        Ticker.init()
+      <div class="p-challenge">
+        <span class="p-badge p-badge--problem">Intégrité</span>
+        <h3>Cohérence Multi-Tables</h3>
+        <p class="p-card__body">Maintenir l'intégrité entre 7 tables. Empêcher les chevauchements de congés et les soldes négatifs.</p>
+        <hr class="p-challenge__sep" />
+        <span class="p-badge p-badge--solution">Solution</span>
+        <p class="p-card__body">Contraintes SQL : DELETE CASCADE, UNIQUE sur projet-utilisateur, indices optimisés. Validation métier côté Java avant insertion.</p>
+      </div>
 
-        this.onResize()
-        document.dispatchEvent(new CustomEvent('intro'))
-        Ticker.nextTick(() => Emitter.emit('updateViewport'))
-      }
+      <div class="p-challenge">
+        <span class="p-badge p-badge--ux">UX</span>
+        <h3>Système de Notifications</h3>
+        <p class="p-card__body">Badge rouge avec compteur de non-lues, génération automatique lors des demandes/décisions, filtrage lues/non lues.</p>
+        <hr class="p-challenge__sep" />
+        <span class="p-badge p-badge--solution">Solution</span>
+        <p class="p-card__body">Table <strong style="color:var(--p-text)">notification</strong> avec statut, timestamps, liens contextuels. Badge UI dynamique. Onglets de filtrage.</p>
+      </div>
+    </div>
+  </section>
 
-      /**
-       * Bind events
-       */
-      bindEvents() {
-        window.addEventListener('resize', this.resizeThrottle.bind(this))
-        window.addEventListener('scroll', this.onScroll.bind(this), {
-          passive: true,
-        })
-        window.addEventListener('mousemove', this.onMouseMove.bind(this), {
-          passive: true,
-        })
+  <!-- ═══ 04 · SHOWCASE VIDÉO ══════════════════════════════════════ -->
+  <section class="p-section" data-reveal>
+    <div class="p-section__header">
+      <span class="p-section__num">04</span>
+      <h2 class="p-section__title">Showcase Vidéo</h2>
+      <div class="p-section__line"></div>
+    </div>
 
-        Emitter.on('updateViewport', this.onResize, this, true)
+    <p class="p-body" style="max-width:600px; margin-bottom:3rem;">
+      <span style="opacity:0.6">Extraits de démonstration de l'application en fonctionnement.</span>
+    </p>
 
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              entry.target.dispatchEvent(
-                new CustomEvent('intersect', {
-                  detail: { isIntersecting: entry.isIntersecting },
-                }),
-              )
+    <div class="p-videos">
+      <div class="p-video">
+        <video src={vid1} controls loop muted playsinline></video>
+      </div>
+      <div class="p-video">
+        <video src={vid2} controls loop muted playsinline></video>
+      </div>
+      <div class="p-video">
+        <video src={vid3} controls loop muted playsinline></video>
+      </div>
+    </div>
+  </section>
 
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-in-view')
-                entry.target.classList.remove(
-                  'is-out-of-view',
-                  'is-out-of-view-top',
-                  'is-out-of-view-bottom',
-                )
-              } else {
-                entry.target.classList.remove('is-in-view')
-                entry.target.classList.add('is-out-of-view')
+  <!-- ═══ STATS ═════════════════════════════════════════════════════ -->
+  <div class="p-stats" data-reveal>
+    <div class="p-stat">
+      <div class="p-stat__num">7</div>
+      <div class="p-stat__label">Tables SQL</div>
+    </div>
+    <div class="p-stat">
+      <div class="p-stat__num">4</div>
+      <div class="p-stat__label">Niveaux Rôles</div>
+    </div>
+    <div class="p-stat">
+      <div class="p-stat__num">100%</div>
+      <div class="p-stat__label">PreparedStmts</div>
+    </div>
+    <div class="p-stat">
+      <div class="p-stat__num">3</div>
+      <div class="p-stat__label">Mois Projet</div>
+    </div>
+  </div>
 
-                entry.target.classList.toggle(
-                  'is-out-of-view-top',
-                  entry.boundingClientRect.top < 0,
-                )
-                entry.target.classList.toggle(
-                  'is-out-of-view-bottom',
-                  entry.boundingClientRect.top > 0,
-                )
-              }
-            })
-          },
-          {
-            threshold: 0,
-          },
-        )
-
-        document.querySelectorAll('[data-intersect]').forEach((el) => {
-          observer.observe(el)
-        })
-
-        // Site loaded event
-        if (document.readyState === 'complete') {
-          this.siteLoaded()
-        } else {
-          window.addEventListener('load', this.siteLoaded, { once: true })
-        }
-
-        this.onScroll()
-      }
-
-      /**
-       * Init lenis
-       */
-      initLenis() {
-        // Only valid if wrapper matches standard flow
-        const lenis = new Lenis()
-
-        lenis.on('scroll', ScrollTrigger.update)
-
-        gsap.ticker.add((time) => {
-          lenis.raf(time * 1000)
-        })
-
-        gsap.ticker.lagSmoothing(0)
-
-        window.lenis = lenis
-        this.lenis = lenis
-      }
-
-      /**
-       * Set loaded class
-       */
-      siteLoaded() {
-        document.documentElement.classList.add('is-loaded')
-
-        Emitter.emit('siteLoaded')
-      }
-
-      /**
-       * Resize throttle
-       */
-      resizeThrottle() {
-        clearTimeout(this.timeouts.resizeThrottle)
-
-        this.timeouts.resizeThrottle = setTimeout(() => {
-          Ticker.nextTick(this.onResize, this)
-        }, 200)
-      }
-
-      /**
-       * Resize handler
-       */
-      onResize() {
-        const newWidth = window.innerWidth
-        let widthChanged = false
-        if (this.windowWidth !== newWidth) {
-          if (this.windowWidth !== undefined) {
-            widthChanged = true
-          }
-
-          this.windowWidth = newWidth
-          this.clientWidth = document.body.clientWidth
-        }
-
-        const newHeight = window.innerHeight
-        let heightChanged = false
-        if (this.windowHeight !== newHeight) {
-          if (this.windowHeight !== undefined) {
-            heightChanged = true
-          }
-
-          this.windowHeight = newHeight
-          this.clientHeight = document.body.clientHeight
-        }
-
-        window.safeWidth = newWidth
-        window.safeHeight = newHeight
-
-        window.maxScrollTop = document.body.scrollHeight - window.safeHeight
-
-        this.setScrollProgress()
-
-        Emitter.emit('resize', widthChanged, heightChanged)
-      }
-
-      /**
-       * Scroll handler
-       */
-      onScroll() {
-        this.setScrollProgress()
-
-        Ticker.nextTick(() => {
-          Emitter.emit('scroll', window.scrollY)
-        })
-      }
-
-      /**
-       * Set scroll progress
-       */
-      setScrollProgress() {
-        window.scrollProgress = window.scrollY / window.maxScrollTop
-      }
-
-      /**
-       * Mouse move handler
-       */
-      onMouseMove(e) {
-        Emitter.emit('mousemove', e.clientX, e.clientY)
-      }
-
-    }
-
-    const site = new Site()
-
-    // Site init on DOM ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', site.init, { once: true })
-    } else {
-      site.init()
-    }
-  </script>
-</html>
+</ProjectLayout>

@@ -1,1074 +1,260 @@
 ---
-import SiteHead from '../components/SiteHead.astro'
-import SiteFoot from '../components/SiteFoot.astro'
-import SiteScrollbar from '../components/SiteScrollbar.astro'
-import '../styles/global.scss'
+import ProjectLayout from '../layouts/ProjectLayout.astro'
+
+const base = import.meta.env.BASE_URL
 ---
 
-<html lang="fr" class="theme-contrasted">
-  <head>
-    <meta charset="utf-8" />
-    <title>Gymnova Shop | E-Commerce Gymnastique</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="Site e-commerce de vente de matériel de gymnastique professionnel. React 18, Node.js, Express, MySQL, Stripe."
-    />
-    <link rel="icon" type="image/png" href="/icons/favicon-48x48.png" />
-
-    <!-- Fonts -->
-    <link
-      rel="preload"
-      href="/fonts/PPEditorialNew-Regular.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/fonts/PPEditorialNew-Ultralight.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/fonts/PPFraktionMono-Regular.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/fonts/PPFraktionMono-Bold.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/fonts/Bigger-Display.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-
-    <style lang="scss">
-      @import url('https://fonts.googleapis.com/css2?family=Italiana&display=swap');
-
-      :root {
-        --gshop-bg: #8b5cf6;
-        --gshop-text: #e8e8f0;
-        --gshop-text-muted: #a0a0b8;
-        --gshop-accent: #9b59b6;
-        --gshop-accent-dim: rgba(155, 89, 182, 0.12);
-        --gshop-gold: #d4a853;
-        --gshop-gold-dim: rgba(212, 168, 83, 0.15);
-
-        --font-serif: 'Italiana', serif;
-        --font-mono: 'PP Fraktion Mono', monospace;
-
-        --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-
-        --glass-bg: rgba(18, 18, 28, 0.5);
-        --glass-border: rgba(255, 255, 255, 0.08);
-        --glass-highlight: rgba(255, 255, 255, 0.03);
-        --glass-blur: blur(20px);
-        --glass-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
-      }
-
-      .gymnova-page {
-        margin: 0;
-        background-color: var(--gshop-bg);
-        color: var(--gshop-text);
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        overflow-x: hidden;
-        -webkit-font-smoothing: antialiased;
-        min-height: 100vh;
-        padding-bottom: 4rem;
-      }
-
-      /* Ambient gradient */
-      .ambient-light {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background:
-          radial-gradient(circle at 20% 20%, rgba(155, 89, 182, 0.06), transparent 50%),
-          radial-gradient(circle at 80% 80%, rgba(212, 168, 83, 0.04), transparent 50%);
-        pointer-events: none;
-        z-index: 1;
-      }
-
-      /* Floating particles */
-      .particles {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-        pointer-events: none;
-        overflow: hidden;
-      }
-
-      .particle {
-        position: absolute;
-        bottom: -20px;
-        width: 4px;
-        height: 4px;
-        background: var(--gshop-accent);
-        border-radius: 50%;
-        opacity: 0;
-        animation: float var(--duration) infinite ease-in-out;
-        animation-delay: var(--delay);
-      }
-
-      @keyframes float {
-        0% { bottom: -20px; opacity: 0; transform: translateX(0); }
-        20% { opacity: 0.6; }
-        100% { bottom: 110%; opacity: 0; transform: translateX(var(--sway)); }
-      }
-
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 2rem;
-        position: relative;
-        z-index: 2;
-      }
-
-      h1, h2, h3 { margin: 0; font-weight: normal; }
-
-      .font-serif { font-family: var(--font-serif); }
-      .font-mono { font-family: var(--font-mono); }
-
-      /* Glass Panel */
-      .glass-panel {
-        background: var(--glass-bg);
-        backdrop-filter: var(--glass-blur);
-        -webkit-backdrop-filter: var(--glass-blur);
-        border: 1px solid var(--glass-border);
-        border-radius: 24px;
-        padding: 3rem;
-        box-shadow: var(--glass-shadow);
-        transition: transform 0.6s var(--ease-out), border-color 0.4s ease;
-        position: relative;
-        overflow: hidden;
-
-        &::before {
-          content: '';
-          position: absolute;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: linear-gradient(135deg, var(--glass-highlight) 0%, transparent 40%);
-          pointer-events: none;
-        }
-
-        &:hover {
-          transform: translateY(-5px);
-          border-color: rgba(255, 255, 255, 0.2);
-        }
-      }
-
-      .tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-family: var(--font-mono);
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        padding: 0.5rem 1rem;
-        border: 1px solid var(--glass-border);
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 100px;
-        backdrop-filter: blur(4px);
-        margin-bottom: 1.5rem;
-        color: var(--gshop-accent);
-      }
-
-      /* Hero */
-      .hero {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        padding-top: 4rem;
-        position: relative;
-        z-index: 2;
-
-        h1 {
-          font-family: var(--font-serif);
-          font-size: clamp(4rem, 15vw, 10rem);
-          line-height: 0.9;
-          letter-spacing: -0.02em;
-          margin-bottom: 2rem;
-          color: #fff;
-          text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-          animation: fadeUp 1.2s var(--ease-out) forwards;
-          opacity: 0;
-        }
-
-        p {
-          font-size: clamp(1.1rem, 2vw, 1.4rem);
-          max-width: 650px;
-          color: var(--gshop-text-muted);
-          line-height: 1.5;
-          margin-bottom: 3rem;
-          animation: fadeUp 1.2s var(--ease-out) 0.2s forwards;
-          opacity: 0;
-        }
-      }
-
-      .scroll-indicator {
-        position: absolute;
-        bottom: 3rem;
-        left: 50%;
-        transform: translateX(-50%);
-        font-family: var(--font-mono);
-        font-size: 0.75rem;
-        opacity: 0.5;
-        animation: bounce 2s infinite;
-      }
-
-      @keyframes bounce {
-        0%, 100% { transform: translate(-50%, 0); }
-        50% { transform: translate(-50%, 10px); }
-      }
-
-      @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(40px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-
-      /* Sections */
-      .section-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 6rem;
-        align-items: center;
-        margin: 10rem 0;
-
-        &.reversed {
-          direction: rtl;
-          .section-content, .glass-panel { direction: ltr; }
-        }
-
-        @media (max-width: 900px) {
-          grid-template-columns: 1fr;
-          gap: 3rem;
-          margin: 6rem 0;
-          &.reversed { direction: ltr; }
-        }
-      }
-
-      .section-content {
-        h2 {
-          font-family: var(--font-serif);
-          font-size: 3.5rem;
-          margin-bottom: 2rem;
-          line-height: 1.05;
-        }
-        p {
-          font-size: 1.15rem;
-          line-height: 1.6;
-          color: var(--gshop-text-muted);
-          margin-bottom: 2rem;
-        }
-      }
-
-      /* Tech Pills */
-      .tech-stack {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.8rem;
-
-        span {
-          font-family: var(--font-mono);
-          font-size: 0.9rem;
-          padding: 0.6rem 1.2rem;
-          border: 1px solid rgba(155, 89, 182, 0.25);
-          background: var(--gshop-accent-dim);
-          color: var(--gshop-accent);
-          border-radius: 50px;
-          transition: 0.3s;
-
-          &:hover {
-            background: var(--gshop-accent);
-            color: #fff;
-            cursor: default;
-          }
-        }
-      }
-
-      /* Catalogue Grid */
-      .catalogue-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1px;
-        margin: 4rem 0;
-        border: 1px solid var(--glass-border);
-        border-radius: 16px;
-        overflow: hidden;
-
-        @media (max-width: 900px) {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-
-      .cat-item {
-        background: rgba(255, 255, 255, 0.02);
-        padding: 2rem 1.5rem;
-        text-align: center;
-        transition: 0.3s ease;
-        border-right: 1px solid var(--glass-border);
-        border-bottom: 1px solid var(--glass-border);
-
-        &:hover {
-          background: var(--gshop-accent-dim);
-        }
-
-        .cat-icon {
-          font-size: 2.5rem;
-          margin-bottom: 0.75rem;
-          display: block;
-        }
-
-        .cat-name {
-          font-family: var(--font-mono);
-          font-size: 0.85rem;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          color: #fff;
-          display: block;
-          margin-bottom: 0.5rem;
-        }
-
-        .cat-price {
-          font-family: var(--font-mono);
-          font-size: 0.75rem;
-          color: var(--gshop-gold);
-          opacity: 0.8;
-        }
-      }
-
-      /* Feature Cards */
-      .features-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 2rem;
-        margin-top: 4rem;
-      }
-
-      .feature-card {
-        padding: 2.5rem;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 16px;
-        transition: 0.4s var(--ease-out);
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.06);
-          transform: translateY(-5px);
-          border-color: var(--gshop-accent);
-        }
-
-        h3 {
-          font-family: var(--font-serif);
-          font-size: 1.8rem;
-          margin-bottom: 1rem;
-          color: #fff;
-        }
-
-        .badge {
-          display: inline-block;
-          font-size: 0.7rem;
-          font-weight: bold;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          padding: 0.3rem 0.6rem;
-          border-radius: 4px;
-          margin-bottom: 0.75rem;
-
-          &.frontend { background: rgba(96, 165, 250, 0.2); color: #60a5fa; }
-          &.backend { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
-          &.database { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
-          &.payment { background: rgba(155, 89, 182, 0.2); color: var(--gshop-accent); }
-        }
-      }
-
-      /* User Flow */
-      .flow-steps {
-        counter-reset: flow;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
-
-      .flow-steps li {
-        counter-increment: flow;
-        position: relative;
-        padding: 1.5rem 0 1.5rem 4rem;
-        border-left: 1px solid var(--glass-border);
-        margin-left: 1rem;
-
-        &::before {
-          content: counter(flow);
-          position: absolute;
-          left: -1.25rem;
-          top: 1.5rem;
-          width: 2.5rem;
-          height: 2.5rem;
-          background: var(--gshop-accent);
-          color: #fff;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 700;
-          font-size: 1rem;
-          font-family: var(--font-mono);
-        }
-
-        &:last-child { border-left: none; }
-
-        strong {
-          color: #fff;
-          display: block;
-          font-size: 1.1rem;
-          margin-bottom: 0.25rem;
-        }
-
-        span {
-          font-size: 0.95rem;
-          color: var(--gshop-text-muted);
-          line-height: 1.5;
-        }
-      }
-
-      /* Stats */
-      .stats-container {
-        display: flex;
-        justify-content: space-around;
-        gap: 2rem;
-        margin-top: 3rem;
-        flex-wrap: wrap;
-
-        div { text-align: center; }
-
-        h3 {
-          font-family: var(--font-serif);
-          font-size: 5rem;
-          background: linear-gradient(180deg, #fff 0%, rgba(255, 255, 255, 0.5) 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          margin-bottom: 0.5rem;
-        }
-        span {
-          font-family: var(--font-mono);
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          color: var(--gshop-accent);
-          font-size: 0.9rem;
-        }
-      }
-
-      /* API Routes */
-      .api-block {
-        font-family: var(--font-mono);
-        font-size: 0.85rem;
-        line-height: 2;
-
-        .route-group {
-          margin-bottom: 1.5rem;
-        }
-
-        .route-title {
-          color: var(--gshop-accent);
-          font-weight: bold;
-          font-size: 0.9rem;
-          margin-bottom: 0.5rem;
-        }
-
-        .method {
-          display: inline-block;
-          padding: 0.15rem 0.4rem;
-          border-radius: 3px;
-          font-size: 0.7rem;
-          font-weight: bold;
-          margin-right: 0.5rem;
-
-          &.get { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
-          &.post { background: rgba(96, 165, 250, 0.2); color: #60a5fa; }
-          &.put { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
-          &.delete { background: rgba(155, 89, 182, 0.2); color: var(--gshop-accent); }
-        }
-
-        .endpoint {
-          opacity: 0.7;
-        }
-      }
-
-      /* CTA */
-      .cta-wrapper {
-        text-align: center;
-        padding: 5rem 0;
-
-        a {
-          display: inline-block;
-          font-family: var(--font-serif);
-          font-size: 2rem;
-          color: #fff;
-          text-decoration: none;
-          padding-bottom: 0.5rem;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-          transition: 0.3s;
-
-          &:hover {
-            border-color: var(--gshop-accent);
-            color: var(--gshop-accent);
-            transform: scale(1.05);
-          }
-        }
-      }
-
-      /* DB Schema */
-      .db-table {
-        margin-bottom: 1.5rem;
-
-        .db-name {
-          color: var(--gshop-gold);
-          font-weight: bold;
-          font-size: 0.9rem;
-        }
-
-        .db-fields {
-          padding-left: 1.5rem;
-          font-size: 0.8rem;
-          opacity: 0.7;
-          line-height: 1.6;
-        }
-      }
-
-      /* Site Structure */
-      .site-wrapper {
-        position: relative;
-        z-index: 2;
-        background: map.get($theme-colors, 'default', 'primary');
-        background-color: #000;
-        min-height: 100vh;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="site-wrapper js-site-wrapper">
-      <SiteHead />
-
-      <main class="gymnova-page">
-        <div class="ambient-light"></div>
-        <div class="particles">
-          {
-            [...Array(20)].map(() => (
-              <div
-                class="particle"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  '--duration': `${12 + Math.random() * 18}s`,
-                  '--delay': `${Math.random() * 10}s`,
-                  '--sway': `${-30 + Math.random() * 60}px`,
-                }}
-              />
-            ))
-          }
-        </div>
-
-        <section class="hero">
-          <div class="tag">React 18 • Node.js • Stripe</div>
-          <h1>
-            Gymnova<br /><span style="color: var(--gshop-accent);">Shop</span>
-          </h1>
-          <p>
-            Site e-commerce de vente de materiel de gymnastique professionnel.
-            Du catalogue produit au paiement Stripe, une experience d'achat complete
-            inspiree de la marque Gymnova.
-          </p>
-          <div class="scroll-indicator">SCROLL TO EXPLORE</div>
-        </section>
-
-        <div class="container">
-          <!-- Section: Overview -->
-          <div class="section-row">
-            <div class="section-content">
-              <div class="tag">Le Projet</div>
-              <h2>E-Commerce Premium</h2>
-              <p>
-                Gymnova Shop est un site e-commerce complet de vente de materiel de
-                gymnastique professionnel, developpe dans le cadre du <strong>BTS SIO SLAM</strong>.
-                Inspire de la marque Gymnova (fabricant francais d'equipements de
-                gymnastique), le site propose un catalogue de <strong>~50 references</strong>
-                reparties en 8 categories.
-              </p>
-              <p>
-                L'application couvre l'ensemble du parcours client : navigation dans le
-                catalogue avec filtres, fiche produit detaillee, gestion du panier,
-                checkout avec <strong>paiement Stripe</strong> integre, et suivi des commandes.
-                Un back-office administrateur permet la gestion des commandes et de
-                leur statut.
-              </p>
-            </div>
-            <div class="glass-panel">
-              <h3 class="font-serif" style="font-size: 2rem; margin-bottom: 1.5rem;">
-                Stack Technique
-              </h3>
-              <div class="tech-stack">
-                <span>React 18</span>
-                <span>Node.js</span>
-                <span>Express</span>
-                <span>MySQL</span>
-                <span>Stripe.js</span>
-                <span>Axios</span>
-                <span>JWT Auth</span>
-                <span>bcryptjs</span>
-                <span>React Router</span>
-                <span>CORS</span>
-              </div>
-              <div style="margin-top: 2rem; font-size: 1.1rem; line-height: 1.8;">
-                <span style="display:block; margin-bottom:0.5rem;">
-                  <strong style="color: var(--gshop-accent);">Frontend:</strong> React 18 SPA + React Router
-                </span>
-                <span style="display:block; margin-bottom:0.5rem;">
-                  <strong style="color: var(--gshop-accent);">Backend:</strong> API REST Express (port 5000)
-                </span>
-                <span style="display:block; margin-bottom:0.5rem;">
-                  <strong style="color: var(--gshop-accent);">BDD:</strong> MySQL (gymnova_bdd) - 8 tables
-                </span>
-                <span style="display:block;">
-                  <strong style="color: var(--gshop-accent);">Paiement:</strong> Stripe (+ mode demo)
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section: Catalogue -->
-          <div style="margin: 10rem 0;">
-            <div style="text-align: center; margin-bottom: 4rem;">
-              <div class="tag">8 Categories</div>
-              <h2 class="font-serif" style="font-size: 3.5rem;">
-                Catalogue Produits
-              </h2>
-              <p style="max-width: 600px; margin: 1rem auto; color: var(--gshop-text-muted); font-size: 1.1rem;">
-                ~50 references de materiel de gymnastique professionnel
-              </p>
-            </div>
-
-            <div class="catalogue-grid">
-              <div class="cat-item">
-                <span class="cat-icon">🤸</span>
-                <span class="cat-name">Floor Mats</span>
-                <span class="cat-price">149 - 15 999 EUR</span>
-              </div>
-              <div class="cat-item">
-                <span class="cat-icon">⚖️</span>
-                <span class="cat-name">Poutres</span>
-                <span class="cat-price">79 - 3 299 EUR</span>
-              </div>
-              <div class="cat-item">
-                <span class="cat-icon">🏋️</span>
-                <span class="cat-name">Barres</span>
-                <span class="cat-price">24 - 5 999 EUR</span>
-              </div>
-              <div class="cat-item">
-                <span class="cat-icon">🦘</span>
-                <span class="cat-name">Trampolines</span>
-                <span class="cat-price">79 - 12 999 EUR</span>
-              </div>
-              <div class="cat-item">
-                <span class="cat-icon">⭕</span>
-                <span class="cat-name">Anneaux</span>
-                <span class="cat-price">149 - 4 999 EUR</span>
-              </div>
-              <div class="cat-item">
-                <span class="cat-icon">🐴</span>
-                <span class="cat-name">Cheval d'Arcons</span>
-                <span class="cat-price">299 - 3 299 EUR</span>
-              </div>
-              <div class="cat-item">
-                <span class="cat-icon">🏃</span>
-                <span class="cat-name">Saut</span>
-                <span class="cat-price">599 - 3 499 EUR</span>
-              </div>
-              <div class="cat-item">
-                <span class="cat-icon">🎒</span>
-                <span class="cat-name">Accessoires</span>
-                <span class="cat-price">12 - 189 EUR</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section: Architecture -->
-          <div class="section-row reversed">
-            <div class="section-content">
-              <div class="tag">Architecture</div>
-              <h2>API REST & Base de Donnees</h2>
-              <p>
-                Le backend est construit avec <strong>Node.js / Express</strong> et expose
-                une API REST sur 5 groupes de routes. L'authentification repose sur des
-                <strong>tokens JWT</strong> (validite 7 jours) avec hachage des mots de
-                passe via bcryptjs. Le CORS est configure pour autoriser les requetes
-                du frontend React.
-              </p>
-              <p>
-                La base de donnees MySQL <strong>gymnova_bdd</strong> comprend 8 tables
-                avec des noms de champs en francais (nom, prix, stock, quantite, categorie_id...).
-                Le design du frontend adopte un <strong>theme sombre premium</strong> avec
-                effet glassmorphism et video YouTube en fond sur la page d'accueil.
-              </p>
-            </div>
-            <div class="glass-panel" style="font-family: var(--font-mono); font-size: 0.85rem;">
-              <div style="opacity: 0.7; margin-bottom: 1.5rem;">-- API Endpoints</div>
-
-              <div class="api-block">
-                <div class="route-group">
-                  <div class="route-title">/api/auth</div>
-                  <span class="method post">POST</span><span class="endpoint">/register</span><br/>
-                  <span class="method post">POST</span><span class="endpoint">/login</span>
-                </div>
-                <div class="route-group">
-                  <div class="route-title">/api/products</div>
-                  <span class="method get">GET</span><span class="endpoint">/ (liste + filtres)</span><br/>
-                  <span class="method get">GET</span><span class="endpoint">/:id (detail)</span>
-                </div>
-                <div class="route-group">
-                  <div class="route-title">/api/cart</div>
-                  <span class="method get">GET</span><span class="endpoint">/ (panier)</span><br/>
-                  <span class="method post">POST</span><span class="endpoint">/add</span><br/>
-                  <span class="method put">PUT</span><span class="endpoint">/update</span><br/>
-                  <span class="method delete">DEL</span><span class="endpoint">/remove/:id</span>
-                </div>
-                <div class="route-group">
-                  <div class="route-title">/api/orders</div>
-                  <span class="method post">POST</span><span class="endpoint">/create</span><br/>
-                  <span class="method get">GET</span><span class="endpoint">/ (historique)</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section: Fonctionnalites -->
-          <div style="margin: 10rem 0;">
-            <div style="text-align: center; margin-bottom: 4rem;">
-              <div class="tag">Features</div>
-              <h2 class="font-serif" style="font-size: 3.5rem;">
-                Fonctionnalites
-              </h2>
-            </div>
-
-            <div class="features-grid">
-              <div class="feature-card">
-                <span class="badge frontend">Frontend</span>
-                <h3>Catalogue & Filtres</h3>
-                <p style="margin-top: 1rem; opacity: 0.8; line-height: 1.6;">
-                  Navigation dans le catalogue avec <strong>filtrage par categorie</strong>
-                  et recherche textuelle. Fiche produit complete avec images, description
-                  detaillee et avis clients.
-                </p>
-              </div>
-
-              <div class="feature-card">
-                <span class="badge payment">Paiement</span>
-                <h3>Checkout Stripe</h3>
-                <p style="margin-top: 1rem; opacity: 0.8; line-height: 1.6;">
-                  Integration <strong>Stripe.js</strong> pour le paiement securise par
-                  carte bancaire. Mode demo disponible sans cle Stripe pour les tests.
-                  Formulaire d'adresse de livraison integre.
-                </p>
-              </div>
-
-              <div class="feature-card">
-                <span class="badge backend">Backend</span>
-                <h3>Auth JWT</h3>
-                <p style="margin-top: 1rem; opacity: 0.8; line-height: 1.6;">
-                  Systeme d'authentification complet avec <strong>JSON Web Tokens</strong>
-                  (validite 7 jours). Inscription, connexion, gestion du profil
-                  (nom, prenom, telephone). Hash bcryptjs.
-                </p>
-              </div>
-
-              <div class="feature-card">
-                <span class="badge database">Admin</span>
-                <h3>Gestion Commandes</h3>
-                <p style="margin-top: 1rem; opacity: 0.8; line-height: 1.6;">
-                  Back-office admin pour visualiser toutes les commandes et modifier
-                  leur statut: <strong>en_attente -> payee -> en_preparation ->
-                  expediee -> livree / annulee</strong>.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section: Parcours Utilisateur -->
-          <div class="section-row">
-            <div class="section-content">
-              <div class="tag">UX Flow</div>
-              <h2>Parcours Client</h2>
-              <ol class="flow-steps">
-                <li>
-                  <strong>Page d'accueil</strong>
-                  <span>Video YouTube en fond + presentation de la marque</span>
-                </li>
-                <li>
-                  <strong>Catalogue</strong>
-                  <span>Navigation et filtrage par categorie (8 categories)</span>
-                </li>
-                <li>
-                  <strong>Fiche Produit</strong>
-                  <span>Images, description, avis, ajout au panier</span>
-                </li>
-                <li>
-                  <strong>Inscription / Connexion</strong>
-                  <span>Authentification JWT securisee</span>
-                </li>
-                <li>
-                  <strong>Panier & Checkout</strong>
-                  <span>Gestion des quantites, adresse de livraison, paiement Stripe</span>
-                </li>
-                <li>
-                  <strong>Confirmation</strong>
-                  <span>Page Order Success + suivi dans l'historique</span>
-                </li>
-              </ol>
-            </div>
-            <div class="glass-panel" style="font-family: var(--font-mono); font-size: 0.85rem;">
-              <div style="opacity: 0.7; margin-bottom: 1.5rem;">-- Base de Donnees: gymnova_bdd</div>
-
-              <div class="db-table">
-                <div class="db-name">users</div>
-                <div class="db-fields">id, nom, prenom, email, password, telephone, role</div>
-              </div>
-              <div class="db-table">
-                <div class="db-name">categories</div>
-                <div class="db-fields">id, nom, description, image_url</div>
-              </div>
-              <div class="db-table">
-                <div class="db-name">products</div>
-                <div class="db-fields">id, nom, description, prix, stock, categorie_id</div>
-              </div>
-              <div class="db-table">
-                <div class="db-name">product_images</div>
-                <div class="db-fields">id, product_id, image_url, is_primary</div>
-              </div>
-              <div class="db-table">
-                <div class="db-name">cart</div>
-                <div class="db-fields">id, user_id, product_id, quantite</div>
-              </div>
-              <div class="db-table">
-                <div class="db-name">orders</div>
-                <div class="db-fields">id, user_id, total, statut, adresse_livraison</div>
-              </div>
-              <div class="db-table">
-                <div class="db-name">order_items</div>
-                <div class="db-fields">id, order_id, product_id, quantite, prix_unitaire</div>
-              </div>
-              <div class="db-table">
-                <div class="db-name">reviews</div>
-                <div class="db-fields">id, user_id, product_id, note, commentaire</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Stats -->
-          <div class="glass-panel" style="text-align: center; padding: 4rem 2rem;">
-            <h2 class="font-serif" style="font-size: 2.5rem; margin-bottom: 2rem;">
-              Le Projet en Chiffres
-            </h2>
-            <div class="stats-container">
-              <div>
-                <h3>8</h3>
-                <span>Tables MySQL</span>
-              </div>
-              <div>
-                <h3>50</h3>
-                <span>References</span>
-              </div>
-              <div>
-                <h3>5</h3>
-                <span>Routes API</span>
-              </div>
-              <div>
-                <h3>11</h3>
-                <span>Pages React</span>
-              </div>
-            </div>
-            <div style="margin-top: 3rem; font-family: var(--font-mono); font-size: 0.9rem; opacity: 0.7; line-height: 1.8;">
-              <p><strong style="color: var(--gshop-accent);">Frontend:</strong> React 18 + React Router + Axios + Stripe.js</p>
-              <p><strong style="color: var(--gshop-accent);">Backend:</strong> Node.js + Express + JWT + bcryptjs + CORS</p>
-              <p><strong style="color: var(--gshop-accent);">BDD:</strong> MySQL (gymnova_bdd) - Champs en francais</p>
-              <p><strong style="color: var(--gshop-accent);">Design:</strong> Theme sombre premium + Glassmorphism + Video Hero</p>
-              <p><strong style="color: var(--gshop-accent);">Contexte:</strong> Projet BTS SIO SLAM</p>
-            </div>
-          </div>
-
-          <div class="cta-wrapper">
-            <a href="/portfolio_bpa/">← Retour au Portfolio</a>
-          </div>
-        </div>
-      </main>
-
-      <SiteFoot />
+<ProjectLayout
+  title="Gymnova Shop | E-Commerce React"
+  description="Site e-commerce de vente de matériel de gymnastique. React 18, Node.js, Express, MySQL, Stripe."
+  heroLabel="Projet 02 · BTS SIO SLAM · 2024"
+  heroSub="Site e-commerce complet de vente de matériel de gymnastique professionnel — catalogue, panier, paiement Stripe intégré."
+  techTags={["React 18", "Node.js", "Express", "MySQL", "Stripe", "JWT"]}
+>
+  <Fragment slot="hero-title">GYMNOVA<br/>SHOP</Fragment>
+
+  <!-- ═══ 01 · STACK & CONTEXTE ════════════════════════════════════ -->
+  <section class="p-section" data-reveal>
+    <div class="p-section__header">
+      <span class="p-section__num">01</span>
+      <h2 class="p-section__title">Stack & Contexte</h2>
+      <div class="p-section__line"></div>
     </div>
 
-    <SiteScrollbar />
-  </body>
+    <div class="p-grid">
+      <div>
+        <div class="p-body">
+          <p>
+            Gymnova Shop est un site e-commerce complet développé dans le cadre
+            du <strong>BTS SIO SLAM</strong>. Inspiré de la marque Gymnova (fabricant
+            français d'équipements), le site propose un catalogue de <strong>~50 références</strong>
+            réparties en 8 catégories.
+          </p>
+          <p>
+            Le projet couvre l'ensemble du parcours client : navigation avec filtres,
+            fiche produit, gestion du panier, checkout avec <strong>paiement Stripe</strong>,
+            suivi des commandes. Un back-office admin gère les statuts des commandes.
+          </p>
+          <p>
+            L'architecture repose sur une <strong>SPA React 18</strong> côté front
+            communicant avec une <strong>API REST Express</strong> (port 5000), une base
+            MySQL à 8 tables, et l'authentification via <strong>JWT + bcryptjs</strong>.
+          </p>
+        </div>
 
-  <script>
-    import Emitter from '../utils/Emitter'
-    import Ticker from '../utils/Ticker'
-    import Lenis from 'lenis'
-    import { gsap } from 'gsap'
-    import { ScrollTrigger } from 'gsap/ScrollTrigger'
-    gsap.registerPlugin(ScrollTrigger)
+        <div class="p-stack" style="margin-top: 2.5rem;">
+          {["React 18", "React Router", "Node.js", "Express", "MySQL", "Stripe.js", "JWT", "bcryptjs", "Axios", "CORS"].map(t => (
+            <span class="p-tag">{t}</span>
+          ))}
+        </div>
+      </div>
 
-    declare global {
-      interface Window {
-        safeWidth: number
-        safeHeight: number
-        maxScrollTop: number
-        scrollProgress: number
-        lenis: any
-      }
-    }
+      <div class="p-card">
+        <span class="p-card__label">API Endpoints</span>
+        <div class="p-mono-block">
+          <div class="p-mono-block__group">
+            <div class="p-mono-block__title">/api/auth</div>
+            <div><span class="p-method p-method--post">POST</span>/register</div>
+            <div><span class="p-method p-method--post">POST</span>/login</div>
+          </div>
+          <div class="p-mono-block__group">
+            <div class="p-mono-block__title">/api/products</div>
+            <div><span class="p-method p-method--get">GET</span>/ (liste + filtres)</div>
+            <div><span class="p-method p-method--get">GET</span>/:id</div>
+          </div>
+          <div class="p-mono-block__group">
+            <div class="p-mono-block__title">/api/cart</div>
+            <div><span class="p-method p-method--get">GET</span>/</div>
+            <div><span class="p-method p-method--post">POST</span>/add</div>
+            <div><span class="p-method p-method--put">PUT</span>/update</div>
+            <div><span class="p-method p-method--delete">DEL</span>/remove/:id</div>
+          </div>
+          <div class="p-mono-block__group">
+            <div class="p-mono-block__title">/api/orders</div>
+            <div><span class="p-method p-method--post">POST</span>/create</div>
+            <div><span class="p-method p-method--get">GET</span>/ (historique)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    class Site {
-      timeouts: any = { resizeThrottle: null }
-      windowWidth: number
-      windowHeight: number
-      clientWidth: number
-      clientHeight: number
-      isScrolling: boolean = false
-      lenis: any
+  <!-- ═══ 02 · CATALOGUE ═══════════════════════════════════════════ -->
+  <section class="p-section" data-reveal>
+    <div class="p-section__header">
+      <span class="p-section__num">02</span>
+      <h2 class="p-section__title">Catalogue Produits</h2>
+      <div class="p-section__line"></div>
+    </div>
 
-      constructor() {
-        let os = 'unknown'
-        if (navigator.userAgent.indexOf('Win') !== -1) os = 'windows'
-        else if (navigator.userAgent.indexOf('Android') !== -1) os = 'android'
-        else if (navigator.userAgent.indexOf('Mac') !== -1) os = 'mac'
-        else if (navigator.userAgent.indexOf('Linux') !== -1) os = 'linux'
-        document.documentElement.classList.add(`is-${os}`)
+    <p class="p-body" style="max-width: 600px; margin-bottom: 3rem;">
+      <span style="opacity:0.6">~50 références de matériel de gymnastique professionnel réparties en 8 catégories.</span>
+    </p>
 
-        let browser = 'unknown'
-        if (navigator.userAgent.indexOf('Firefox') !== -1) browser = 'firefox'
-        else if (navigator.userAgent.indexOf('Chrome') !== -1) browser = 'chrome'
-        else if (navigator.userAgent.indexOf('Safari') !== -1) browser = 'safari'
-        document.documentElement.classList.add(`is-${browser}`)
+    <div class="p-catalogue">
+      <div class="p-cat-item">
+        <span class="p-cat-icon">🤸</span>
+        <span class="p-cat-name">Floor Mats</span>
+        <span class="p-cat-price">149 – 15 999 €</span>
+      </div>
+      <div class="p-cat-item">
+        <span class="p-cat-icon">⚖️</span>
+        <span class="p-cat-name">Poutres</span>
+        <span class="p-cat-price">79 – 3 299 €</span>
+      </div>
+      <div class="p-cat-item">
+        <span class="p-cat-icon">🏋️</span>
+        <span class="p-cat-name">Barres</span>
+        <span class="p-cat-price">24 – 5 999 €</span>
+      </div>
+      <div class="p-cat-item">
+        <span class="p-cat-icon">🦘</span>
+        <span class="p-cat-name">Trampolines</span>
+        <span class="p-cat-price">79 – 12 999 €</span>
+      </div>
+      <div class="p-cat-item">
+        <span class="p-cat-icon">⭕</span>
+        <span class="p-cat-name">Anneaux</span>
+        <span class="p-cat-price">149 – 4 999 €</span>
+      </div>
+      <div class="p-cat-item">
+        <span class="p-cat-icon">🐴</span>
+        <span class="p-cat-name">Cheval d'Arçons</span>
+        <span class="p-cat-price">299 – 3 299 €</span>
+      </div>
+      <div class="p-cat-item">
+        <span class="p-cat-icon">🏃</span>
+        <span class="p-cat-name">Saut</span>
+        <span class="p-cat-price">599 – 3 499 €</span>
+      </div>
+      <div class="p-cat-item">
+        <span class="p-cat-icon">🎒</span>
+        <span class="p-cat-name">Accessoires</span>
+        <span class="p-cat-price">12 – 189 €</span>
+      </div>
+    </div>
+  </section>
 
-        this.bindEvents()
-      }
+  <!-- ═══ 03 · FONCTIONNALITÉS ═════════════════════════════════════ -->
+  <section class="p-section" data-reveal>
+    <div class="p-section__header">
+      <span class="p-section__num">03</span>
+      <h2 class="p-section__title">Fonctionnalités</h2>
+      <div class="p-section__line"></div>
+    </div>
 
-      init() {
-        this.initLenis()
-        Ticker.init()
-        this.onResize()
-        document.dispatchEvent(new CustomEvent('intro'))
-        Ticker.nextTick(() => Emitter.emit('updateViewport'))
-      }
+    <div class="p-features">
+      <div class="p-card">
+        <span class="p-badge p-badge--ux">Frontend</span>
+        <h3 class="p-card__title">Catalogue & Filtres</h3>
+        <p class="p-card__body">
+          Navigation avec <strong style="color:var(--p-text)">filtrage par catégorie</strong>
+          et recherche textuelle. Fiche produit complète avec images, description et avis clients.
+        </p>
+      </div>
 
-      bindEvents() {
-        window.addEventListener('resize', this.resizeThrottle.bind(this))
-        window.addEventListener('scroll', this.onScroll.bind(this), { passive: true })
-        window.addEventListener('mousemove', this.onMouseMove.bind(this), { passive: true })
-        Emitter.on('updateViewport', this.onResize, this, true)
+      <div class="p-card">
+        <span class="p-badge p-badge--arch">Paiement</span>
+        <h3 class="p-card__title">Checkout Stripe</h3>
+        <p class="p-card__body">
+          Intégration <strong style="color:var(--p-text)">Stripe.js</strong> pour le paiement
+          sécurisé. Mode démo disponible sans clé API. Formulaire d'adresse de livraison intégré.
+        </p>
+      </div>
 
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              entry.target.dispatchEvent(
-                new CustomEvent('intersect', { detail: { isIntersecting: entry.isIntersecting } }),
-              )
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-in-view')
-                entry.target.classList.remove('is-out-of-view', 'is-out-of-view-top', 'is-out-of-view-bottom')
-              } else {
-                entry.target.classList.remove('is-in-view')
-                entry.target.classList.add('is-out-of-view')
-              }
-            })
-          },
-          { threshold: 0 },
-        )
+      <div class="p-card">
+        <span class="p-badge p-badge--solution">Backend</span>
+        <h3 class="p-card__title">Auth JWT</h3>
+        <p class="p-card__body">
+          Authentification complète avec <strong style="color:var(--p-text)">JSON Web Tokens</strong>
+          (7 jours). Inscription, connexion, gestion du profil. Hash bcryptjs.
+        </p>
+      </div>
 
-        document.querySelectorAll('[data-intersect]').forEach((el) => observer.observe(el))
+      <div class="p-card">
+        <span class="p-badge p-badge--problem">Admin</span>
+        <h3 class="p-card__title">Gestion Commandes</h3>
+        <p class="p-card__body">
+          Back-office pour visualiser toutes les commandes et gérer leur statut :
+          <strong style="color:var(--p-text)">en_attente → payée → expédiée → livrée</strong>.
+        </p>
+      </div>
+    </div>
+  </section>
 
-        if (document.readyState === 'complete') this.siteLoaded()
-        else window.addEventListener('load', this.siteLoaded, { once: true })
-        this.onScroll()
-      }
+  <!-- ═══ 04 · PARCOURS & BDD ══════════════════════════════════════ -->
+  <section class="p-section" data-reveal>
+    <div class="p-section__header">
+      <span class="p-section__num">04</span>
+      <h2 class="p-section__title">Parcours & Base de Données</h2>
+      <div class="p-section__line"></div>
+    </div>
 
-      initLenis() {
-        const lenis = new Lenis()
-        lenis.on('scroll', ScrollTrigger.update)
-        gsap.ticker.add((time) => lenis.raf(time * 1000))
-        gsap.ticker.lagSmoothing(0)
-        window.lenis = lenis
-        this.lenis = lenis
-      }
+    <div class="p-grid">
+      <div>
+        <span class="p-mono" style="color:var(--p-accent);opacity:0.7;display:block;margin-bottom:1.5rem;">UX FLOW</span>
+        <ol class="p-steps">
+          <li>
+            <strong>Page d'accueil</strong>
+            <span>Vidéo YouTube en fond + présentation de la marque</span>
+          </li>
+          <li>
+            <strong>Catalogue</strong>
+            <span>Navigation et filtrage par catégorie (8 catégories)</span>
+          </li>
+          <li>
+            <strong>Fiche Produit</strong>
+            <span>Images, description, avis, ajout au panier</span>
+          </li>
+          <li>
+            <strong>Inscription / Connexion</strong>
+            <span>Authentification JWT sécurisée</span>
+          </li>
+          <li>
+            <strong>Panier & Checkout</strong>
+            <span>Quantités, adresse livraison, paiement Stripe</span>
+          </li>
+          <li>
+            <strong>Confirmation</strong>
+            <span>Order Success + suivi dans l'historique</span>
+          </li>
+        </ol>
+      </div>
 
-      siteLoaded() {
-        document.documentElement.classList.add('is-loaded')
-        Emitter.emit('siteLoaded')
-      }
+      <div class="p-card">
+        <span class="p-card__label">gymnova_bdd — 8 tables</span>
+        <div>
+          <div class="p-db-table"><div class="p-db-name">users</div><div class="p-db-fields">id, nom, prenom, email, password, telephone, role</div></div>
+          <div class="p-db-table"><div class="p-db-name">categories</div><div class="p-db-fields">id, nom, description, image_url</div></div>
+          <div class="p-db-table"><div class="p-db-name">products</div><div class="p-db-fields">id, nom, description, prix, stock, categorie_id</div></div>
+          <div class="p-db-table"><div class="p-db-name">product_images</div><div class="p-db-fields">id, product_id, image_url, is_primary</div></div>
+          <div class="p-db-table"><div class="p-db-name">cart</div><div class="p-db-fields">id, user_id, product_id, quantite</div></div>
+          <div class="p-db-table"><div class="p-db-name">orders</div><div class="p-db-fields">id, user_id, total, statut, adresse_livraison</div></div>
+          <div class="p-db-table"><div class="p-db-name">order_items</div><div class="p-db-fields">id, order_id, product_id, quantite, prix_unitaire</div></div>
+          <div class="p-db-table"><div class="p-db-name">reviews</div><div class="p-db-fields">id, user_id, product_id, note, commentaire</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      resizeThrottle() {
-        clearTimeout(this.timeouts.resizeThrottle)
-        this.timeouts.resizeThrottle = setTimeout(() => Ticker.nextTick(this.onResize, this), 200)
-      }
+  <!-- ═══ STATS ═════════════════════════════════════════════════════ -->
+  <div class="p-stats" data-reveal>
+    <div class="p-stat">
+      <div class="p-stat__num">8</div>
+      <div class="p-stat__label">Tables MySQL</div>
+    </div>
+    <div class="p-stat">
+      <div class="p-stat__num">50</div>
+      <div class="p-stat__label">Références</div>
+    </div>
+    <div class="p-stat">
+      <div class="p-stat__num">5</div>
+      <div class="p-stat__label">Routes API</div>
+    </div>
+    <div class="p-stat">
+      <div class="p-stat__num">11</div>
+      <div class="p-stat__label">Pages React</div>
+    </div>
+  </div>
 
-      onResize() {
-        const newWidth = window.innerWidth
-        let widthChanged = false
-        if (this.windowWidth !== newWidth) {
-          if (this.windowWidth !== undefined) widthChanged = true
-          this.windowWidth = newWidth
-          this.clientWidth = document.body.clientWidth
-        }
-        const newHeight = window.innerHeight
-        let heightChanged = false
-        if (this.windowHeight !== newHeight) {
-          if (this.windowHeight !== undefined) heightChanged = true
-          this.windowHeight = newHeight
-          this.clientHeight = document.body.clientHeight
-        }
-        window.safeWidth = newWidth
-        window.safeHeight = newHeight
-        window.maxScrollTop = document.body.scrollHeight - window.safeHeight
-        this.setScrollProgress()
-        Emitter.emit('resize', widthChanged, heightChanged)
-      }
-
-      onScroll() {
-        this.setScrollProgress()
-        Ticker.nextTick(() => Emitter.emit('scroll', window.scrollY))
-      }
-
-      setScrollProgress() {
-        window.scrollProgress = window.scrollY / window.maxScrollTop
-      }
-
-      onMouseMove(e) {
-        Emitter.emit('mousemove', e.clientX, e.clientY)
-      }
-
-    }
-
-    const site = new Site()
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => site.init(), { once: true })
-    } else {
-      site.init()
-    }
-  </script>
-</html>
+</ProjectLayout>

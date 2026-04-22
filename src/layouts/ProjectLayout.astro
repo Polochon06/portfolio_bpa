@@ -1,0 +1,812 @@
+---
+import SiteHead from '../components/SiteHead.astro'
+import SiteFoot from '../components/SiteFoot.astro'
+import SiteScrollbar from '../components/SiteScrollbar.astro'
+import '../styles/global.scss'
+
+interface Props {
+  title: string
+  description?: string
+  heroLabel: string
+  heroSub: string
+  techTags: string[]
+}
+
+const {
+  title,
+  description = '',
+  heroLabel,
+  heroSub,
+  techTags = [],
+} = Astro.props
+
+const base = import.meta.env.BASE_URL
+---
+
+<html lang="fr" class="theme-contrasted">
+  <head>
+    <meta charset="utf-8" />
+    <title>{title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {description && <meta name="description" content={description} />}
+    <link rel="icon" type="image/png" href={`${base}icons/favicon-48x48.png`} />
+    <link rel="preload" href={`${base}fonts/Bigger-Display.woff2`} as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href={`${base}fonts/PPEditorialNew-Regular.woff2`} as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href={`${base}fonts/PPFraktionMono-Regular.woff2`} as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href={`${base}fonts/PPFraktionMono-Bold.woff2`} as="font" type="font/woff2" crossorigin="anonymous" />
+  </head>
+
+  <body>
+    <div class="site-wrapper js-site-wrapper">
+      <SiteHead />
+
+      <main class="p-page">
+
+        <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
+        <section class="p-hero">
+          <div class="p-hero__top">
+            <span class="p-mono p-hero__label">{heroLabel}</span>
+            <a href={`${base}`} class="p-mono p-hero__back">← Portfolio</a>
+          </div>
+
+          <div class="p-hero__center">
+            <h1 class="p-hero__title">
+              <slot name="hero-title" />
+            </h1>
+            <p class="p-hero__sub">{heroSub}</p>
+            <div class="p-hero__tags">
+              {techTags.map(tag => <span class="p-tag">{tag}</span>)}
+            </div>
+          </div>
+
+          <div class="p-hero__bottom">
+            <span class="p-mono">SCROLL TO EXPLORE</span>
+            <div class="p-hero__line"></div>
+          </div>
+        </section>
+
+        <!-- ═══ CONTENT ══════════════════════════════════════════════════ -->
+        <div class="p-content">
+          <slot />
+        </div>
+
+        <!-- ═══ CTA ══════════════════════════════════════════════════════ -->
+        <div class="p-cta">
+          <a href={`${base}`} class="p-cta__link">
+            <span class="p-mono p-cta__label">RETOUR</span>
+            <span class="p-cta__text">Portfolio</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5">
+              <line x1="19" y1="12" x2="5" y2="12"/>
+              <polyline points="12 5 5 12 12 19"/>
+            </svg>
+          </a>
+        </div>
+
+      </main>
+
+      <SiteFoot />
+    </div>
+
+    <SiteScrollbar />
+  </body>
+
+  <script>
+    import Emitter from '../utils/Emitter'
+    import Ticker from '../utils/Ticker'
+    import Lenis from 'lenis'
+    import { gsap } from 'gsap'
+    import { ScrollTrigger } from 'gsap/ScrollTrigger'
+    gsap.registerPlugin(ScrollTrigger)
+
+    declare global {
+      interface Window {
+        safeWidth: number
+        safeHeight: number
+        maxScrollTop: number
+        scrollProgress: number
+        lenis: any
+      }
+    }
+
+    class Site {
+      timeouts: any = { resizeThrottle: null }
+      windowWidth: number = 0
+      windowHeight: number = 0
+      clientWidth: number = 0
+      clientHeight: number = 0
+      lenis: any
+
+      constructor() {
+        let os = 'unknown'
+        if (navigator.userAgent.indexOf('Win') !== -1) os = 'windows'
+        else if (navigator.userAgent.indexOf('Android') !== -1) os = 'android'
+        else if (navigator.userAgent.indexOf('Mac') !== -1) os = 'mac'
+        else if (navigator.userAgent.indexOf('Linux') !== -1) os = 'linux'
+        document.documentElement.classList.add(`is-${os}`)
+
+        let browser = 'unknown'
+        if (navigator.userAgent.indexOf('Firefox') !== -1) browser = 'firefox'
+        else if (navigator.userAgent.indexOf('Chrome') !== -1) browser = 'chrome'
+        else if (navigator.userAgent.indexOf('Safari') !== -1) browser = 'safari'
+        document.documentElement.classList.add(`is-${browser}`)
+
+        this.bindEvents()
+      }
+
+      init() {
+        this.initLenis()
+        Ticker.init()
+        this.onResize()
+        document.dispatchEvent(new CustomEvent('intro'))
+        Ticker.nextTick(() => Emitter.emit('updateViewport'))
+      }
+
+      bindEvents() {
+        window.addEventListener('resize', this.resizeThrottle.bind(this))
+        window.addEventListener('scroll', this.onScroll.bind(this), { passive: true })
+        window.addEventListener('mousemove', this.onMouseMove.bind(this), { passive: true })
+        Emitter.on('updateViewport', this.onResize, this, true)
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              entry.target.dispatchEvent(new CustomEvent('intersect', { detail: { isIntersecting: entry.isIntersecting } }))
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-in-view')
+                entry.target.classList.remove('is-out-of-view')
+              } else {
+                entry.target.classList.remove('is-in-view')
+                entry.target.classList.add('is-out-of-view')
+              }
+            })
+          },
+          { threshold: 0.1 },
+        )
+        document.querySelectorAll('[data-reveal]').forEach((el) => observer.observe(el))
+
+        if (document.readyState === 'complete') this.siteLoaded()
+        else window.addEventListener('load', this.siteLoaded.bind(this), { once: true })
+        this.onScroll()
+      }
+
+      initLenis() {
+        const lenis = new Lenis()
+        lenis.on('scroll', ScrollTrigger.update)
+        gsap.ticker.add((time) => lenis.raf(time * 1000))
+        gsap.ticker.lagSmoothing(0)
+        window.lenis = lenis
+        this.lenis = lenis
+      }
+
+      siteLoaded() {
+        document.documentElement.classList.add('is-loaded')
+        Emitter.emit('siteLoaded')
+      }
+
+      resizeThrottle() {
+        clearTimeout(this.timeouts.resizeThrottle)
+        this.timeouts.resizeThrottle = setTimeout(() => Ticker.nextTick(this.onResize, this), 200)
+      }
+
+      onResize() {
+        const newWidth = window.innerWidth
+        let widthChanged = false
+        if (this.windowWidth !== newWidth) {
+          if (this.windowWidth !== undefined) widthChanged = true
+          this.windowWidth = newWidth
+          this.clientWidth = document.body.clientWidth
+        }
+        const newHeight = window.innerHeight
+        if (this.windowHeight !== newHeight) {
+          this.windowHeight = newHeight
+          this.clientHeight = document.body.clientHeight
+        }
+        window.safeWidth = newWidth
+        window.safeHeight = newHeight
+        window.maxScrollTop = document.body.scrollHeight - window.safeHeight
+        this.setScrollProgress()
+        Emitter.emit('resize', widthChanged)
+      }
+
+      onScroll() {
+        this.setScrollProgress()
+        Ticker.nextTick(() => Emitter.emit('scroll', window.scrollY))
+      }
+
+      setScrollProgress() {
+        window.scrollProgress = window.scrollY / window.maxScrollTop
+      }
+
+      onMouseMove(e: MouseEvent) {
+        Emitter.emit('mousemove', e.clientX, e.clientY)
+      }
+    }
+
+    const site = new Site()
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => site.init(), { once: true })
+    } else {
+      site.init()
+    }
+  </script>
+</html>
+
+<style is:global>
+  /* ═══════════════════════════════════════════════════════════════
+     PROJECT PAGE — DESIGN SYSTEM
+     ════════════════════════════════════════════════════════════════ */
+
+  .p-page {
+    --p-bg:        #000;
+    --p-text:      #ddd6fe;
+    --p-muted:     rgba(221, 214, 254, 0.38);
+    --p-accent:    #8b5cf6;
+    --p-accent-lo: rgba(139, 92, 246, 0.10);
+    --p-border:    rgba(139, 92, 246, 0.18);
+    --p-border-hi: rgba(139, 92, 246, 0.55);
+    --p-max:       1320px;
+    --p-pad:       clamp(1.5rem, 5vw, 5rem);
+
+    background: var(--p-bg);
+    color: var(--p-text);
+    font-family: var(--font-family-editorial);
+    overflow-x: hidden;
+  }
+
+  /* Utility: mono text */
+  .p-mono {
+    font-family: var(--font-family-fraktion);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* Utility: small tag badge */
+  .p-tag {
+    display: inline-block;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--p-border);
+    font-family: var(--font-family-fraktion);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--p-accent);
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .p-tag:hover {
+    background: var(--p-accent-lo);
+    border-color: var(--p-border-hi);
+  }
+
+  /* ─── HERO ─────────────────────────────────────────────────────── */
+  .p-hero {
+    min-height: 100svh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 0 var(--p-pad);
+    border-bottom: 1px solid var(--p-border);
+  }
+
+  .p-hero__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--p-border);
+  }
+
+  .p-hero__label { color: var(--p-muted); }
+
+  .p-hero__back {
+    color: var(--p-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .p-hero__back:hover { color: var(--p-text); }
+
+  .p-hero__center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2rem;
+    padding: 4rem 0;
+    max-width: var(--p-max);
+  }
+
+  .p-hero__title {
+    margin: 0;
+    font-family: var(--font-family-bigger);
+    font-size: clamp(4rem, 14vw, 16rem);
+    font-weight: 700;
+    line-height: 0.88;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--p-text);
+  }
+
+  .p-hero__sub {
+    margin: 0;
+    max-width: 600px;
+    font-size: clamp(1rem, 1.8vw, 1.3rem);
+    line-height: 1.5;
+    color: var(--p-muted);
+  }
+
+  .p-hero__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .p-hero__bottom {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    color: var(--p-muted);
+    border-top: 1px solid var(--p-border);
+  }
+
+  .p-hero__line {
+    flex: 1;
+    height: 1px;
+    background: var(--p-border);
+  }
+
+  /* ─── CONTENT WRAPPER ──────────────────────────────────────────── */
+  .p-content {
+    max-width: calc(var(--p-max) + var(--p-pad) * 2);
+    margin: 0 auto;
+    padding: 0 var(--p-pad);
+  }
+
+  /* ─── SECTION ──────────────────────────────────────────────────── */
+  .p-section {
+    padding: 7rem 0;
+    border-bottom: 1px solid var(--p-border);
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .p-section.is-in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .p-section__header {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    margin-bottom: 5rem;
+  }
+
+  .p-section__num {
+    font-family: var(--font-family-fraktion);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    color: var(--p-accent);
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+
+  .p-section__title {
+    margin: 0;
+    font-family: var(--font-family-bigger);
+    font-size: clamp(2.5rem, 6vw, 7rem);
+    font-weight: 700;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: var(--p-text);
+    flex: 1;
+  }
+
+  .p-section__line {
+    flex: 1;
+    height: 1px;
+    background: var(--p-border);
+    align-self: center;
+    min-width: 2rem;
+  }
+
+  /* ─── TWO-COL GRID ─────────────────────────────────────────────── */
+  .p-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  @media (max-width: 860px) {
+    .p-grid { grid-template-columns: 1fr; gap: 3rem; }
+  }
+
+  /* ─── BODY TEXT ────────────────────────────────────────────────── */
+  .p-body {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--p-muted);
+  }
+  .p-body p { margin: 0 0 1.5rem; }
+  .p-body p:last-child { margin-bottom: 0; }
+  .p-body strong { color: var(--p-text); font-weight: 600; }
+
+  /* ─── CARD ─────────────────────────────────────────────────────── */
+  .p-card {
+    padding: 2.5rem;
+    border: 1px solid var(--p-border);
+    background: var(--p-accent-lo);
+    transition: border-color 0.3s;
+  }
+  .p-card:hover { border-color: var(--p-border-hi); }
+
+  .p-card__label {
+    display: block;
+    font-family: var(--font-family-fraktion);
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--p-accent);
+    margin-bottom: 1rem;
+    opacity: 0.8;
+  }
+
+  .p-card__title {
+    margin: 0 0 1rem;
+    font-family: var(--font-family-editorial);
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--p-text);
+    line-height: 1.2;
+  }
+
+  .p-card__body {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--p-muted);
+  }
+
+  /* ─── TECH STACK ───────────────────────────────────────────────── */
+  .p-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  /* ─── MONO BLOCK (code / schema) ───────────────────────────────── */
+  .p-mono-block {
+    font-family: var(--font-family-fraktion);
+    font-size: 0.8rem;
+    line-height: 1.9;
+    color: var(--p-muted);
+  }
+
+  .p-mono-block__group { margin-bottom: 1.5rem; }
+
+  .p-mono-block__title {
+    color: var(--p-accent);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    opacity: 0.9;
+  }
+
+  .p-method {
+    display: inline-block;
+    padding: 0.1rem 0.35rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    margin-right: 0.4rem;
+    vertical-align: middle;
+  }
+  .p-method--get    { background: rgba(74,222,128,.15); color: #4ade80; }
+  .p-method--post   { background: rgba(96,165,250,.15); color: #60a5fa; }
+  .p-method--put    { background: rgba(251,191,36,.15); color: #fbbf24; }
+  .p-method--delete { background: rgba(139,92,246,.15); color: var(--p-accent); }
+
+  /* ─── FEATURE CARDS GRID ───────────────────────────────────────── */
+  .p-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  /* ─── CATALOGUE GRID ───────────────────────────────────────────── */
+  .p-catalogue {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 1px solid var(--p-border);
+    overflow: hidden;
+  }
+
+  @media (max-width: 700px) {
+    .p-catalogue { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .p-cat-item {
+    padding: 2rem 1.5rem;
+    text-align: center;
+    border-right: 1px solid var(--p-border);
+    border-bottom: 1px solid var(--p-border);
+    transition: background 0.2s;
+  }
+  .p-cat-item:hover { background: var(--p-accent-lo); }
+
+  .p-cat-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.75rem;
+    filter: grayscale(1);
+  }
+
+  .p-cat-name {
+    display: block;
+    font-family: var(--font-family-fraktion);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--p-text);
+    margin-bottom: 0.4rem;
+  }
+
+  .p-cat-price {
+    display: block;
+    font-family: var(--font-family-fraktion);
+    font-size: 0.65rem;
+    color: var(--p-accent);
+    opacity: 0.7;
+  }
+
+  /* ─── STEPS (ordered list) ─────────────────────────────────────── */
+  .p-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: steps;
+  }
+
+  .p-steps li {
+    counter-increment: steps;
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--p-border);
+  }
+
+  .p-steps li::before {
+    content: counter(steps, decimal-leading-zero);
+    font-family: var(--font-family-fraktion);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--p-accent);
+    opacity: 0.7;
+    flex-shrink: 0;
+    padding-top: 0.2rem;
+    min-width: 2rem;
+  }
+
+  .p-steps li strong {
+    display: block;
+    color: var(--p-text);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+  }
+
+  .p-steps li span {
+    font-size: 0.95rem;
+    color: var(--p-muted);
+    line-height: 1.5;
+  }
+
+  /* ─── CHALLENGE (problem/solution) ────────────────────────────── */
+  .p-challenge {
+    padding: 2rem;
+    border: 1px solid var(--p-border);
+    transition: border-color 0.3s;
+  }
+  .p-challenge:hover { border-color: var(--p-border-hi); }
+
+  .p-badge {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    font-family: var(--font-family-fraktion);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  .p-badge--problem  { background: rgba(255,107,107,.12); color: #ff6b6b; }
+  .p-badge--solution { background: rgba(81,207,102,.12);  color: #51cf66; }
+  .p-badge--arch     { background: rgba(139,92,246,.12);  color: var(--p-accent); }
+  .p-badge--ux       { background: rgba(96,165,250,.12);  color: #60a5fa; }
+
+  .p-challenge h3 {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-family-editorial);
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--p-text);
+  }
+
+  .p-challenge__sep {
+    margin: 1.25rem 0;
+    border: none;
+    border-top: 1px solid var(--p-border);
+  }
+
+  /* ─── STATS ROW ────────────────────────────────────────────────── */
+  .p-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 1px solid var(--p-border);
+    overflow: hidden;
+    margin: 5rem 0;
+  }
+
+  @media (max-width: 700px) {
+    .p-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .p-stat {
+    padding: 3rem 2rem;
+    text-align: center;
+    border-right: 1px solid var(--p-border);
+  }
+
+  .p-stat__num {
+    font-family: var(--font-family-bigger);
+    font-size: clamp(3rem, 7vw, 6rem);
+    font-weight: 700;
+    color: var(--p-text);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .p-stat__label {
+    font-family: var(--font-family-fraktion);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--p-accent);
+    opacity: 0.8;
+  }
+
+  /* ─── PLUGIN CARD ──────────────────────────────────────────────── */
+  .p-plugin {
+    padding: 2rem;
+    border: 1px solid var(--p-border);
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .p-plugin:hover {
+    border-color: var(--p-border-hi);
+    background: var(--p-accent-lo);
+  }
+
+  .p-plugin__vendor {
+    font-family: var(--font-family-fraktion);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--p-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .p-plugin h3 {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-family-editorial);
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--p-text);
+  }
+
+  /* ─── VIDEO GRID ───────────────────────────────────────────────── */
+  .p-videos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .p-video {
+    position: relative;
+    aspect-ratio: 16/9;
+    border: 1px solid var(--p-border);
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .p-video:hover { border-color: var(--p-border-hi); }
+
+  .p-video iframe,
+  .p-video video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    object-fit: cover;
+  }
+
+  /* ─── IMAGE SHOWCASE ───────────────────────────────────────────── */
+  .p-showcase {
+    border: 1px solid var(--p-border);
+    overflow: hidden;
+  }
+  .p-showcase img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* ─── DB TABLE ─────────────────────────────────────────────────── */
+  .p-db-table { margin-bottom: 1.25rem; }
+
+  .p-db-name {
+    font-family: var(--font-family-fraktion);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--p-accent);
+    margin-bottom: 0.3rem;
+  }
+
+  .p-db-fields {
+    font-family: var(--font-family-fraktion);
+    font-size: 0.72rem;
+    color: var(--p-muted);
+    line-height: 1.6;
+    padding-left: 1rem;
+  }
+
+  /* ─── CTA ──────────────────────────────────────────────────────── */
+  .p-cta {
+    padding: 8rem var(--p-pad);
+    border-top: 1px solid var(--p-border);
+  }
+
+  .p-cta__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.5rem;
+    text-decoration: none;
+    color: var(--p-text);
+    transition: color 0.2s;
+  }
+  .p-cta__link:hover { color: var(--p-accent); }
+
+  .p-cta__label {
+    color: var(--p-muted);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .p-cta__text {
+    font-family: var(--font-family-bigger);
+    font-size: clamp(2.5rem, 6vw, 6rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  /* ─── SITE WRAPPER overrides ────────────────────────────────────── */
+  .site-wrapper {
+    position: relative;
+    z-index: 2;
+    background: #000;
+    min-height: 100vh;
+  }
+
+  /* ─── REVEAL ANIMATION ─────────────────────────────────────────── */
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+  }
+  [data-reveal].is-in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
