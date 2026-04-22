@@ -1,62 +1,81 @@
 ---
 const { caption, description, cssClass, index, site, src, total, type } = Astro.props
 
-// A random string with the syntax '[a-z][0-9]{3}-index-total'
+// Parse tech tags from description
+const techMatch = description?.match(/TECH:\s*([^\n.]+)/i)
+const techTags = techMatch
+  ? techMatch[1].split(',').map((t: string) => t.trim()).filter(Boolean).slice(0, 6)
+  : []
+
 const key = Math.random().toString(36).slice(2, 6) + '-' + index + '/' + total
+const displayIndex = String(parseInt(index) + 1).padStart(2, '0')
 ---
 
 <a-work class={cssClass}>
   <div class="a__inner">
     <a href={site} target="_blank">
-      {type === 'youtube' ? (
-        <iframe
-          data-src={src}
-          class="a__video js-video"
-          width="1082"
-          height="636"
-          frameborder="0"
-          allow="autoplay; encrypted-media"
-          style="pointer-events: none;"
-        ></iframe>
-      ) : type === 'image' ? (
-        <img
-          src={src}
-          class="a__video js-video"
-          width="1082"
-          height="636"
-          alt={caption}
-          loading="lazy"
-        />
-      ) : (
-        <video
-          data-src={src}
-          class="a__video js-video"
-          loop
-          muted
-          playsinline
-          width="1082"
-          height="636"
-        >
-        </video>
-      )}
 
-      <div class="a__caption">
-        <div class="a__caption__text">
-          {caption}
-        </div><!-- .a__caption__text -->
+      <div class="a__media">
+        {type === 'youtube' ? (
+          <iframe
+            data-src={src}
+            class="a__video js-video"
+            width="1082"
+            height="636"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            style="pointer-events: none;"
+          ></iframe>
+        ) : type === 'image' ? (
+          <img
+            src={src}
+            class="a__video js-video"
+            width="1082"
+            height="636"
+            alt={caption}
+            loading="lazy"
+          />
+        ) : (
+          <video
+            data-src={src}
+            class="a__video js-video"
+            loop
+            muted
+            playsinline
+            width="1082"
+            height="636"
+          >
+          </video>
+        )}
 
-        <div class="a__caption__key">
-          #{key}
-        </div><!-- .a__caption__key -->
-      </div><!-- .a__caption -->
+        <div class="a__index">_{displayIndex}</div>
+        <div class="a__overlay"></div>
+      </div>
 
-      {description && (
-        <div class="a__description">
-          {description}
+      <div class="a__footer">
+        <div class="a__footer__row">
+          <div class="a__caption">{caption}</div>
+          <div class="a__arrow">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </div>
         </div>
-      )}
+
+        {techTags.length > 0 && (
+          <div class="a__tags">
+            {techTags.map((tag: string) => (
+              <span class="a__tag">{tag}</span>
+            ))}
+          </div>
+        )}
+
+        <div class="a__key">#{key}</div>
+      </div>
+
     </a>
-  </div><!-- .a__inner -->
+  </div>
 </a-work>
 
 <script>
@@ -128,7 +147,7 @@ const key = Math.random().toString(36).slice(2, 6) + '-' + index + '/' + total
       if (this.video) {
         if (this.video.tagName === 'VIDEO') {
           (this.video as HTMLVideoElement).pause()
-        } 
+        }
         // Do not clear src for iframes to prevent reloading/flashing
       }
       this.isPlaying = false
@@ -158,22 +177,23 @@ const key = Math.random().toString(36).slice(2, 6) + '-' + index + '/' + total
 
     display: block;
     margin: 0;
-    padding: 0.5rem 0.5rem 0;
+    padding: 0;
 
     background: color(secondary);
+    border: 1px solid rgba(139, 92, 246, 0.25);
     content-visibility: hidden;
 
     transform-style: preserve-3d;
-
     will-change: transform;
 
-    @include mq(phone) {
-      padding: 0.25rem;
+    transition: border-color 0.3s ease;
+
+    &:hover {
+      border-color: rgba(139, 92, 246, 0.7);
     }
 
     a {
       display: block;
-
       text-decoration: none;
     }
 
@@ -182,18 +202,24 @@ const key = Math.random().toString(36).slice(2, 6) + '-' + index + '/' + total
       display: block;
       margin: 0;
       padding: 0;
-      overflow: hidden; /* Clip zoomed video */
+    }
+
+    // ─── Media block ───────────────────────────────────────────
+
+    .a__media {
+      position: relative;
+      overflow: hidden;
     }
 
     .a__video {
       display: block;
-
       width: 100%;
       max-width: 50vw;
       height: auto;
       aspect-ratio: 16 / 9;
       object-fit: cover;
-      /* transform: scale(1.35);  Variable moved to specific types */
+
+      transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
       @include mq(phone) {
         max-width: 80vw;
@@ -202,8 +228,6 @@ const key = Math.random().toString(36).slice(2, 6) + '-' + index + '/' + total
 
     iframe.a__video {
       max-width: 60vw;
-      /* transform: scale(1.35); Removed to show full video content */
-
       @include mq(phone) {
         max-width: 90vw;
       }
@@ -211,37 +235,126 @@ const key = Math.random().toString(36).slice(2, 6) + '-' + index + '/' + total
 
     img.a__video {
       max-width: 40vw;
-
       @include mq(phone) {
         max-width: 70vw;
       }
     }
 
-    .a__caption {
-      @include flex(row, center, space-between);
+    a:hover .a__video {
+      transform: scale(1.04);
+    }
 
-      padding: 0.5rem 0.5rem;
+    // Dark gradient overlay on media
+    .a__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        transparent 40%,
+        rgba(0, 0, 0, 0.55) 100%
+      );
+      pointer-events: none;
+    }
 
-      color: color(primary);
-      font: 700 11px / 1 font-family(fraktion);
-      letter-spacing: 0.15em;
-      text-align: right;
+    // Large index number over image
+    .a__index {
+      position: absolute;
+      top: 0.6rem;
+      left: 0.75rem;
+
+      font: 700 3.5rem / 1 font-family(bigger);
+      color: color(white);
+      opacity: 0.18;
+      letter-spacing: -0.03em;
       text-transform: uppercase;
+      pointer-events: none;
+      user-select: none;
+
+      transition: opacity 0.3s ease;
 
       @include mq(phone) {
-        display: none;
+        font-size: 2.5rem;
       }
     }
 
-    .a__description {
-      padding: 0 1rem 1rem;
+    a:hover .a__index {
+      opacity: 0.38;
+    }
+
+    // ─── Footer block ──────────────────────────────────────────
+
+    .a__footer {
+      padding: 0.75rem 0.875rem 0.875rem;
+      background: color(secondary);
+      border-top: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    .a__footer__row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .a__caption {
+      font: 700 0.75rem / 1.2 font-family(fraktion);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
       color: color(white);
-      font-size: 0.9rem;
-      line-height: 1.4;
-      white-space: pre-wrap;
-      font-family: sans-serif;
-      opacity: 0.8;
-      max-width: 50vw;
+    }
+
+    .a__arrow {
+      flex-shrink: 0;
+      color: color(primary);
+      opacity: 0.6;
+
+      transition: opacity 0.25s ease, transform 0.25s ease;
+
+      svg {
+        display: block;
+      }
+    }
+
+    a:hover .a__arrow {
+      opacity: 1;
+      transform: translateX(3px);
+    }
+
+    // Tech tags
+    .a__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .a__tag {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border: 1px solid rgba(139, 92, 246, 0.45);
+      border-radius: 2px;
+
+      font: 600 9px / 1.4 font-family(fraktion);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: color(primary);
+
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    a:hover .a__tag {
+      background: rgba(139, 92, 246, 0.12);
+      border-color: rgba(139, 92, 246, 0.7);
+    }
+
+    // Hash key
+    .a__key {
+      font: 400 9px / 1 font-family(fraktion);
+      letter-spacing: 0.1em;
+      color: color(white);
+      opacity: 0.25;
+      text-transform: uppercase;
     }
 
     &.is-inview {
