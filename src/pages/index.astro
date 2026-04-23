@@ -401,6 +401,7 @@ import '../styles/global.scss'
         const targetR = Math.min(canvas.width, canvas.height) * 0.27
 
         const particles: any[] = []
+        let currentR     = 0          // grows 0 → targetR during 'forming'
         let totalTime    = 0
         let openProgress = 0
         let openFlash    = 0
@@ -429,6 +430,13 @@ import '../styles/global.scss'
 
         function updatePortal(dt: number) {
           totalTime += dt
+
+          // Grow visual ring radius independently of particle positions
+          if (phase === 'forming') {
+            currentR = Math.min(currentR + dt * targetR / 1.5, targetR)
+          } else {
+            currentR = targetR
+          }
 
           if (phase === 'opening') {
             openProgress = Math.min(openProgress + dt * 0.88, 1)
