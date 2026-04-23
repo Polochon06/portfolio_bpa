@@ -244,7 +244,7 @@ const base = import.meta.env.BASE_URL
      ════════════════════════════════════════════════════════════════ */
 
   .p-page {
-    --p-bg:        #000;
+    --p-bg:        #04000f;
     --p-text:      #ddd6fe;
     --p-muted:     rgba(221, 214, 254, 0.38);
     --p-accent:    #8b5cf6;
@@ -255,6 +255,8 @@ const base = import.meta.env.BASE_URL
     --p-pad:       clamp(1.5rem, 5vw, 5rem);
 
     background: var(--p-bg);
+    background-image: radial-gradient(rgba(139,92,246,0.055) 1px, transparent 1px);
+    background-size: 28px 28px;
     color: var(--p-text);
     font-family: var(--font-family-editorial);
     overflow-x: hidden;
@@ -309,8 +311,8 @@ const base = import.meta.env.BASE_URL
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(to bottom, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.78) 100%),
-      linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 60%);
+      linear-gradient(to bottom, rgba(6,0,18,0.9) 0%, rgba(18,4,42,0.28) 48%, rgba(6,0,18,0.92) 100%),
+      linear-gradient(135deg, rgba(139,92,246,0.18) 0%, transparent 55%);
     z-index: 1;
   }
 
@@ -319,9 +321,9 @@ const base = import.meta.env.BASE_URL
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.5;
-    filter: blur(1px) saturate(0.65);
-    transform: scale(1.04);
+    opacity: 0.62;
+    filter: saturate(0.85) contrast(1.06);
+    transform: scale(1.02);
   }
 
   .p-hero__top,
@@ -360,6 +362,15 @@ const base = import.meta.env.BASE_URL
     max-width: var(--p-max);
   }
 
+  .p-hero__center::before {
+    content: '';
+    display: block;
+    width: 3.5rem;
+    height: 2px;
+    background: linear-gradient(to right, var(--p-accent), transparent);
+    margin-bottom: -1rem;
+  }
+
   .p-hero__title {
     margin: 0;
     font-family: var(--font-family-bigger);
@@ -369,7 +380,10 @@ const base = import.meta.env.BASE_URL
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: #fff;
-    text-shadow: 0 2px 40px rgba(139, 92, 246, 0.25);
+    text-shadow:
+      0 0 120px rgba(139, 92, 246, 0.55),
+      0 0 40px  rgba(139, 92, 246, 0.3),
+      0 4px 60px rgba(0, 0, 0, 0.9);
     overflow-wrap: break-word;
     word-break: break-word;
   }
@@ -465,24 +479,24 @@ const base = import.meta.env.BASE_URL
     margin: 0 calc(-1 * var(--p-pad)) 6rem;
     position: relative;
     overflow: hidden;
-    border-top: 1px solid var(--p-border);
+    border-top: 1px solid rgba(139,92,246,0.45);
     border-bottom: 1px solid var(--p-border);
-    background: #050505;
+    background: #04000f;
   }
 
   .p-featured img {
     display: block;
     width: 100%;
     height: auto;
-    max-height: 65vh;
+    max-height: 78vh;
     object-fit: cover;
-    opacity: 0.78;
-    transition: opacity 0.5s ease, transform 0.7s ease;
+    opacity: 0.85;
+    transition: opacity 0.5s ease, transform 0.8s ease;
   }
 
   .p-featured:hover img {
-    opacity: 0.92;
-    transform: scale(1.012);
+    opacity: 0.96;
+    transform: scale(1.01);
   }
 
   .p-featured__caption {
@@ -525,10 +539,14 @@ const base = import.meta.env.BASE_URL
   .p-card {
     padding: 2.5rem;
     border: 1px solid var(--p-border);
-    background: var(--p-accent-lo);
-    transition: border-color 0.3s;
+    background: rgba(139,92,246,0.06);
+    transition: border-color 0.35s, background 0.35s, transform 0.3s;
   }
-  .p-card:hover { border-color: var(--p-border-hi); }
+  .p-card:hover {
+    border-color: var(--p-border-hi);
+    background: rgba(139,92,246,0.12);
+    transform: translateY(-2px);
+  }
 
   .p-card__label {
     display: block;
@@ -750,9 +768,12 @@ const base = import.meta.env.BASE_URL
     font-family: var(--font-family-bigger);
     font-size: clamp(3rem, 7vw, 6rem);
     font-weight: 700;
-    color: var(--p-text);
     line-height: 1;
     margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #ffffff 30%, rgba(196, 181, 253, 0.9) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .p-stat__label {
