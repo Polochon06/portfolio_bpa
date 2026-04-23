@@ -9,8 +9,6 @@ import SWork from '../components/SWork.astro'
 import SMyWay from '../components/SMyWay.astro'
 import SCTA from '../components/SCTA.astro'
 import ASeparator from '../components/ASeparator.astro'
-import logo from '../assets/logo.png'
-
 import '../styles/global.scss'
 ---
 
@@ -133,23 +131,9 @@ import '../styles/global.scss'
 
     <div
       class="site-intro js-intro"
-      style="opacity: 1; position: fixed; top: 0; left: 0; z-index: 50; width: 100%; height: 100%; background: #F40C3F;"
+      style="opacity: 1; position: fixed; top: 0; left: 0; z-index: 50; width: 100%; height: 100%;"
     >
-      <div class="sb-logo js-logo">
-        <img
-          src={logo.src}
-          alt="Paul Blanc"
-          class="js-intro-logo"
-          style="width: 100%; height: 100%; object-fit: contain;"
-        />
-      </div><!-- .sb-logo -->
-
-      <div class="site-intro__border site-intro__border--top js-border-top">
-      </div>
-      <div class="site-intro__border site-intro__border--left js-border-left">
-      </div>
-      <div class="site-intro__border site-intro__border--right js-border-right">
-      </div>
+      <canvas class="js-portal-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
     </div><!-- .site-intro -->
 
     <div class="site-mount js-mount"></div>
@@ -400,99 +384,220 @@ import '../styles/global.scss'
       }
 
       /**
-       * Intro
+       * Intro — Doctor Strange portal animation
        */
       intro() {
-        // Selectors
-        const wrapper: HTMLElement = document.querySelector('.js-site-wrapper')
-        const intro: HTMLElement = document.querySelector('.js-intro')
-        const mount: HTMLElement = document.querySelector('.js-mount')
-        const introLogo: HTMLElement = intro.querySelector('.js-intro-logo')
-        const borderTop: HTMLElement = intro.querySelector('.js-border-top')
-        const borderLeft: HTMLElement = intro.querySelector('.js-border-left')
-        const borderRight: HTMLElement = intro.querySelector('.js-border-right')
+        const wrapper = document.querySelector('.js-site-wrapper') as HTMLElement
+        const intro = document.querySelector('.js-intro') as HTMLElement
+        const mount = document.querySelector('.js-mount') as HTMLElement
+        const canvas = intro.querySelector('.js-portal-canvas') as HTMLCanvasElement
+        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
 
-        // Timeline
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+
+        const cx = canvas.width / 2
+        const cy = canvas.height / 2
+        const targetR = Math.min(canvas.width, canvas.height) * 0.27
+
+        const particles: any[] = []
+        let currentR = 0
+        let openProgress = 0
+        let totalTime = 0
+        let openFlash = 0
+        let phase = 'forming'
+
+        function spawnParticle() {
+          const dir = Math.random() > 0.5 ? 1 : -1
+          particles.push({
+            a: Math.random() * Math.PI * 2,
+            r: currentR * (0.88 + Math.random() * 0.24),
+            speed: (0.022 + Math.random() * 0.055) * dir,
+            sz: 1.0 + Math.random() * 2.2,
+            life: 1.0,
+            decay: 0.3 + Math.random() * 0.5,
+            hue: 20 + Math.random() * 30,
+            trail: [] as any[],
+          })
+        }
+
+        function updatePortal(dt: number) {
+          totalTime += dt
+          if (phase === 'forming') {
+            currentR = Math.min(currentR + dt * 150, targetR)
+            if (currentR >= targetR) phase = 'full'
+          }
+          if (phase === 'opening') {
+            openProgress = Math.min(openProgress + dt * 0.72, 1)
+            openFlash = Math.max(openFlash - dt * 1.8, 0)
+            if (openProgress >= 1) phase = 'done'
+          }
+          const rate = phase === 'full' ? 14 : phase === 'forming' ? 9 : phase === 'opening' ? 5 : 0
+          for (let i = 0; i < rate * dt; i++) spawnParticle()
+          for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i]
+            p.trail.push({ a: p.a, r: p.r })
+            if (p.trail.length > 7) p.trail.shift()
+            p.a += p.speed
+            p.r += Math.sin(p.a * 4) * 0.35
+            p.life -= p.decay * dt
+            if (p.life <= 0) particles.splice(i, 1)
+          }
+        }
+
+        function drawPortal() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height)
+          ctx.fillStyle = '#020008'
+          ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+          const progress = currentR / targetR
+
+          // Dark void inside the ring
+          if (currentR > 8) {
+            const vg = ctx.createRadialGradient(cx, cy, 0, cx, cy, currentR * 0.9)
+            vg.addColorStop(0, 'rgba(0,0,12,1)')
+            vg.addColorStop(0.8, 'rgba(0,0,12,0.9)')
+            vg.addColorStop(1, 'rgba(0,0,12,0)')
+            ctx.beginPath()
+            ctx.arc(cx, cy, currentR * 0.9, 0, Math.PI * 2)
+            ctx.fillStyle = vg
+            ctx.fill()
+          }
+
+          // Ambient glow ring
+          if (currentR > 8) {
+            const gw = 65
+            const ga = 0.22 + openFlash * 0.65
+            const rg = ctx.createRadialGradient(cx, cy, Math.max(0, currentR - gw), cx, cy, currentR + gw)
+            rg.addColorStop(0, 'rgba(255,140,10,0)')
+            rg.addColorStop(0.35, `rgba(255,120,8,${ga * 0.9})`)
+            rg.addColorStop(0.55, `rgba(255,165,30,${ga})`)
+            rg.addColorStop(1, 'rgba(255,140,10,0)')
+            ctx.beginPath()
+            ctx.arc(cx, cy, currentR + gw, 0, Math.PI * 2)
+            ctx.fillStyle = rg
+            ctx.fill()
+          }
+
+          // Spinning inner rune arcs
+          if (currentR > 20 && progress > 0.3) {
+            const ra = Math.min((progress - 0.3) / 0.4, 1) * 0.18
+            ctx.save()
+            ctx.lineWidth = 1
+            const rings = [
+              { r: currentR * 0.28, segs: 6, spd: 0.18 },
+              { r: currentR * 0.52, segs: 9, spd: -0.12 },
+              { r: currentR * 0.73, segs: 12, spd: 0.08 },
+            ]
+            for (const ring of rings) {
+              ctx.strokeStyle = `rgba(255,185,60,${ra})`
+              const rot = totalTime * ring.spd
+              for (let s = 0; s < ring.segs; s++) {
+                const a1 = (s / ring.segs) * Math.PI * 2 + rot
+                const a2 = ((s + 0.45) / ring.segs) * Math.PI * 2 + rot
+                ctx.beginPath()
+                ctx.arc(cx, cy, ring.r, a1, a2)
+                ctx.stroke()
+              }
+            }
+            ctx.restore()
+          }
+
+          // Ring track line
+          if (currentR > 8) {
+            ctx.save()
+            ctx.beginPath()
+            ctx.arc(cx, cy, currentR, 0, Math.PI * 2)
+            ctx.strokeStyle = `rgba(255,155,25,${0.3 * progress})`
+            ctx.lineWidth = 1.5
+            ctx.stroke()
+            ctx.restore()
+          }
+
+          // Sparks
+          for (const p of particles) {
+            const la = p.life
+            for (let i = 1; i < p.trail.length; i++) {
+              const t = p.trail[i]
+              const tx = cx + Math.cos(t.a) * t.r
+              const ty = cy + Math.sin(t.a) * t.r
+              const ta = (i / p.trail.length) * la * 0.28
+              ctx.beginPath()
+              ctx.arc(tx, ty, p.sz * 0.3, 0, Math.PI * 2)
+              ctx.fillStyle = `hsla(${p.hue},100%,65%,${ta})`
+              ctx.fill()
+            }
+            const x = cx + Math.cos(p.a) * p.r
+            const y = cy + Math.sin(p.a) * p.r
+            const g = ctx.createRadialGradient(x, y, 0, x, y, p.sz * 5)
+            g.addColorStop(0, `hsla(${p.hue},100%,75%,${la * 0.6})`)
+            g.addColorStop(1, `hsla(${p.hue},100%,52%,0)`)
+            ctx.beginPath()
+            ctx.arc(x, y, p.sz * 5, 0, Math.PI * 2)
+            ctx.fillStyle = g
+            ctx.fill()
+            ctx.beginPath()
+            ctx.arc(x, y, p.sz * 0.5, 0, Math.PI * 2)
+            ctx.fillStyle = `rgba(255,252,230,${la})`
+            ctx.fill()
+          }
+
+          // Opening: cut a growing hole to reveal the site below
+          if (phase === 'opening' || phase === 'done') {
+            const ease = 1 - Math.pow(1 - openProgress, 2.8)
+            const holeR = ease * Math.max(canvas.width, canvas.height) * 1.2
+            ctx.save()
+            ctx.globalCompositeOperation = 'destination-out'
+            const hg = ctx.createRadialGradient(cx, cy, 0, cx, cy, holeR)
+            hg.addColorStop(0.4, 'rgba(0,0,0,1)')
+            hg.addColorStop(0.82, 'rgba(0,0,0,0.97)')
+            hg.addColorStop(1, 'rgba(0,0,0,0)')
+            ctx.beginPath()
+            ctx.arc(cx, cy, holeR, 0, Math.PI * 2)
+            ctx.fillStyle = hg
+            ctx.fill()
+            ctx.restore()
+          }
+        }
+
+        let lastTime = 0
+        let rafId: any = 0
+
+        const tick = (time: number) => {
+          const dt = Math.min((time - lastTime) / 1000, 0.05)
+          lastTime = time
+          updatePortal(dt)
+          drawPortal()
+          if (phase !== 'done') rafId = requestAnimationFrame(tick)
+        }
+
+        rafId = requestAnimationFrame((t: number) => {
+          lastTime = t
+          rafId = requestAnimationFrame(tick)
+        })
+
         const tl = gsap.timeline()
 
-        tl.set(wrapper, {
-          opacity: '',
-        })
+        tl.set(wrapper, { opacity: '' })
 
-        tl.set(intro, {
-          background: 'transparent',
-        })
+        tl.call(() => {
+          phase = 'opening'
+          openFlash = 1
+        }, null, 2.8)
 
-        tl.fromTo(
-          introLogo,
-          {
-            scale: 0.8,
-            opacity: 0,
-          },
-          {
-            scale: 1,
-            opacity: 1,
-            duration: 1.5,
-            ease: 'expo.out',
-          },
-          0,
-        )
+        tl.call(() => {
+          document.dispatchEvent(new CustomEvent('intro'))
+        }, null, 3.4)
 
-        tl.to(
-          introLogo,
-          {
-            opacity: 0,
-            scale: 1.1,
-            duration: 0.8,
-            ease: 'power2.in',
-          },
-          2.5,
-        )
-
-        tl.from(
-          borderTop,
-          {
-            scaleY: 0,
-            duration: 3,
-            ease: 'power3.inOut',
-          },
-          1,
-        )
-
-        tl.from(
-          [borderLeft, borderRight],
-          {
-            scaleX: 0,
-            duration: 3,
-            ease: 'power3.inOut',
-          },
-          1,
-        )
-
-        tl.call(
-          () => {
-            document.dispatchEvent(new CustomEvent('intro'))
-          },
-          null,
-          '-=1.85',
-          // 0.5
-        )
-
-        tl.call(
-          () => {
-            mount.style.opacity = '1'
-            intro.remove()
-
-            document.documentElement.classList.remove('is-scroll-blocked')
-
-            Ticker.nextTick(() => {
-              Emitter.emit('updateViewport')
-            })
-          },
-          null,
-          5,
-          // 0
-        )
+        tl.call(() => {
+          cancelAnimationFrame(rafId)
+          mount.style.opacity = '1'
+          intro.remove()
+          document.documentElement.classList.remove('is-scroll-blocked')
+          Ticker.nextTick(() => {
+            Emitter.emit('updateViewport')
+          })
+        }, null, 4.8)
       }
     }
 
@@ -551,65 +656,7 @@ import '../styles/global.scss'
       width: 100%;
       height: 100%;
 
-      background: color(primary);
-
-      .sb-logo {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-
-        width: 16rem;
-        height: 16rem;
-
-        transform: translate3d(-50%, -50%, 0);
-
-        @include mq(phone) {
-          width: 8rem;
-          height: 8rem;
-        }
-      }
-
-      &__border {
-        --width: 1rem;
-
-        position: absolute;
-
-        background: color(secondary);
-
-        @include mq(phone) {
-          --width: 0.5rem;
-        }
-
-        &--top {
-          top: 0;
-          left: 0;
-
-          width: 100%;
-          height: var(--width);
-
-          transform-origin: 50% 0;
-        }
-
-        &--left,
-        &--right {
-          top: 0;
-          left: 0;
-
-          width: var(--width);
-          height: 100%;
-        }
-
-        &--left {
-          transform-origin: 0 50%;
-        }
-
-        &--right {
-          left: auto;
-          right: 0;
-
-          transform-origin: 100% 50%;
-        }
-      }
+      background: #020008;
     }
 
     .site-wrapper {
