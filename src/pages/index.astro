@@ -421,7 +421,7 @@ import '../styles/global.scss'
             orbitSpd: (Math.random() > 0.5 ? 1 : -1) * (0.03 + Math.random() * 0.06),
             orbiting: isRing,
             sz:      0.7 + Math.random() * 2.0,
-            hue:     255 + Math.random() * 38,
+            hue:     258 + Math.random() * 42,
             life:    1.0,
             decay:   isRing ? 0.45 + Math.random() * 0.65 : 0.25 + Math.random() * 0.35,
           })
@@ -537,26 +537,30 @@ import '../styles/global.scss'
             }
           }
 
-          // ── Particles ─────────────────────────────────────────────────
+          // ── Particles — shadowBlur glow (technique from reference) ───
+          ctx.shadowColor = 'rgba(190, 50, 255, 0.95)'
+          ctx.shadowBlur  = 20
           for (const p of particles) {
             const x = cx + Math.cos(p.angle) * p.r
             const y = cy + Math.sin(p.angle) * p.r
-
-            // Outer glow
-            const g = ctx.createRadialGradient(x, y, 0, x, y, p.sz * 5)
-            g.addColorStop(0, `hsla(${p.hue},100%,80%,${p.life * 0.7})`)
-            g.addColorStop(1, `hsla(${p.hue},100%,55%,0)`)
             ctx.beginPath()
-            ctx.arc(x, y, p.sz * 5, 0, Math.PI * 2)
-            ctx.fillStyle = g
-            ctx.fill()
-
-            // White-violet core
-            ctx.beginPath()
-            ctx.fillStyle = `rgba(235,215,255,${p.life})`
-            ctx.arc(x, y, p.sz * 0.55, 0, Math.PI * 2)
+            ctx.fillStyle = `hsl(${p.hue}, 100%, 65%)`
+            ctx.arc(x, y, p.sz * 0.85, 0, Math.PI * 2)
             ctx.fill()
           }
+          ctx.shadowBlur  = 0
+          ctx.shadowColor = 'transparent'
+
+          // ── Glowing centre core ───────────────────────────────────────
+          const coreR = hasRing ? targetR * 0.30 : targetR * 0.10
+          const cg    = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR)
+          cg.addColorStop(0,   'rgba(220, 20, 255, 0.92)')
+          cg.addColorStop(0.4, 'rgba(130,  0, 255, 0.42)')
+          cg.addColorStop(1,   'rgba(  0,  0,   0, 0)')
+          ctx.beginPath()
+          ctx.arc(cx, cy, coreR, 0, Math.PI * 2)
+          ctx.fillStyle = cg
+          ctx.fill()
 
           // ── Portal iris opening (destination-out) ─────────────────────
           if (phase === 'opening' || phase === 'done') {
