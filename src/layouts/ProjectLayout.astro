@@ -10,6 +10,7 @@ interface Props {
   heroLabel: string
   heroSub: string
   techTags: string[]
+  heroBg?: string
 }
 
 const {
@@ -18,6 +19,7 @@ const {
   heroLabel,
   heroSub,
   techTags = [],
+  heroBg = '',
 } = Astro.props
 
 const base = import.meta.env.BASE_URL
@@ -44,6 +46,11 @@ const base = import.meta.env.BASE_URL
 
         <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
         <section class="p-hero">
+          {heroBg && (
+            <div class="p-hero__bg" aria-hidden="true">
+              <img src={heroBg} alt="" loading="eager" />
+            </div>
+          )}
           <div class="p-hero__top">
             <span class="p-mono p-hero__label">{heroLabel}</span>
             <a href={`${base}`} class="p-mono p-hero__back">← Portfolio</a>
@@ -280,11 +287,47 @@ const base = import.meta.env.BASE_URL
 
   /* ─── HERO ─────────────────────────────────────────────────────── */
   .p-hero {
+    position: relative;
     min-height: 100svh;
     display: grid;
     grid-template-rows: auto 1fr auto;
     padding: 0 var(--p-pad);
     border-bottom: 1px solid var(--p-border);
+    overflow: hidden;
+  }
+
+  .p-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .p-hero__bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.88) 100%),
+      linear-gradient(to right, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 55%);
+    z-index: 1;
+  }
+
+  .p-hero__bg img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.28;
+    filter: blur(2px) saturate(0.5);
+    transform: scale(1.06);
+  }
+
+  .p-hero__top,
+  .p-hero__center,
+  .p-hero__bottom {
+    position: relative;
+    z-index: 2;
   }
 
   .p-hero__top {
@@ -308,8 +351,8 @@ const base = import.meta.env.BASE_URL
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 2rem;
-    padding: 4rem 0;
+    gap: 2.5rem;
+    padding: 5rem 0;
     max-width: var(--p-max);
   }
 
@@ -326,9 +369,9 @@ const base = import.meta.env.BASE_URL
 
   .p-hero__sub {
     margin: 0;
-    max-width: 600px;
-    font-size: clamp(1rem, 1.8vw, 1.3rem);
-    line-height: 1.5;
+    max-width: 560px;
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+    line-height: 1.65;
     color: var(--p-muted);
   }
 
@@ -362,7 +405,7 @@ const base = import.meta.env.BASE_URL
 
   /* ─── SECTION ──────────────────────────────────────────────────── */
   .p-section {
-    padding: 7rem 0;
+    padding: 9rem 0;
     border-bottom: 1px solid var(--p-border);
     opacity: 0;
     transform: translateY(32px);
@@ -377,7 +420,7 @@ const base = import.meta.env.BASE_URL
     display: flex;
     align-items: baseline;
     gap: 1.5rem;
-    margin-bottom: 5rem;
+    margin-bottom: 6rem;
   }
 
   .p-section__num {
@@ -406,6 +449,45 @@ const base = import.meta.env.BASE_URL
     background: var(--p-border);
     align-self: center;
     min-width: 2rem;
+  }
+
+  /* ─── FEATURED IMAGE (full-bleed) ──────────────────────────────── */
+  .p-featured {
+    margin: 0 calc(-1 * var(--p-pad)) 6rem;
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid var(--p-border);
+    border-bottom: 1px solid var(--p-border);
+    background: #050505;
+  }
+
+  .p-featured img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 65vh;
+    object-fit: cover;
+    opacity: 0.55;
+    transition: opacity 0.5s ease, transform 0.7s ease;
+  }
+
+  .p-featured:hover img {
+    opacity: 0.75;
+    transform: scale(1.015);
+  }
+
+  .p-featured__caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 2.5rem var(--p-pad);
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+    font-family: var(--font-family-fraktion);
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--p-muted);
   }
 
   /* ─── TWO-COL GRID ─────────────────────────────────────────────── */
@@ -733,11 +815,19 @@ const base = import.meta.env.BASE_URL
   .p-showcase {
     border: 1px solid var(--p-border);
     overflow: hidden;
+    transition: border-color 0.3s;
   }
+  .p-showcase:hover { border-color: var(--p-border-hi); }
   .p-showcase img {
     display: block;
     width: 100%;
     height: auto;
+    transition: transform 0.5s ease, opacity 0.3s;
+    opacity: 0.85;
+  }
+  .p-showcase:hover img {
+    transform: scale(1.02);
+    opacity: 1;
   }
 
   /* ─── DB TABLE ─────────────────────────────────────────────────── */

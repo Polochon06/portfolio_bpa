@@ -1,5 +1,6 @@
 ---
 import ProjectLayout from '../layouts/ProjectLayout.astro'
+import heroBgImg from '../assets/frames/art-lines.jpg'
 ---
 
 <ProjectLayout
@@ -8,6 +9,7 @@ import ProjectLayout from '../layouts/ProjectLayout.astro'
   heroLabel="Créations · Motion Design & VFX"
   heroSub="Mon processus créatif en motion design et effets visuels — de la préproduction à l'export final."
   techTags={["After Effects CC 2024", "Cinema 4D", "Trapcode Suite", "Element 3D", "Plexus", "Saber"]}
+  heroBg={heroBgImg.src}
 >
   <Fragment slot="hero-title">VFX_<br/>LAB</Fragment>
 
@@ -68,6 +70,12 @@ import ProjectLayout from '../layouts/ProjectLayout.astro'
       </div>
     </div>
   </section>
+
+  <!-- ═══ FEATURED VISUAL ═════════════════════════════════════════ -->
+  <div class="p-featured" data-reveal>
+    <img src={heroBgImg.src} alt="VFX Lab — Motion Design & Effects visuels" loading="lazy" />
+    <div class="p-featured__caption">Motion Design · Element 3D · Trapcode Suite · Optical Flares</div>
+  </div>
 
   <!-- ═══ 02 · PLUGINS ════════════════════════════════════════════ -->
   <section class="p-section" data-reveal>

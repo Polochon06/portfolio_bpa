@@ -14,6 +14,7 @@ const base = import.meta.env.BASE_URL
   heroLabel="Projet 01 · Atelier Pro BTS SIO · 2024"
   heroSub="Application desktop de gestion des congés avec workflow de validation multi-niveaux et système RBAC à 4 rôles."
   techTags={["Java 17", "Java Swing", "MySQL 8", "MVC", "DAO", "BCrypt", "JDBC"]}
+  heroBg={`${base}images/works/mt-conges-login-screen.png`}
 >
   <Fragment slot="hero-title">MT-<br/>CONGÉS</Fragment>
 
@@ -27,14 +28,6 @@ const base = import.meta.env.BASE_URL
 
     <div class="p-grid">
       <div>
-        <div class="p-showcase" style="margin-bottom: 2.5rem;">
-          <img
-            src={`${base}images/works/mt-conges-login.png`}
-            alt="Interface Login MT-Congés"
-            loading="lazy"
-          />
-        </div>
-
         <div class="p-body">
           <p>
             MT-Congés est une application desktop développée dans le cadre d'un
@@ -85,6 +78,16 @@ const base = import.meta.env.BASE_URL
       </div>
     </div>
   </section>
+
+  <!-- ═══ FEATURED IMAGE ══════════════════════════════════════════ -->
+  <div class="p-featured" data-reveal>
+    <img
+      src={`${base}images/works/mt-conges-dashboard.png`}
+      alt="MT-Congés — Tableau de bord administrateur"
+      loading="lazy"
+    />
+    <div class="p-featured__caption">Interface Administrateur — Tableau de Bord Principal</div>
+  </div>
 
   <!-- ═══ 02 · ARCHITECTURE ════════════════════════════════════════ -->
   <section class="p-section" data-reveal>
@@ -145,8 +148,8 @@ const base = import.meta.env.BASE_URL
 
         <div class="p-showcase">
           <img
-            src={`${base}images/works/mt-conges-dashboard.png`}
-            alt="Dashboard MT-Congés"
+            src={`${base}images/works/mt-conges-login.png`}
+            alt="Écran de connexion MT-Congés"
             loading="lazy"
           />
         </div>
