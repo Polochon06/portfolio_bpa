@@ -363,13 +363,15 @@ const base = import.meta.env.BASE_URL
   .p-hero__title {
     margin: 0;
     font-family: var(--font-family-bigger);
-    font-size: clamp(4rem, 14vw, 16rem);
+    font-size: clamp(4rem, 11vw, 13rem);
     font-weight: 700;
     line-height: 0.9;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     color: #fff;
     text-shadow: 0 2px 40px rgba(139, 92, 246, 0.25);
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .p-hero__sub {
