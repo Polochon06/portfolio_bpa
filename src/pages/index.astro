@@ -460,58 +460,77 @@ import '../styles/global.scss'
         }
 
         function drawPortal() {
-          // Semi-transparent fill → trail effect (key technique from the reference)
+          // Trail effect — semi-transparent fill (not clearRect)
           ctx.fillStyle = `rgba(1,0,8,${trailAlpha})`
           ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-          const hasRing = phase === 'full' || phase === 'opening' || phase === 'done'
+          // Ring draw radius grows with portal during 'forming'
+          const ringR = phase === 'forming' ? currentR : targetR
 
-          // ── Inner violet void ─────────────────────────────────────────
-          if (hasRing) {
-            const ig = ctx.createRadialGradient(cx, cy, 0, cx, cy, targetR * 0.86)
-            ig.addColorStop(0,   `rgba(55,0,120,${0.75 + openFlash * 0.2})`)
-            ig.addColorStop(0.55, 'rgba(25,0, 70,0.45)')
-            ig.addColorStop(1,   'rgba( 8,0, 25,0)')
-            ctx.beginPath()
-            ctx.arc(cx, cy, targetR * 0.86, 0, Math.PI * 2)
-            ctx.fillStyle = ig
-            ctx.fill()
+          // Portal window: site is visible through this area every frame.
+          // Grows from 0 → targetR*0.84 during forming, stays there during
+          // 'full', then expands to fill the screen during 'opening'.
+          let windowR: number
+          if (phase === 'forming') {
+            windowR = currentR * 0.84
+          } else if (phase === 'full') {
+            windowR = targetR * 0.84
+          } else {
+            const ease = 1 - Math.pow(1 - openProgress, 3)
+            windowR = targetR * 0.84 + ease * Math.max(canvas.width, canvas.height) * 1.35
           }
 
-          // ── Outer glow halo ───────────────────────────────────────────
-          if (hasRing) {
-            const ga = 0.45 + openFlash * 0.6
+          // ── Outer glow halo (drawn before the window cut) ────────────
+          if (ringR > 8) {
             const gw = 65
-            const rg = ctx.createRadialGradient(cx, cy, Math.max(0, targetR - gw * 0.4), cx, cy, targetR + gw)
+            const ga = 0.45 + openFlash * 0.6
+            const rg = ctx.createRadialGradient(cx, cy, Math.max(0, ringR - gw * 0.4), cx, cy, ringR + gw)
             rg.addColorStop(0,    'rgba( 80,  0,180,0)')
             rg.addColorStop(0.35, `rgba(120, 30,245,${ga * 0.85})`)
             rg.addColorStop(0.6,  `rgba(170, 90,255,${ga})`)
             rg.addColorStop(1,    'rgba( 80,  0,180,0)')
             ctx.beginPath()
-            ctx.arc(cx, cy, targetR + gw, 0, Math.PI * 2)
+            ctx.arc(cx, cy, ringR + gw, 0, Math.PI * 2)
             ctx.fillStyle = rg
             ctx.fill()
           }
 
-          // ── Bright ring strokes ───────────────────────────────────────
-          if (hasRing) {
-            const sa = 0.75 + openFlash * 0.25
+          // ── Transparent window — site appears through here ────────────
+          if (windowR > 2) {
+            ctx.save()
+            ctx.globalCompositeOperation = 'destination-out'
+            const hg = ctx.createRadialGradient(cx, cy, 0, cx, cy, windowR)
+            hg.addColorStop(0.72, 'rgba(0,0,0,1)')
+            hg.addColorStop(0.92, 'rgba(0,0,0,0.95)')
+            hg.addColorStop(1,    'rgba(0,0,0,0)')
+            ctx.beginPath()
+            ctx.arc(cx, cy, windowR, 0, Math.PI * 2)
+            ctx.fillStyle = hg
+            ctx.fill()
+            ctx.restore()
+          }
+
+          // ── Everything below floats OVER the site content ─────────────
+
+          // Ring strokes
+          if (ringR > 8) {
+            const sa = (phase === 'forming' ? currentR / targetR : 1) * (0.75 + openFlash * 0.25)
             ctx.save()
             ctx.beginPath()
-            ctx.arc(cx, cy, targetR, 0, Math.PI * 2)
+            ctx.arc(cx, cy, ringR, 0, Math.PI * 2)
             ctx.strokeStyle = `rgba(215,175,255,${sa})`
             ctx.lineWidth   = 2.5
             ctx.stroke()
             ctx.beginPath()
-            ctx.arc(cx, cy, targetR, 0, Math.PI * 2)
+            ctx.arc(cx, cy, ringR, 0, Math.PI * 2)
             ctx.strokeStyle = `rgba(130, 50,255,${sa * 0.45})`
             ctx.lineWidth   = 10
             ctx.stroke()
             ctx.restore()
           }
 
-          // ── Spinning rune arcs ────────────────────────────────────────
-          if (hasRing) {
+          // Spinning rune arcs (visible over site)
+          if (phase === 'full' || phase === 'opening') {
             const ra = Math.min(totalTime - 2.0, 1) * 0.28
             if (ra > 0) {
               ctx.save()
@@ -537,7 +556,7 @@ import '../styles/global.scss'
             }
           }
 
-          // ── Particles — shadowBlur glow (technique from reference) ───
+          // Particles
           ctx.shadowColor = 'rgba(190, 50, 255, 0.95)'
           ctx.shadowBlur  = 20
           for (const p of particles) {
@@ -551,33 +570,16 @@ import '../styles/global.scss'
           ctx.shadowBlur  = 0
           ctx.shadowColor = 'transparent'
 
-          // ── Glowing centre core ───────────────────────────────────────
-          const coreR = hasRing ? targetR * 0.30 : targetR * 0.10
+          // Glowing centre core
+          const coreR = phase === 'forming' ? Math.max(currentR * 0.10, 6) : targetR * 0.28
           const cg    = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR)
-          cg.addColorStop(0,   'rgba(220, 20, 255, 0.92)')
-          cg.addColorStop(0.4, 'rgba(130,  0, 255, 0.42)')
+          cg.addColorStop(0,   'rgba(220, 20, 255, 0.88)')
+          cg.addColorStop(0.4, 'rgba(130,  0, 255, 0.38)')
           cg.addColorStop(1,   'rgba(  0,  0,   0, 0)')
           ctx.beginPath()
           ctx.arc(cx, cy, coreR, 0, Math.PI * 2)
           ctx.fillStyle = cg
           ctx.fill()
-
-          // ── Portal iris opening (destination-out) ─────────────────────
-          if (phase === 'opening' || phase === 'done') {
-            const ease  = 1 - Math.pow(1 - openProgress, 3)
-            const holeR = ease * Math.max(canvas.width, canvas.height) * 1.3
-            ctx.save()
-            ctx.globalCompositeOperation = 'destination-out'
-            const hg = ctx.createRadialGradient(cx, cy, 0, cx, cy, holeR)
-            hg.addColorStop(0.3,  'rgba(0,0,0,1)')
-            hg.addColorStop(0.82, 'rgba(0,0,0,0.97)')
-            hg.addColorStop(1,    'rgba(0,0,0,0)')
-            ctx.beginPath()
-            ctx.arc(cx, cy, holeR, 0, Math.PI * 2)
-            ctx.fillStyle = hg
-            ctx.fill()
-            ctx.restore()
-          }
         }
 
         let lastTime = 0
