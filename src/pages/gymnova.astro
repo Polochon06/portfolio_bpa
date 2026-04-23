@@ -1,15 +1,13 @@
 ---
 import ProjectLayout from '../layouts/ProjectLayout.astro'
-import heroBgImg from '../assets/frames/legos.jpg'
-
-const base = import.meta.env.BASE_URL
+import heroBgImg from '../assets/bg-gymnova.jpg'
 ---
 
 <ProjectLayout
   title="Gymnova Shop | E-Commerce React"
-  description="Site e-commerce de vente de matériel de gymnastique. React 18, Node.js, Express, MySQL, Stripe."
+  description="Site e-commerce de vente de materiel de gymnastique. React 18, Node.js, Express, MySQL, Stripe."
   heroLabel="Projet 02 · BTS SIO SLAM · 2024"
-  heroSub="Site e-commerce complet de vente de matériel de gymnastique professionnel — catalogue, panier, paiement Stripe intégré."
+  heroSub="Site e-commerce complet de vente de materiel de gymnastique professionnel — catalogue, panier, paiement Stripe integre."
   techTags={["React 18", "Node.js", "Express", "MySQL", "Stripe", "JWT"]}
   heroBg={heroBgImg.src}
 >
@@ -27,20 +25,20 @@ const base = import.meta.env.BASE_URL
       <div>
         <div class="p-body">
           <p>
-            Gymnova Shop est un site e-commerce complet développé dans le cadre
-            du <strong>BTS SIO SLAM</strong>. Inspiré de la marque Gymnova (fabricant
-            français d'équipements), le site propose un catalogue de <strong>~50 références</strong>
-            réparties en 8 catégories.
+            Gymnova Shop est un site e-commerce complet developpe dans le cadre
+            du <strong>BTS SIO SLAM</strong>. Inspire de la marque Gymnova (fabricant
+            francais d'equipements), le site propose un catalogue de <strong>~50 references</strong>
+            reparties en 8 categories.
           </p>
           <p>
             Le projet couvre l'ensemble du parcours client : navigation avec filtres,
             fiche produit, gestion du panier, checkout avec <strong>paiement Stripe</strong>,
-            suivi des commandes. Un back-office admin gère les statuts des commandes.
+            suivi des commandes. Un back-office admin gere les statuts des commandes.
           </p>
           <p>
-            L'architecture repose sur une <strong>SPA React 18</strong> côté front
+            L'architecture repose sur une <strong>SPA React 18</strong> cote front
             communicant avec une <strong>API REST Express</strong> (port 5000), une base
-            MySQL à 8 tables, et l'authentification via <strong>JWT + bcryptjs</strong>.
+            MySQL a 8 tables, et l'authentification via <strong>JWT + bcryptjs</strong>.
           </p>
         </div>
 
@@ -83,8 +81,8 @@ const base = import.meta.env.BASE_URL
 
   <!-- ═══ FEATURED VISUAL ═════════════════════════════════════════ -->
   <div class="p-featured" data-reveal>
-    <img src={heroBgImg.src} alt="Gymnova Shop — Aperçu" loading="lazy" />
-    <div class="p-featured__caption">Interface E-Commerce · React 18 + Stripe · ~50 Références</div>
+    <img src={heroBgImg.src} alt="Gymnova Shop — Salle de sport professionnelle" loading="lazy" />
+    <div class="p-featured__caption">Interface E-Commerce · React 18 + Stripe · ~50 References</div>
   </div>
 
   <!-- ═══ 02 · CATALOGUE ═══════════════════════════════════════════ -->
@@ -96,7 +94,7 @@ const base = import.meta.env.BASE_URL
     </div>
 
     <p class="p-body" style="max-width: 600px; margin-bottom: 3rem;">
-      <span style="opacity:0.6">~50 références de matériel de gymnastique professionnel réparties en 8 catégories.</span>
+      <span style="opacity:0.6">~50 references de materiel de gymnastique professionnel reparties en 8 categories.</span>
     </p>
 
     <div class="p-catalogue">
@@ -127,7 +125,7 @@ const base = import.meta.env.BASE_URL
       </div>
       <div class="p-cat-item">
         <span class="p-cat-icon">🐴</span>
-        <span class="p-cat-name">Cheval d'Arçons</span>
+        <span class="p-cat-name">Cheval d'Arcons</span>
         <span class="p-cat-price">299 – 3 299 €</span>
       </div>
       <div class="p-cat-item">
@@ -143,11 +141,11 @@ const base = import.meta.env.BASE_URL
     </div>
   </section>
 
-  <!-- ═══ 03 · FONCTIONNALITÉS ═════════════════════════════════════ -->
+  <!-- ═══ 03 · FONCTIONNALITES ═════════════════════════════════════ -->
   <section class="p-section" data-reveal>
     <div class="p-section__header">
       <span class="p-section__num">03</span>
-      <h2 class="p-section__title">Fonctionnalités</h2>
+      <h2 class="p-section__title">Fonctionnalites</h2>
       <div class="p-section__line"></div>
     </div>
 
@@ -156,8 +154,8 @@ const base = import.meta.env.BASE_URL
         <span class="p-badge p-badge--ux">Frontend</span>
         <h3 class="p-card__title">Catalogue & Filtres</h3>
         <p class="p-card__body">
-          Navigation avec <strong style="color:var(--p-text)">filtrage par catégorie</strong>
-          et recherche textuelle. Fiche produit complète avec images, description et avis clients.
+          Navigation avec <strong style="color:var(--p-text)">filtrage par categorie</strong>
+          et recherche textuelle. Fiche produit complete avec images, description et avis clients.
         </p>
       </div>
 
@@ -165,8 +163,8 @@ const base = import.meta.env.BASE_URL
         <span class="p-badge p-badge--arch">Paiement</span>
         <h3 class="p-card__title">Checkout Stripe</h3>
         <p class="p-card__body">
-          Intégration <strong style="color:var(--p-text)">Stripe.js</strong> pour le paiement
-          sécurisé. Mode démo disponible sans clé API. Formulaire d'adresse de livraison intégré.
+          Integration <strong style="color:var(--p-text)">Stripe.js</strong> pour le paiement
+          securise. Mode demo disponible sans cle API. Formulaire d'adresse de livraison integre.
         </p>
       </div>
 
@@ -174,7 +172,7 @@ const base = import.meta.env.BASE_URL
         <span class="p-badge p-badge--solution">Backend</span>
         <h3 class="p-card__title">Auth JWT</h3>
         <p class="p-card__body">
-          Authentification complète avec <strong style="color:var(--p-text)">JSON Web Tokens</strong>
+          Authentification complete avec <strong style="color:var(--p-text)">JSON Web Tokens</strong>
           (7 jours). Inscription, connexion, gestion du profil. Hash bcryptjs.
         </p>
       </div>
@@ -183,8 +181,8 @@ const base = import.meta.env.BASE_URL
         <span class="p-badge p-badge--problem">Admin</span>
         <h3 class="p-card__title">Gestion Commandes</h3>
         <p class="p-card__body">
-          Back-office pour visualiser toutes les commandes et gérer leur statut :
-          <strong style="color:var(--p-text)">en_attente → payée → expédiée → livrée</strong>.
+          Back-office pour visualiser toutes les commandes et gerer leur statut :
+          <strong style="color:var(--p-text)">en_attente → payee → expediee → livree</strong>.
         </p>
       </div>
     </div>
@@ -194,7 +192,7 @@ const base = import.meta.env.BASE_URL
   <section class="p-section" data-reveal>
     <div class="p-section__header">
       <span class="p-section__num">04</span>
-      <h2 class="p-section__title">Parcours & Base de Données</h2>
+      <h2 class="p-section__title">Parcours & Base de Donnees</h2>
       <div class="p-section__line"></div>
     </div>
 
@@ -204,11 +202,11 @@ const base = import.meta.env.BASE_URL
         <ol class="p-steps">
           <li>
             <strong>Page d'accueil</strong>
-            <span>Vidéo YouTube en fond + présentation de la marque</span>
+            <span>Video YouTube en fond + presentation de la marque</span>
           </li>
           <li>
             <strong>Catalogue</strong>
-            <span>Navigation et filtrage par catégorie (8 catégories)</span>
+            <span>Navigation et filtrage par categorie (8 categories)</span>
           </li>
           <li>
             <strong>Fiche Produit</strong>
@@ -216,11 +214,11 @@ const base = import.meta.env.BASE_URL
           </li>
           <li>
             <strong>Inscription / Connexion</strong>
-            <span>Authentification JWT sécurisée</span>
+            <span>Authentification JWT securisee</span>
           </li>
           <li>
             <strong>Panier & Checkout</strong>
-            <span>Quantités, adresse livraison, paiement Stripe</span>
+            <span>Quantites, adresse livraison, paiement Stripe</span>
           </li>
           <li>
             <strong>Confirmation</strong>
@@ -253,7 +251,7 @@ const base = import.meta.env.BASE_URL
     </div>
     <div class="p-stat">
       <div class="p-stat__num">50</div>
-      <div class="p-stat__label">Références</div>
+      <div class="p-stat__label">References</div>
     </div>
     <div class="p-stat">
       <div class="p-stat__num">5</div>

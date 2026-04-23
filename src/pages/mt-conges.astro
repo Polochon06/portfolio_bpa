@@ -4,19 +4,20 @@ import ProjectLayout from '../layouts/ProjectLayout.astro'
 import vid1 from '../assets/works/Pen-4.mp4'
 import vid2 from '../assets/works/Pen-5.mp4'
 import vid3 from '../assets/works/Pen-6.mp4'
-
-const base = import.meta.env.BASE_URL
+import heroBgImg from '../assets/bg-mt-conges.jpg'
+import dashboardImg from '../assets/works/mt-conges-dashboard.png'
+import loginImg from '../assets/works/mt-conges-login.png'
 ---
 
 <ProjectLayout
-  title="MT-Congés | Architecture Java MVC"
-  description="Application desktop de gestion des congés. Java 17, Swing, MySQL, MVC, RBAC, BCrypt."
+  title="MT-Conges | Architecture Java MVC"
+  description="Application desktop de gestion des conges. Java 17, Swing, MySQL, MVC, RBAC, BCrypt."
   heroLabel="Projet 01 · Atelier Pro BTS SIO · 2024"
-  heroSub="Application desktop de gestion des congés avec workflow de validation multi-niveaux et système RBAC à 4 rôles."
+  heroSub="Application desktop de gestion des conges avec workflow de validation multi-niveaux et systeme RBAC a 4 roles."
   techTags={["Java 17", "Java Swing", "MySQL 8", "MVC", "DAO", "BCrypt", "JDBC"]}
-  heroBg={`${base}images/works/mt-conges-login-screen.png`}
+  heroBg={heroBgImg.src}
 >
-  <Fragment slot="hero-title">MT-<br/>CONGÉS</Fragment>
+  <Fragment slot="hero-title">MT-<br/>CONGES</Fragment>
 
   <!-- ═══ 01 · STACK & CONTEXTE ════════════════════════════════════ -->
   <section class="p-section" data-reveal>
@@ -30,16 +31,16 @@ const base = import.meta.env.BASE_URL
       <div>
         <div class="p-body">
           <p>
-            MT-Congés est une application desktop développée dans le cadre d'un
-            <strong>atelier de professionnalisation BTS SIO</strong> (équipe de 4).
-            Elle simplifie la gestion des congés en entreprise avec
+            MT-Conges est une application desktop developpee dans le cadre d'un
+            <strong>atelier de professionnalisation BTS SIO</strong> (equipe de 4).
+            Elle simplifie la gestion des conges en entreprise avec
             <strong>trois profils utilisateurs distincts</strong> :
-            Administrateur, Responsable et Employé.
+            Administrateur, Responsable et Employe.
           </p>
           <p>
-            Chaque rôle dispose d'une interface Swing adaptative :
-            l'employé soumet des demandes via calendrier, le responsable
-            valide/refuse avec notification automatique, l'admin gère les
+            Chaque role dispose d'une interface Swing adaptative :
+            l'employe soumet des demandes via calendrier, le responsable
+            valide/refuse avec notification automatique, l'admin gere les
             comptes et permissions.
           </p>
         </div>
@@ -52,19 +53,19 @@ const base = import.meta.env.BASE_URL
       </div>
 
       <div class="p-card">
-        <span class="p-card__label">Base de Données — adpv1 (7 tables)</span>
+        <span class="p-card__label">Base de Donnees — adpv1 (7 tables)</span>
         <div>
           <div class="p-db-table">
             <div class="p-db-name">utilisateur</div>
-            <div class="p-db-fields">IdUtilisateur, NomUtilisateur, Nom, Prénom<br/>Email, MotDePasse (BCrypt), NombreCongeRestant (30j)<br/>IdRole, IdProjet</div>
+            <div class="p-db-fields">IdUtilisateur, NomUtilisateur, Nom, Prenom<br/>Email, MotDePasse (BCrypt), NombreCongeRestant (30j)<br/>IdRole, IdProjet</div>
           </div>
           <div class="p-db-table">
             <div class="p-db-name">demandeconge</div>
-            <div class="p-db-fields">IdConge, DureeConge, DateDebutConge<br/>EtatConge (En attente / Validé / Refusé)<br/>Motif, IdUtilisateur (FK CASCADE)</div>
+            <div class="p-db-fields">IdConge, DureeConge, DateDebutConge<br/>EtatConge (En attente / Valide / Refuse)<br/>Motif, IdUtilisateur (FK CASCADE)</div>
           </div>
           <div class="p-db-table">
             <div class="p-db-name">role</div>
-            <div class="p-db-fields">IdRole, NomRole, Permission (1–4)<br/>Super-Admin, Admin, Responsable, Employé</div>
+            <div class="p-db-fields">IdRole, NomRole, Permission (1–4)<br/>Super-Admin, Admin, Responsable, Employe</div>
           </div>
           <div class="p-db-table">
             <div class="p-db-name">notification</div>
@@ -72,7 +73,7 @@ const base = import.meta.env.BASE_URL
           </div>
           <div class="p-db-table">
             <div class="p-db-name">projet + projet_utilisateur</div>
-            <div class="p-db-fields">Projets: CNP, Cyber · Association many-to-many<br/>Flag est_responsable (booléen)</div>
+            <div class="p-db-fields">Projets: CNP, Cyber · Association many-to-many<br/>Flag est_responsable (booleen)</div>
           </div>
         </div>
       </div>
@@ -81,11 +82,7 @@ const base = import.meta.env.BASE_URL
 
   <!-- ═══ FEATURED IMAGE ══════════════════════════════════════════ -->
   <div class="p-featured" data-reveal>
-    <img
-      src={`${base}images/works/mt-conges-dashboard.png`}
-      alt="MT-Congés — Tableau de bord administrateur"
-      loading="lazy"
-    />
+    <img src={dashboardImg.src} alt="MT-Conges — Tableau de bord administrateur" loading="lazy" />
     <div class="p-featured__caption">Interface Administrateur — Tableau de Bord Principal</div>
   </div>
 
@@ -103,7 +100,7 @@ const base = import.meta.env.BASE_URL
           <p>
             L'application repose sur une <strong>architecture MVC stricte</strong>
             en Java SE-22 avec interface graphique Swing. La couche DAO isole
-            entièrement l'accès base de données du reste de l'application.
+            entierement l'acces base de donnees du reste de l'application.
           </p>
           <p>
             <strong>Workflow de validation :</strong>
@@ -112,34 +109,34 @@ const base = import.meta.env.BASE_URL
         <ol class="p-steps" style="margin-top: 1.5rem;">
           <li>
             <strong>Soumission</strong>
-            <span>L'employé sélectionne les dates via le calendrier interactif et soumet sa demande</span>
+            <span>L'employe selectionne les dates via le calendrier interactif et soumet sa demande</span>
           </li>
           <li>
             <strong>Notification</strong>
-            <span>Une notification est automatiquement créée pour le responsable de projet</span>
+            <span>Une notification est automatiquement creee pour le responsable de projet</span>
           </li>
           <li>
             <strong>Validation</strong>
-            <span>Le responsable valide ou refuse — une notification est envoyée à l'employé</span>
+            <span>Le responsable valide ou refuse — une notification est envoyee a l'employe</span>
           </li>
           <li>
-            <strong>Mise à jour solde</strong>
-            <span>NombreCongeRestant mis à jour automatiquement après acceptation</span>
+            <strong>Mise a jour solde</strong>
+            <span>NombreCongeRestant mis a jour automatiquement apres acceptation</span>
           </li>
           <li>
-            <strong>Détection conflits</strong>
-            <span>Détection automatique des chevauchements entre demandes simultanées</span>
+            <strong>Detection conflits</strong>
+            <span>Detection automatique des chevauchements entre demandes simultanees</span>
           </li>
         </ol>
       </div>
 
       <div>
         <div class="p-card" style="margin-bottom: 1.5rem;">
-          <span class="p-card__label">Sécurité</span>
+          <span class="p-card__label">Securite</span>
           <div class="p-mono-block">
             <div>✓ PreparedStatements JDBC (anti-injections SQL)</div>
             <div>✓ Hachage BCrypt des mots de passe</div>
-            <div>✓ Vérification RBAC au niveau DAO</div>
+            <div>✓ Verification RBAC au niveau DAO</div>
             <div>✓ SessionManager singleton pour les sessions</div>
             <div>✓ Contraintes FK DELETE CASCADE</div>
             <div>✓ UNIQUE sur association projet-utilisateur</div>
@@ -147,56 +144,52 @@ const base = import.meta.env.BASE_URL
         </div>
 
         <div class="p-showcase">
-          <img
-            src={`${base}images/works/mt-conges-login.png`}
-            alt="Écran de connexion MT-Congés"
-            loading="lazy"
-          />
+          <img src={loginImg.src} alt="Ecran de connexion MT-Conges" loading="lazy" />
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══ 03 · DÉFIS & SOLUTIONS ═══════════════════════════════════ -->
+  <!-- ═══ 03 · DEFIS & SOLUTIONS ═══════════════════════════════════ -->
   <section class="p-section" data-reveal>
     <div class="p-section__header">
       <span class="p-section__num">03</span>
-      <h2 class="p-section__title">Défis & Solutions</h2>
+      <h2 class="p-section__title">Defis & Solutions</h2>
       <div class="p-section__line"></div>
     </div>
 
     <div class="p-features">
       <div class="p-challenge">
-        <span class="p-badge p-badge--problem">Sécurité</span>
+        <span class="p-badge p-badge--problem">Securite</span>
         <h3>Injections SQL</h3>
-        <p class="p-card__body">Les données RH (emails, mots de passe, soldes) sont sensibles. Une faille SQL compromettrait l'intégralité de la base.</p>
+        <p class="p-card__body">Les donnees RH (emails, mots de passe, soldes) sont sensibles. Une faille SQL compromettrait l'integralite de la base.</p>
         <hr class="p-challenge__sep" />
         <span class="p-badge p-badge--solution">Solution</span>
-        <p class="p-card__body">Utilisation <strong style="color:var(--p-text)">exclusive</strong> de PreparedStatements JDBC pour toutes les requêtes. Mots de passe chiffrés avec BCrypt.</p>
+        <p class="p-card__body">Utilisation <strong style="color:var(--p-text)">exclusive</strong> de PreparedStatements JDBC pour toutes les requetes. Mots de passe chiffres avec BCrypt.</p>
       </div>
 
       <div class="p-challenge">
         <span class="p-badge p-badge--arch">Architecture</span>
         <h3>RBAC 4 Niveaux</h3>
-        <p class="p-card__body">Gérer un système de permissions à 4 niveaux : Super-Admin, Admin, Responsable de projet et Employé standard.</p>
+        <p class="p-card__body">Gerer un systeme de permissions a 4 niveaux : Super-Admin, Admin, Responsable de projet et Employe standard.</p>
         <hr class="p-challenge__sep" />
         <span class="p-badge p-badge--solution">Solution</span>
-        <p class="p-card__body">Table <strong style="color:var(--p-text)">role</strong> avec colonne Permission (1–4). SessionManager singleton. Interfaces Swing adaptatives selon le rôle.</p>
+        <p class="p-card__body">Table <strong style="color:var(--p-text)">role</strong> avec colonne Permission (1–4). SessionManager singleton. Interfaces Swing adaptatives selon le role.</p>
       </div>
 
       <div class="p-challenge">
-        <span class="p-badge p-badge--problem">Intégrité</span>
-        <h3>Cohérence Multi-Tables</h3>
-        <p class="p-card__body">Maintenir l'intégrité entre 7 tables. Empêcher les chevauchements de congés et les soldes négatifs.</p>
+        <span class="p-badge p-badge--problem">Integrite</span>
+        <h3>Coherence Multi-Tables</h3>
+        <p class="p-card__body">Maintenir l'integrite entre 7 tables. Empecher les chevauchements de conges et les soldes negatifs.</p>
         <hr class="p-challenge__sep" />
         <span class="p-badge p-badge--solution">Solution</span>
-        <p class="p-card__body">Contraintes SQL : DELETE CASCADE, UNIQUE sur projet-utilisateur, indices optimisés. Validation métier côté Java avant insertion.</p>
+        <p class="p-card__body">Contraintes SQL : DELETE CASCADE, UNIQUE sur projet-utilisateur, indices optimises. Validation metier cote Java avant insertion.</p>
       </div>
 
       <div class="p-challenge">
         <span class="p-badge p-badge--ux">UX</span>
-        <h3>Système de Notifications</h3>
-        <p class="p-card__body">Badge rouge avec compteur de non-lues, génération automatique lors des demandes/décisions, filtrage lues/non lues.</p>
+        <h3>Systeme de Notifications</h3>
+        <p class="p-card__body">Badge rouge avec compteur de non-lues, generation automatique lors des demandes/decisions, filtrage lues/non lues.</p>
         <hr class="p-challenge__sep" />
         <span class="p-badge p-badge--solution">Solution</span>
         <p class="p-card__body">Table <strong style="color:var(--p-text)">notification</strong> avec statut, timestamps, liens contextuels. Badge UI dynamique. Onglets de filtrage.</p>
@@ -204,16 +197,16 @@ const base = import.meta.env.BASE_URL
     </div>
   </section>
 
-  <!-- ═══ 04 · SHOWCASE VIDÉO ══════════════════════════════════════ -->
+  <!-- ═══ 04 · SHOWCASE VIDEO ══════════════════════════════════════ -->
   <section class="p-section" data-reveal>
     <div class="p-section__header">
       <span class="p-section__num">04</span>
-      <h2 class="p-section__title">Showcase Vidéo</h2>
+      <h2 class="p-section__title">Showcase Video</h2>
       <div class="p-section__line"></div>
     </div>
 
     <p class="p-body" style="max-width:600px; margin-bottom:3rem;">
-      <span style="opacity:0.6">Extraits de démonstration de l'application en fonctionnement.</span>
+      <span style="opacity:0.6">Extraits de demonstration de l'application en fonctionnement.</span>
     </p>
 
     <div class="p-videos">
@@ -237,7 +230,7 @@ const base = import.meta.env.BASE_URL
     </div>
     <div class="p-stat">
       <div class="p-stat__num">4</div>
-      <div class="p-stat__label">Niveaux Rôles</div>
+      <div class="p-stat__label">Niveaux Roles</div>
     </div>
     <div class="p-stat">
       <div class="p-stat__num">100%</div>
