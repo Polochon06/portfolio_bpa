@@ -407,6 +407,7 @@ import '../styles/global.scss'
         let openProgress = 0
         let flashAlpha   = 0
         let trailAlpha   = 0.12
+        let ringFade     = 1
 
         const sparks: any[] = []
         const bolts:  any[] = []
@@ -434,9 +435,9 @@ import '../styles/global.scss'
             const og   = ac.createGain()
             og.gain.setValueAtTime(0, now)
             og.gain.linearRampToValueAtTime(0.06, now + 0.9)
-            og.gain.setValueAtTime(0.06, now + 3.2)
-            og.gain.linearRampToValueAtTime(0, now + 5.5)
-            osc.connect(og); og.connect(ac.destination); osc.start(); osc.stop(now + 6)
+            og.gain.setValueAtTime(0.06, now + 1.8)
+            og.gain.linearRampToValueAtTime(0, now + 3.0)
+            osc.connect(og); og.connect(ac.destination); osc.start(); osc.stop(now + 3.5)
 
             // Electrical crackle (filtered noise)
             const buf = ac.createBuffer(1, ac.sampleRate * 4, ac.sampleRate)
@@ -447,9 +448,9 @@ import '../styles/global.scss'
             bpf.frequency.value = 2400; bpf.Q.value = 1.5
             const ng  = ac.createGain()
             ng.gain.setValueAtTime(0, now)
-            ng.gain.linearRampToValueAtTime(0.04, now + 1.4)
-            ng.gain.linearRampToValueAtTime(0.07, now + 3.2)
-            ng.gain.linearRampToValueAtTime(0, now + 5.5)
+            ng.gain.linearRampToValueAtTime(0.04, now + 0.8)
+            ng.gain.linearRampToValueAtTime(0.07, now + 1.8)
+            ng.gain.linearRampToValueAtTime(0, now + 3.0)
             ns.connect(bpf); bpf.connect(ng); ng.connect(ac.destination); ns.start()
 
             // Opening whoosh at t=3.4s
@@ -457,14 +458,14 @@ import '../styles/global.scss'
               try {
                 const w  = ac.createOscillator(); w.type = 'sine'
                 w.frequency.setValueAtTime(110, ac.currentTime)
-                w.frequency.exponentialRampToValueAtTime(2200, ac.currentTime + 0.9)
+                w.frequency.exponentialRampToValueAtTime(2200, ac.currentTime + 0.6)
                 const wg = ac.createGain()
                 wg.gain.setValueAtTime(0.2, ac.currentTime)
-                wg.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 1.4)
+                wg.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 1.0)
                 w.connect(wg); wg.connect(ac.destination)
-                w.start(); w.stop(ac.currentTime + 1.6)
+                w.start(); w.stop(ac.currentTime + 1.2)
               } catch(e) {}
-            }, 3400)
+            }, 2000)
           } catch(e) { /* autoplay blocked — silent */ }
         })()
 
@@ -511,11 +512,12 @@ import '../styles/global.scss'
         // ── Update ──────────────────────────────────────────────────────
         function update(dt: number) {
           t        += dt
-          currentR  = phase === 'forming' ? Math.min(currentR + dt * R / 1.5, R) : R
+          currentR  = phase === 'forming' ? Math.min(currentR + dt * R / 1.0, R) : R
 
           if (phase === 'opening') {
-            openProgress = Math.min(openProgress + dt * 0.78, 1)
+            openProgress = Math.min(openProgress + dt * 1.5, 1)
             flashAlpha   = Math.max(flashAlpha - dt * 2.8, 0)
+            ringFade     = Math.max(0, 1 - openProgress * 4)
             if (openProgress >= 1) phase = 'done'
           }
 
@@ -569,7 +571,7 @@ import '../styles/global.scss'
           // Outer glow halo
           if (rVis) {
             const gw = 72 + flashAlpha * 28
-            const ga = 0.42 + flashAlpha * 0.58
+            const ga = (0.42 + flashAlpha * 0.58) * ringFade
             const rg = ctx.createRadialGradient(cx, cy, Math.max(0, currentR - gw * 0.3), cx, cy, currentR + gw)
             rg.addColorStop(0,    'rgba(65,0,155,0)')
             rg.addColorStop(0.32, `rgba(105,22,235,${ga * 0.82})`)
@@ -607,7 +609,7 @@ import '../styles/global.scss'
 
           // Runic rings + tick marks
           if (rVis) {
-            const ra = Math.min(t * 1.1, 1) * 0.30
+            const ra = Math.min(t * 1.1, 1) * 0.30 * ringFade
             if (ra > 0) {
               ctx.save()
               for (const rr of runeRings) {
@@ -639,7 +641,7 @@ import '../styles/global.scss'
 
           // Ring strokes
           if (rVis) {
-            const sa = (phase === 'forming' ? currentR / R : 1) * (0.78 + flashAlpha * 0.22)
+            const sa = (phase === 'forming' ? currentR / R : 1) * (0.78 + flashAlpha * 0.22) * ringFade
             ctx.save()
             ctx.beginPath(); ctx.arc(cx, cy, currentR, 0, Math.PI * 2)
             ctx.strokeStyle = `rgba(215,172,255,${sa})`; ctx.lineWidth = 2.5; ctx.stroke()
@@ -675,7 +677,7 @@ import '../styles/global.scss'
             const x = cx + Math.cos(p.angle) * p.r
             const y = cy + Math.sin(p.angle) * p.r
             ctx.beginPath()
-            ctx.fillStyle = `hsl(${p.hue},100%,66%)`
+            ctx.fillStyle = `hsla(${p.hue},100%,66%,${ringFade})`
             ctx.arc(x, y, p.sz * 0.82, 0, Math.PI * 2)
             ctx.fill()
           }
@@ -684,10 +686,11 @@ import '../styles/global.scss'
           // Energy core (pulsing)
           const coreR  = phase === 'forming' ? Math.max(currentR * 0.09, 5) : R * 0.26
           const pulse  = 1 + Math.sin(t * 7.5) * 0.07 + flashAlpha * 0.25
+          const coreAlpha = Math.max(0, 1 - openProgress * 2)
           const cg     = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR * pulse * 1.6)
-          cg.addColorStop(0,   `rgba(232,55,255,${0.90 + flashAlpha * 0.10})`)
-          cg.addColorStop(0.28,`rgba(155,18,255,${0.58 + flashAlpha * 0.18})`)
-          cg.addColorStop(0.65,'rgba(75,0,175,0.18)')
+          cg.addColorStop(0,   `rgba(232,55,255,${(0.90 + flashAlpha * 0.10) * coreAlpha})`)
+          cg.addColorStop(0.28,`rgba(155,18,255,${(0.58 + flashAlpha * 0.18) * coreAlpha})`)
+          cg.addColorStop(0.65,`rgba(75,0,175,${0.18 * coreAlpha})`)
           cg.addColorStop(1,   'rgba(0,0,0,0)')
           ctx.beginPath(); ctx.arc(cx, cy, coreR * pulse * 1.6, 0, Math.PI * 2)
           ctx.fillStyle = cg; ctx.fill()
@@ -716,25 +719,27 @@ import '../styles/global.scss'
         const tl = gsap.timeline()
         tl.set(wrapper, { opacity: '' })
 
-        tl.call(() => { phase = 'full' }, null, 1.8)
+        tl.call(() => { phase = 'full' }, null, 1.0)
 
         tl.call(() => {
           phase      = 'opening'
           flashAlpha = 1
           trailAlpha = 0.32
-        }, null, 3.5)
+        }, null, 2.0)
 
         tl.call(() => {
           document.dispatchEvent(new CustomEvent('intro'))
-        }, null, 4.3)
+        }, null, 2.6)
 
         tl.call(() => {
           cancelAnimationFrame(rafId)
-          mount.style.opacity = '1'
-          intro.remove()
-          document.documentElement.classList.remove('is-scroll-blocked')
-          Ticker.nextTick(() => { Emitter.emit('updateViewport') })
-        }, null, 5.6)
+          gsap.to(intro, { opacity: 0, duration: 0.3, onComplete: () => {
+            mount.style.opacity = '1'
+            intro.remove()
+            document.documentElement.classList.remove('is-scroll-blocked')
+            Ticker.nextTick(() => { Emitter.emit('updateViewport') })
+          }})
+        }, null, 3.0)
       }
     }
 
