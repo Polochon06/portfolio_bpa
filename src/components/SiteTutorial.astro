@@ -3,14 +3,23 @@
 
 <div class="site-tutorial js-site-tutorial">
   <div class="site-tutorial__inner">
-    <div class="site-tutorial__icon">
+
+    <div class="site-tutorial__item">
       <div class="site-tutorial__mouse">
         <div class="site-tutorial__wheel"></div>
       </div>
+      <span>Scrollez pour naviguer</span>
     </div>
-    <div class="site-tutorial__text">
-      <span>Scrollez pour explorer</span>
+
+    <div class="site-tutorial__sep"></div>
+
+    <div class="site-tutorial__item">
+      <svg class="site-tutorial__cursor" viewBox="0 0 12 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1 1L1 14.5L4 11L6 16.5L8 15.5L6 10L10 10L1 1Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+      <span>Cliquez sur un projet pour l'ouvrir</span>
     </div>
+
   </div>
 </div>
 
@@ -19,11 +28,11 @@
 
   class SiteTutorial {
     el: HTMLElement
-    hasScrolled: boolean
+    hasInteracted: boolean
 
     constructor() {
       this.el = document.querySelector('.js-site-tutorial')
-      this.hasScrolled = false
+      this.hasInteracted = false
 
       if (this.el) {
         this.bindEvents()
@@ -32,17 +41,18 @@
 
     bindEvents() {
       Emitter.on('scroll', this.onScroll, this)
-      
-      window.addEventListener('wheel', this.onInteraction.bind(this), { passive: true })
+
+      window.addEventListener('wheel',     this.onInteraction.bind(this), { passive: true })
       window.addEventListener('touchmove', this.onInteraction.bind(this), { passive: true })
-      window.addEventListener('keydown', this.onInteraction.bind(this), { passive: true })
-      
+      window.addEventListener('keydown',   this.onInteraction.bind(this), { passive: true })
+      window.addEventListener('click',     this.onInteraction.bind(this), { passive: true })
+
       document.addEventListener('intro', () => {
         setTimeout(() => {
-          if (!this.hasScrolled) {
+          if (!this.hasInteracted) {
             this.el.classList.add('is-visible')
           }
-        }, 1000)
+        }, 800)
       }, { once: true })
     }
 
@@ -53,15 +63,15 @@
     }
 
     onInteraction() {
-        this.hide()
+      this.hide()
     }
 
     hide() {
-      if (!this.hasScrolled) {
-        this.hasScrolled = true
+      if (!this.hasInteracted) {
+        this.hasInteracted = true
         this.el.classList.remove('is-visible')
         setTimeout(() => {
-            this.el.style.display = 'none'
+          this.el.style.display = 'none'
         }, 500)
       }
     }
@@ -77,60 +87,90 @@
     left: 50%;
     transform: translateX(-50%);
     z-index: 100;
-    
+
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.5s ease;
-    
+
     &.is-visible {
       opacity: 1;
     }
-    
+
     &__inner {
       @include flex(row, center, center);
-      gap: 1.5rem;
-      
+      gap: 0;
+
       background: color(primary);
-      padding: 1rem 2rem;
+      padding: 0.85rem 1.8rem;
       border: 1px solid color(secondary);
       border-radius: 3rem;
     }
-    
-    &__mouse {
-      width: 22px;
-      height: 34px;
-      border: 2px solid color(secondary);
-      border-radius: 11px;
-      position: relative;
+
+    &__item {
+      @include flex(row, center, center);
+      gap: 0.9rem;
+      padding: 0 1rem;
+
+      color: color(secondary);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+
+      @include mq(phone) {
+        font-size: 0.75rem;
+        gap: 0.6rem;
+        padding: 0 0.6rem;
+      }
     }
-    
+
+    &__sep {
+      width: 1px;
+      height: 1.4rem;
+      background: color(secondary);
+      opacity: 0.35;
+      flex-shrink: 0;
+    }
+
+    &__mouse {
+      width: 20px;
+      height: 30px;
+      border: 1.5px solid color(secondary);
+      border-radius: 10px;
+      position: relative;
+      flex-shrink: 0;
+    }
+
     &__wheel {
-      width: 4px;
-      height: 8px;
+      width: 3px;
+      height: 7px;
       background: color(secondary);
       border-radius: 2px;
       position: absolute;
-      top: 6px;
+      top: 5px;
       left: 50%;
       transform: translateX(-50%);
-      animation: scroll 1.5s infinite;
+      animation: wheel 1.5s infinite;
     }
-    
-    &__text {
+
+    &__cursor {
+      width: 14px;
+      height: 20px;
       color: color(secondary);
-      font-size: 1rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      white-space: nowrap;
-      
-      @include mq(phone) {
-        font-size: 0.8rem;
-      }
+      flex-shrink: 0;
+      animation: click-pulse 1.8s infinite;
     }
-    
-    @keyframes scroll {
-      0% { top: 6px; opacity: 1; }
-      100% { top: 18px; opacity: 0; }
+
+    @keyframes wheel {
+      0%   { top: 5px;  opacity: 1; }
+      100% { top: 16px; opacity: 0; }
+    }
+
+    @keyframes click-pulse {
+      0%, 100% { opacity: 1;    transform: scale(1); }
+      45%      { opacity: 1;    transform: scale(1); }
+      55%      { opacity: 0.55; transform: scale(0.88); }
+      65%      { opacity: 1;    transform: scale(1); }
     }
   }
 </style>
