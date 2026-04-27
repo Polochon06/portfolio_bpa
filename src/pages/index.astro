@@ -398,7 +398,8 @@ import '../styles/global.scss'
 
         const cx = canvas.width  / 2
         const cy = canvas.height / 2
-        const R  = Math.min(canvas.width, canvas.height) * 0.27
+        const R       = Math.min(canvas.width, canvas.height) * 0.27
+        const maxDim  = Math.max(canvas.width, canvas.height)
 
         // ── State ──────────────────────────────────────────────────────
         let phase        = 'forming'
@@ -515,9 +516,9 @@ import '../styles/global.scss'
           currentR  = phase === 'forming' ? Math.min(currentR + dt * R / 1.0, R) : R
 
           if (phase === 'opening') {
-            openProgress = Math.min(openProgress + dt * 1.5, 1)
+            openProgress = Math.min(openProgress + dt * 0.85, 1)
             flashAlpha   = Math.max(flashAlpha - dt * 2.8, 0)
-            ringFade     = Math.max(0, 1 - openProgress * 4)
+            ringFade     = Math.max(0, 1 - openProgress * 3)
             if (openProgress >= 1) phase = 'done'
           }
 
@@ -527,7 +528,7 @@ import '../styles/global.scss'
           }
 
           // Lightning: only when ring is mature
-          if ((phase === 'full' || phase === 'opening') && currentR > R * 0.6) {
+          if ((phase === 'full' || (phase === 'opening' && openProgress < 0.28)) && currentR > R * 0.6) {
             nextBolt -= dt
             if (nextBolt <= 0) {
               spawnBolt()
@@ -602,6 +603,25 @@ import '../styles/global.scss'
             ctx.arc(cx, cy, windowR, 0, Math.PI * 2)
             ctx.fillStyle = hg
             ctx.fill()
+            ctx.restore()
+          }
+
+          // ── Sweep ring — glowing edge at the expanding portal boundary ─
+          if (phase === 'opening' && openProgress < 0.99) {
+            const easeSweep = 1 - Math.pow(1 - openProgress, 3)
+            const sweepR    = R * 0.84 + easeSweep * maxDim * 1.4
+            const sweepA    = Math.pow(1 - openProgress, 0.3) * 0.88
+            ctx.save()
+            ctx.shadowColor = `rgba(165,55,255,${sweepA})`
+            ctx.shadowBlur  = 32
+            ctx.beginPath(); ctx.arc(cx, cy, sweepR, 0, Math.PI * 2)
+            ctx.strokeStyle = `rgba(200,120,255,${sweepA})`
+            ctx.lineWidth   = 5 + (1 - openProgress) * 22
+            ctx.stroke()
+            ctx.shadowBlur  = 10
+            ctx.strokeStyle = `rgba(255,248,255,${sweepA * 0.5})`
+            ctx.lineWidth   = 1.5
+            ctx.stroke()
             ctx.restore()
           }
 
@@ -725,21 +745,21 @@ import '../styles/global.scss'
           phase      = 'opening'
           flashAlpha = 1
           trailAlpha = 0.32
-        }, null, 2.0)
+        }, null, 2.2)
 
         tl.call(() => {
           document.dispatchEvent(new CustomEvent('intro'))
-        }, null, 2.6)
+        }, null, 2.8)
 
         tl.call(() => {
           cancelAnimationFrame(rafId)
-          gsap.to(intro, { opacity: 0, duration: 0.3, onComplete: () => {
+          gsap.to(intro, { opacity: 0, duration: 0.45, onComplete: () => {
             mount.style.opacity = '1'
             intro.remove()
             document.documentElement.classList.remove('is-scroll-blocked')
             Ticker.nextTick(() => { Emitter.emit('updateViewport') })
           }})
-        }, null, 3.0)
+        }, null, 3.6)
       }
     }
 
