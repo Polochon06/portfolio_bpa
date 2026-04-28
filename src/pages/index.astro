@@ -407,7 +407,7 @@ import '../styles/global.scss'
         let currentR     = 0
         let openProgress = 0
         let flashAlpha   = 0
-        let trailAlpha   = 0.12
+        let trailAlpha   = 0.08
         let ringFade     = 1
 
         const sparks: any[] = []
@@ -471,14 +471,17 @@ import '../styles/global.scss'
 
         // ── Spawn spark ────────────────────────────────────────────────
         function spawnSpark() {
+          const cw = Math.random() < 0.75          // 75 % dans le même sens
           sparks.push({
             angle:    Math.random() * Math.PI * 2,
-            r:        currentR * (0.92 + Math.random() * 0.16),
-            orbitSpd: (Math.random() > 0.5 ? 1 : -1) * (0.016 + Math.random() * 0.052),
-            sz:       0.4 + Math.random() * 1.8,
-            hue:      252 + Math.random() * 55,
+            r:        currentR * (0.91 + Math.random() * 0.18),
+            orbitSpd: cw
+              ? (0.022 + Math.random() * 0.050)
+              : -(0.015 + Math.random() * 0.038),
+            sz:       0.28 + Math.random() * 1.55,
+            hue:      244 + Math.random() * 72,    // violet → magenta
             life:     1.0,
-            decay:    0.30 + Math.random() * 0.62,
+            decay:    0.24 + Math.random() * 0.54,
           })
         }
 
@@ -519,7 +522,7 @@ import '../styles/global.scss'
           }
 
           if (phase !== 'done') {
-            const rate = phase === 'full' ? 34 : phase === 'opening' ? 14 : 8
+            const rate = phase === 'full' ? 55 : phase === 'opening' ? 20 : 10
             for (let i = 0; i < rate * dt; i++) spawnSpark()
           }
 
@@ -603,6 +606,17 @@ import '../styles/global.scss'
             ctx.restore()
           }
 
+          // ── Interior tint — lueur dimensionnelle dans le portail ──────────
+          if (windowR > 8 && phase !== 'forming') {
+            const pulse = 0.055 + Math.sin(t * 2.2) * 0.016 + Math.sin(t * 3.8) * 0.010
+            const ig = ctx.createRadialGradient(cx, cy, 0, cx, cy, windowR * 0.80)
+            ig.addColorStop(0,   `rgba(75,5,165,${pulse})`)
+            ig.addColorStop(0.5, `rgba(38,2,100,${pulse * 0.52})`)
+            ig.addColorStop(1,   'rgba(0,0,0,0)')
+            ctx.beginPath(); ctx.arc(cx, cy, windowR * 0.80, 0, Math.PI * 2)
+            ctx.fillStyle = ig; ctx.fill()
+          }
+
           // ── Sweep ring — iris edge sweeping to screen edge ─────────────
           if (phase === 'opening' && openProgress < 0.97) {
             const easeSweep = 1 - Math.pow(1 - openProgress, 2.5)
@@ -661,15 +675,17 @@ import '../styles/global.scss'
             }
           }
 
-          // Ring strokes
+          // Ring guide — fil de lumière fin, le reste vient des sparks
           if (rVis) {
-            const sa = (phase === 'forming' ? currentR / R : 1) * (0.78 + flashAlpha * 0.22) * ringFade
-            ctx.save()
-            ctx.beginPath(); ctx.arc(cx, cy, currentR, 0, Math.PI * 2)
-            ctx.strokeStyle = `rgba(215,172,255,${sa})`; ctx.lineWidth = 2.5; ctx.stroke()
-            ctx.beginPath(); ctx.arc(cx, cy, currentR, 0, Math.PI * 2)
-            ctx.strokeStyle = `rgba(128,48,255,${sa * 0.42})`; ctx.lineWidth = 11; ctx.stroke()
-            ctx.restore()
+            const sa = (phase === 'forming' ? currentR / R : 1) * (0.52 + flashAlpha * 0.48) * ringFade
+            if (sa > 0.01) {
+              ctx.save()
+              ctx.shadowColor = `rgba(210,148,255,${sa * 0.65})`
+              ctx.shadowBlur  = 16
+              ctx.beginPath(); ctx.arc(cx, cy, currentR, 0, Math.PI * 2)
+              ctx.strokeStyle = `rgba(240,198,255,${sa * 0.62})`; ctx.lineWidth = 0.9; ctx.stroke()
+              ctx.restore()
+            }
           }
 
           // Lightning bolts
@@ -692,15 +708,32 @@ import '../styles/global.scss'
             ctx.restore()
           }
 
-          // Sparks
-          ctx.shadowColor = 'rgba(185,48,255,0.95)'
-          ctx.shadowBlur  = 19
+          // Sparks — passe 1 : traînées arc (comet tails)
           for (const p of sparks) {
+            const alpha = p.life * ringFade
+            if (alpha < 0.02) continue
+            const trailLen = 0.13 + p.sz * 0.046
+            ctx.beginPath()
+            if (p.orbitSpd > 0) {
+              ctx.arc(cx, cy, p.r, p.angle - trailLen, p.angle, false)
+            } else {
+              ctx.arc(cx, cy, p.r, p.angle, p.angle + trailLen, true)
+            }
+            ctx.strokeStyle = `hsla(${p.hue},100%,68%,${alpha * 0.38})`
+            ctx.lineWidth   = p.sz * 0.48
+            ctx.stroke()
+          }
+          // Sparks — passe 2 : têtes lumineuses
+          ctx.shadowColor = 'rgba(215,158,255,0.92)'
+          ctx.shadowBlur  = 11
+          for (const p of sparks) {
+            const alpha = p.life * ringFade
+            if (alpha < 0.02) continue
             const x = cx + Math.cos(p.angle) * p.r
             const y = cy + Math.sin(p.angle) * p.r
             ctx.beginPath()
-            ctx.fillStyle = `hsla(${p.hue},100%,68%,${p.life * ringFade})`
-            ctx.arc(x, y, p.sz * 0.82, 0, Math.PI * 2)
+            ctx.fillStyle = `hsla(${p.hue},100%,88%,${alpha})`
+            ctx.arc(x, y, p.sz * 0.58, 0, Math.PI * 2)
             ctx.fill()
           }
           ctx.shadowBlur = 0; ctx.shadowColor = 'transparent'
