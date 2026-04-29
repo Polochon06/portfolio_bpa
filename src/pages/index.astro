@@ -741,12 +741,8 @@ import '../styles/global.scss'
 
           // ── Portal window (destination-out) ───────────────────────────
           let windowR: number
-          if (phase === 'forming')      windowR = currentR * 0.84
-          else if (phase === 'full')    windowR = R * 0.84
-          else {
-            const ease = 1 - Math.pow(1 - openProgress, 3)
-            windowR = R * 0.84 + ease * Math.max(canvas.width, canvas.height) * 1.4
-          }
+          if (phase === 'forming')   windowR = currentR * 0.84
+          else                       windowR = R * 0.84
           if (windowR > 2) {
             ctx.save()
             ctx.globalCompositeOperation = 'destination-out'
@@ -855,28 +851,6 @@ import '../styles/global.scss'
             ctx.strokeStyle = `rgba(255,30,80,${ca * 0.72})`; ctx.lineWidth = 1.4; ctx.stroke()
             ctx.beginPath(); ctx.arc(cx, cy, currentR + 2.5, 0, Math.PI * 2)
             ctx.strokeStyle = `rgba(60,140,255,${ca * 0.72})`; ctx.lineWidth = 1.4; ctx.stroke()
-            ctx.restore()
-          }
-
-          // ── Sweep ring — iris edge sweeping to screen edge ─────────────
-          if (phase === 'opening' && openProgress < 0.97) {
-            const easeSweep = 1 - Math.pow(1 - openProgress, 2.5)
-            const sweepR    = R * 0.84 + easeSweep * maxDim * 1.4
-            const fade      = Math.pow(1 - openProgress, 0.20)
-            const thick     = 3 + (1 - openProgress) * 28
-            ctx.save()
-            ctx.shadowColor = `rgba(0,140,255,${fade * 0.82})`
-            ctx.shadowBlur  = 48
-            ctx.beginPath(); ctx.arc(cx, cy, sweepR, 0, Math.PI * 2)
-            ctx.strokeStyle = `rgba(0,160,255,${fade * 0.75})`
-            ctx.lineWidth   = thick
-            ctx.stroke()
-            ctx.shadowBlur  = 16
-            ctx.shadowColor = `rgba(255,255,255,${fade * 0.45})`
-            ctx.beginPath(); ctx.arc(cx, cy, sweepR - thick * 0.44, 0, Math.PI * 2)
-            ctx.strokeStyle = `rgba(220,240,255,${fade * 0.68})`
-            ctx.lineWidth   = 1.6
-            ctx.stroke()
             ctx.restore()
           }
 
@@ -1071,6 +1045,25 @@ import '../styles/global.scss'
             ctx.filter = 'none'
             ctx.restore()
           }
+
+          // Opening bloom — white radial explosion fills the entire screen
+          if (phase === 'opening') {
+            const fillA = Math.min(openProgress * 2.2, 1.0)
+            // Full-canvas white wash (covers dark edges)
+            ctx.fillStyle = `rgba(255,255,255,${fillA})`
+            ctx.fillRect(0, 0, canvas.width, canvas.height)
+            // Extra radial brightness at center while ramping up
+            if (fillA < 1) {
+              const ease   = 1 - Math.pow(1 - openProgress, 2.5)
+              const bloomR = R * 0.5 + ease * maxDim * 1.6
+              const cg     = ctx.createRadialGradient(cx, cy, 0, cx, cy, bloomR)
+              cg.addColorStop(0,    `rgba(255,255,255,${fillA})`)
+              cg.addColorStop(0.40, `rgba(180,228,255,${fillA * 0.55})`)
+              cg.addColorStop(1,    'rgba(0,0,0,0)')
+              ctx.fillStyle = cg
+              ctx.fillRect(0, 0, canvas.width, canvas.height)
+            }
+          }
         }
 
         // Pre-fill before first rAF to avoid flash
@@ -1102,21 +1095,21 @@ import '../styles/global.scss'
           phase      = 'opening'
           flashAlpha = 1
           trailAlpha = 0.22
+          mount.style.opacity = '1'
         }, null, 2.2)
 
         tl.call(() => {
           document.dispatchEvent(new CustomEvent('intro'))
-        }, null, 2.8)
+        }, null, 2.7)
 
         tl.call(() => {
           cancelAnimationFrame(rafId)
-          gsap.to(intro, { opacity: 0, duration: 0.45, onComplete: () => {
-            mount.style.opacity = '1'
+          gsap.to(intro, { opacity: 0, duration: 0.38, ease: 'power1.in', onComplete: () => {
             intro.remove()
             document.documentElement.classList.remove('is-scroll-blocked')
             Ticker.nextTick(() => { Emitter.emit('updateViewport') })
           }})
-        }, null, 3.6)
+        }, null, 2.9)
       }
     }
 
