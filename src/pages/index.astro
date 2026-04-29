@@ -418,9 +418,9 @@ import '../styles/global.scss'
         let nextRipple = 0.4
 
         const runeRings = [
-          { ratio: 0.36, segs: 5,  gap: 0.44, spd:  0.38, lw: 1.8 },
-          { ratio: 0.60, segs: 8,  gap: 0.34, spd: -0.22, lw: 1.3 },
-          { ratio: 0.84, segs: 11, gap: 0.27, spd:  0.14, lw: 0.9 },
+          { ratio: 0.36, segs: 5,  gap: 0.44, spd:  0.38, lw: 2.2 },
+          { ratio: 0.60, segs: 8,  gap: 0.34, spd: -0.22, lw: 1.6 },
+          { ratio: 0.84, segs: 11, gap: 0.27, spd:  0.14, lw: 1.1 },
         ]
 
         // ── Web Audio (procedural, fails silently if blocked) ──────────
@@ -566,7 +566,7 @@ import '../styles/global.scss'
           }
 
           if (phase !== 'done') {
-            const rate = phase === 'full' ? 55 : phase === 'opening' ? 20 : 10
+            const rate = phase === 'full' ? 80 : phase === 'opening' ? 22 : 12
             for (let i = 0; i < rate * dt; i++) spawnSpark()
           }
 
@@ -700,15 +700,65 @@ import '../styles/global.scss'
             ctx.stroke()
           }
 
-          // ── Interior tint — lueur dimensionnelle dans le portail ──────────
-          if (windowR > 8 && phase !== 'forming') {
-            const pulse = 0.055 + Math.sin(t * 2.2) * 0.016 + Math.sin(t * 3.8) * 0.010
-            const ig = ctx.createRadialGradient(cx, cy, 0, cx, cy, windowR * 0.80)
-            ig.addColorStop(0,   `rgba(75,5,165,${pulse})`)
-            ig.addColorStop(0.5, `rgba(38,2,100,${pulse * 0.52})`)
-            ig.addColorStop(1,   'rgba(0,0,0,0)')
-            ctx.beginPath(); ctx.arc(cx, cy, windowR * 0.80, 0, Math.PI * 2)
-            ctx.fillStyle = ig; ctx.fill()
+          // ── Dimensional vortex — inside the portal ───────────────────────
+          if (windowR > 8) {
+            const vA = phase === 'forming'
+              ? Math.pow(Math.min(currentR / R, 1), 1.4)
+              : phase === 'full'
+                ? 1.0
+                : Math.max(0, 1 - openProgress * 6)
+            if (vA > 0.005) {
+              const clipR = Math.min(windowR * 0.89, R * 0.89)
+              ctx.save()
+              ctx.globalAlpha = vA
+              ctx.beginPath(); ctx.arc(cx, cy, clipR, 0, Math.PI * 2); ctx.clip()
+
+              // Base: deep dimensional space
+              const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, clipR)
+              bg.addColorStop(0,   'rgba(18,0,52,1)')
+              bg.addColorStop(0.55,'rgba(6,0,22,1)')
+              bg.addColorStop(1,   'rgba(0,0,0,0.92)')
+              ctx.fillStyle = bg; ctx.fillRect(cx - clipR, cy - clipR, clipR * 2, clipR * 2)
+
+              // Rotating energy arms (4 arms, slow rotation)
+              const armT = t * 0.5
+              for (let arm = 0; arm < 4; arm++) {
+                const ang  = armT + (arm / 4) * Math.PI * 2
+                const cx2  = cx + Math.cos(ang) * clipR * 0.20
+                const cy2  = cy + Math.sin(ang) * clipR * 0.20
+                const aAlpha = 0.22 + Math.sin(t * 1.3 + arm * 1.8) * 0.06
+                const armG = ctx.createRadialGradient(cx2, cy2, 0, cx, cy, clipR * 0.88)
+                armG.addColorStop(0,    `rgba(145,35,255,${aAlpha})`)
+                armG.addColorStop(0.45, `rgba(75,8,175,${aAlpha * 0.38})`)
+                armG.addColorStop(1,    'rgba(0,0,0,0)')
+                ctx.beginPath(); ctx.arc(cx, cy, clipR * 0.88, 0, Math.PI * 2)
+                ctx.fillStyle = armG; ctx.fill()
+              }
+
+              // Concentric inner energy rings
+              ctx.shadowBlur = 0
+              for (let i = 1; i <= 5; i++) {
+                const ir    = clipR * (i / 6.2)
+                const shift = i * 0.85 + t * (i % 2 === 0 ? 1.6 : -1.2)
+                const a     = (0.12 + Math.sin(shift) * 0.055) * Math.min(t * 1.1, 1)
+                ctx.beginPath(); ctx.arc(cx, cy, ir, 0, Math.PI * 2)
+                ctx.strokeStyle = `rgba(170,75,255,${a})`
+                ctx.lineWidth   = 0.7 + Math.sin(shift * 0.65) * 0.35
+                ctx.stroke()
+              }
+
+              // Central singularity
+              const singR = clipR * 0.13 + Math.sin(t * 5.2) * clipR * 0.018
+              const singG = ctx.createRadialGradient(cx, cy, 0, cx, cy, singR)
+              singG.addColorStop(0,    `rgba(255,245,255,${0.82 + flashAlpha * 0.18})`)
+              singG.addColorStop(0.28, `rgba(215,118,255,0.58)`)
+              singG.addColorStop(0.65, `rgba(105,22,195,0.24)`)
+              singG.addColorStop(1,    'rgba(0,0,0,0)')
+              ctx.beginPath(); ctx.arc(cx, cy, singR, 0, Math.PI * 2)
+              ctx.fillStyle = singG; ctx.fill()
+
+              ctx.restore()
+            }
           }
 
           // ── Chromatic aberration — red/blue ring split at portal edge ─────
@@ -751,7 +801,7 @@ import '../styles/global.scss'
 
           // Runic rings + tick marks
           if (rVis) {
-            const ra = Math.min(t * 1.1, 1) * 0.30 * ringFade
+            const ra = Math.min(t * 1.1, 1) * 0.40 * ringFade
             if (ra > 0) {
               ctx.save()
               for (const rr of runeRings) {
@@ -781,15 +831,62 @@ import '../styles/global.scss'
             }
           }
 
-          // Ring guide — fil de lumière fin, le reste vient des sparks
+          // Energy tendrils — courbes de Bézier spiralant du bord vers le centre
+          if (rVis && ringFade > 0.08 && phase !== 'forming') {
+            const ta = Math.min((t - 1.0) * 0.8, 1) * ringFade
+            if (ta > 0.01) {
+              ctx.save()
+              ctx.shadowColor = `rgba(180,70,255,${ta * 0.5})`
+              ctx.shadowBlur  = 10
+              const tCount = 8
+              for (let i = 0; i < tCount; i++) {
+                const ang  = (i / tCount) * Math.PI * 2 + t * 0.10
+                const x0   = cx + Math.cos(ang) * currentR
+                const y0   = cy + Math.sin(ang) * currentR
+                const cpA  = ang + 0.55 + Math.sin(t * 0.7 + i) * 0.15
+                const cpR  = currentR * (0.48 + Math.sin(t * 0.9 + i * 1.3) * 0.08)
+                const cp1x = cx + Math.cos(cpA) * cpR
+                const cp1y = cy + Math.sin(cpA) * cpR
+                const endR = currentR * (0.13 + Math.sin(t * 0.6 + i * 0.8) * 0.04)
+                const x1   = cx + Math.cos(ang + 0.25) * endR
+                const y1   = cy + Math.sin(ang + 0.25) * endR
+                const tA   = ta * (0.32 + Math.sin(t * 1.4 + i * 1.2) * 0.14)
+                ctx.beginPath(); ctx.moveTo(x0, y0)
+                ctx.quadraticCurveTo(cp1x, cp1y, x1, y1)
+                ctx.strokeStyle = `rgba(195,90,255,${tA})`
+                ctx.lineWidth   = 0.7
+                ctx.stroke()
+              }
+              ctx.restore()
+            }
+          }
+
+          // Energy band — anneau lumineux 3-passes (remplace le thin guide ring)
           if (rVis) {
-            const sa = (phase === 'forming' ? currentR / R : 1) * (0.52 + flashAlpha * 0.48) * ringFade
+            const sa = (phase === 'forming' ? currentR / R : 1) * (0.72 + flashAlpha * 0.28) * ringFade
             if (sa > 0.01) {
               ctx.save()
-              ctx.shadowColor = `rgba(210,148,255,${sa * 0.65})`
-              ctx.shadowBlur  = 16
+              // Pass 1: large soft outer glow
+              ctx.shadowColor = `rgba(165,65,255,${sa * 0.58})`
+              ctx.shadowBlur  = 32
               ctx.beginPath(); ctx.arc(cx, cy, currentR, 0, Math.PI * 2)
-              ctx.strokeStyle = `rgba(240,198,255,${sa * 0.62})`; ctx.lineWidth = 0.9; ctx.stroke()
+              ctx.strokeStyle = `rgba(105,22,218,${sa * 0.32})`
+              ctx.lineWidth   = 11
+              ctx.stroke()
+              // Pass 2: main bright band
+              ctx.shadowBlur  = 16
+              ctx.shadowColor = `rgba(205,110,255,${sa * 0.88})`
+              ctx.beginPath(); ctx.arc(cx, cy, currentR, 0, Math.PI * 2)
+              ctx.strokeStyle = `rgba(188,82,255,${sa * 0.65})`
+              ctx.lineWidth   = 3.8
+              ctx.stroke()
+              // Pass 3: crisp bright inner edge
+              ctx.shadowBlur  = 7
+              ctx.shadowColor = `rgba(252,228,255,${sa})`
+              ctx.beginPath(); ctx.arc(cx, cy, currentR - 1.2, 0, Math.PI * 2)
+              ctx.strokeStyle = `rgba(250,232,255,${sa * 0.80})`
+              ctx.lineWidth   = 1.2
+              ctx.stroke()
               ctx.restore()
             }
           }
