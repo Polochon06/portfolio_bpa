@@ -794,10 +794,10 @@ import '../styles/global.scss'
 
               // Nebula clouds — nuages de couleur qui dérivent lentement
               const nebulae = [
-                { baseA: 0.0,  orbR: 0.40, spd:  0.12, hue: 272, sz: 0.52 },
-                { baseA: 2.09, orbR: 0.34, spd: -0.09, hue: 198, sz: 0.46 },
-                { baseA: 4.18, orbR: 0.38, spd:  0.16, hue: 305, sz: 0.50 },
-                { baseA: 1.05, orbR: 0.44, spd: -0.07, hue: 238, sz: 0.40 },
+                { baseA: 0.0,  orbR: 0.40, spd:  0.12, hue: 272, sz: 0.56 },
+                { baseA: 2.09, orbR: 0.34, spd: -0.09, hue: 198, sz: 0.50 },
+                { baseA: 4.18, orbR: 0.38, spd:  0.16, hue: 305, sz: 0.54 },
+                { baseA: 1.05, orbR: 0.44, spd: -0.07, hue: 238, sz: 0.44 },
               ]
               const nebulaBase = Math.min(t * 0.55, 1)
               for (const n of nebulae) {
@@ -805,10 +805,10 @@ import '../styles/global.scss'
                 const nx    = cx + Math.cos(nAng) * clipR * n.orbR
                 const ny    = cy + Math.sin(nAng) * clipR * n.orbR
                 const nSize = clipR * n.sz
-                const nA    = (0.24 + Math.sin(t * 0.85 + n.baseA) * 0.07) * nebulaBase
+                const nA    = (0.32 + Math.sin(t * 0.85 + n.baseA) * 0.08) * nebulaBase
                 const nG    = ctx.createRadialGradient(nx, ny, 0, nx, ny, nSize)
-                nG.addColorStop(0,   `hsla(${n.hue},72%,58%,${nA})`)
-                nG.addColorStop(0.45,`hsla(${n.hue},60%,40%,${nA * 0.32})`)
+                nG.addColorStop(0,   `hsla(${n.hue},78%,62%,${nA})`)
+                nG.addColorStop(0.42,`hsla(${n.hue},62%,42%,${nA * 0.35})`)
                 nG.addColorStop(1,   'rgba(0,0,0,0)')
                 ctx.beginPath(); ctx.arc(nx, ny, nSize, 0, Math.PI * 2)
                 ctx.fillStyle = nG; ctx.fill()
@@ -838,15 +838,16 @@ import '../styles/global.scss'
               ctx.beginPath(); ctx.arc(cx, cy, singR, 0, Math.PI * 2)
               ctx.fillStyle = singG; ctx.fill()
 
-              // Teal counter-arm — contraste chromatique
-              const tealAng = -armT * 0.65 + Math.PI * 0.5
+              // Teal counter-nebula — contraste chromatique
+              const tealAng = -t * 0.325 + Math.PI * 0.5
+              const tealA   = 0.22 + Math.sin(t * 1.6) * 0.06
               const tealG   = ctx.createRadialGradient(
-                cx + Math.cos(tealAng) * clipR * 0.18, cy + Math.sin(tealAng) * clipR * 0.18,
-                0, cx, cy, clipR * 0.80)
-              tealG.addColorStop(0,   `rgba(28,185,225,${0.18 + Math.sin(t * 1.6) * 0.05})`)
-              tealG.addColorStop(0.5, `rgba(8,80,140,0.06)`)
+                cx + Math.cos(tealAng) * clipR * 0.22, cy + Math.sin(tealAng) * clipR * 0.22,
+                0, cx, cy, clipR * 0.78)
+              tealG.addColorStop(0,   `rgba(28,195,235,${tealA})`)
+              tealG.addColorStop(0.45,`rgba(8,90,155,${tealA * 0.30})`)
               tealG.addColorStop(1,   'rgba(0,0,0,0)')
-              ctx.beginPath(); ctx.arc(cx, cy, clipR * 0.80, 0, Math.PI * 2)
+              ctx.beginPath(); ctx.arc(cx, cy, clipR * 0.78, 0, Math.PI * 2)
               ctx.fillStyle = tealG; ctx.fill()
 
               // Stars — points de lumière dans l'espace dimensionnel
@@ -957,14 +958,14 @@ import '../styles/global.scss'
                 // Diffuse wide glow trail
                 ctx.beginPath()
                 ctx.arc(cx, cy, r, c.ang - c.span, c.ang)
-                ctx.strokeStyle = `hsla(${c.hue},100%,68%,${ca * 0.28})`
-                ctx.lineWidth   = c.w * 2.4
+                ctx.strokeStyle = `hsla(${c.hue},100%,68%,${ca * 0.36})`
+                ctx.lineWidth   = c.w * 2.8
                 ctx.stroke()
                 // Bright sharp center line (shorter = brighter head)
                 ctx.beginPath()
                 ctx.arc(cx, cy, r, c.ang - c.span * 0.45, c.ang)
-                ctx.strokeStyle = `hsla(${c.hue},100%,92%,${ca * 0.52})`
-                ctx.lineWidth   = c.w * 0.48
+                ctx.strokeStyle = `hsla(${c.hue},100%,94%,${ca * 0.62})`
+                ctx.lineWidth   = c.w * 0.52
                 ctx.stroke()
               }
               ctx.restore()
