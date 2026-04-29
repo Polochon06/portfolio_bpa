@@ -417,10 +417,10 @@ import '../styles/global.scss'
         let nextBolt   = 0.6
         let nextRipple = 0.4
 
-        const runeRings = [
-          { ratio: 0.36, segs: 5,  gap: 0.44, spd:  0.38, lw: 2.2 },
-          { ratio: 0.60, segs: 8,  gap: 0.34, spd: -0.22, lw: 1.6 },
-          { ratio: 0.84, segs: 11, gap: 0.27, spd:  0.14, lw: 1.1 },
+        const nodeRings = [
+          { ratio: 0.38, count: 4, spd:  0.45, sz: 4.5, rgb: '80,180,255'  },
+          { ratio: 0.62, count: 6, spd: -0.28, sz: 3.2, rgb: '60,160,255'  },
+          { ratio: 0.86, count: 9, spd:  0.18, sz: 2.4, rgb: '100,210,255' },
         ]
 
         const inflows: any[] = []
@@ -882,30 +882,42 @@ import '../styles/global.scss'
 
           // ── Below: drawn over site content ────────────────────────────
 
-          // Runic rings + tick marks
+          // Orbital nodes — glowing points on concentric orbits with short trails
           if (rVis) {
-            const ra = Math.min(t * 1.1, 1) * 0.40 * ringFade
-            if (ra > 0) {
+            const baseA = Math.min(t * 1.1, 1) * ringFade
+            if (baseA > 0.01) {
               ctx.save()
-              for (const rr of runeRings) {
-                const r   = currentR * rr.ratio
-                const rot = t * rr.spd
-                ctx.strokeStyle = `rgba(60,160,255,${ra})`
-                ctx.lineWidth   = rr.lw
-                for (let s = 0; s < rr.segs; s++) {
-                  const a1 = (s / rr.segs) * Math.PI * 2 + rot
-                  const a2 = ((s + rr.gap) / rr.segs) * Math.PI * 2 + rot
-                  ctx.beginPath(); ctx.arc(cx, cy, r, a1, a2); ctx.stroke()
-                }
-                ctx.strokeStyle = `rgba(140,210,255,${ra * 1.6})`
-                ctx.lineWidth   = 1
-                for (let s = 0; s < rr.segs; s++) {
-                  const a  = (s / rr.segs) * Math.PI * 2 + rot
-                  const tk = 5
+              // Faint guide circles
+              ctx.strokeStyle = `rgba(60,140,255,${baseA * 0.10})`
+              ctx.lineWidth = 0.5
+              for (const nr of nodeRings) {
+                ctx.beginPath(); ctx.arc(cx, cy, currentR * nr.ratio, 0, Math.PI * 2); ctx.stroke()
+              }
+              // Glowing orbital nodes + trails
+              ctx.globalCompositeOperation = 'screen'
+              for (const nr of nodeRings) {
+                const r   = currentR * nr.ratio
+                const rot = t * nr.spd
+                for (let i = 0; i < nr.count; i++) {
+                  const ang   = (i / nr.count) * Math.PI * 2 + rot
+                  const pulse = 0.55 + Math.sin(t * 2.2 + i * 1.57) * 0.45
+                  const a     = baseA * pulse
+                  const nx    = cx + Math.cos(ang) * r
+                  const ny    = cy + Math.sin(ang) * r
+                  // Short trailing arc
                   ctx.beginPath()
-                  ctx.moveTo(cx + Math.cos(a) * (r - tk), cy + Math.sin(a) * (r - tk))
-                  ctx.lineTo(cx + Math.cos(a) * (r + tk), cy + Math.sin(a) * (r + tk))
+                  if (nr.spd > 0) ctx.arc(cx, cy, r, ang - 0.20, ang, false)
+                  else            ctx.arc(cx, cy, r, ang, ang + 0.20, true)
+                  ctx.strokeStyle = `rgba(${nr.rgb},${a * 0.32})`
+                  ctx.lineWidth   = nr.sz * 0.65
                   ctx.stroke()
+                  // Node radial glow
+                  const ng = ctx.createRadialGradient(nx, ny, 0, nx, ny, nr.sz * 2.8)
+                  ng.addColorStop(0,    `rgba(230,248,255,${a})`)
+                  ng.addColorStop(0.35, `rgba(${nr.rgb},${a * 0.45})`)
+                  ng.addColorStop(1,    'rgba(0,0,0,0)')
+                  ctx.beginPath(); ctx.arc(nx, ny, nr.sz * 2.8, 0, Math.PI * 2)
+                  ctx.fillStyle = ng; ctx.fill()
                 }
               }
               ctx.restore()
