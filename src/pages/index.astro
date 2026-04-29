@@ -398,7 +398,7 @@ import '../styles/global.scss'
 
         const cx = canvas.width  / 2
         const cy = canvas.height / 2
-        const R       = Math.min(canvas.width, canvas.height) * 0.27
+        const R       = Math.min(canvas.width, canvas.height) * 0.30
         const maxDim  = Math.max(canvas.width, canvas.height)
 
         // ── State ──────────────────────────────────────────────────────
@@ -576,7 +576,7 @@ import '../styles/global.scss'
             if (nextBolt <= 0) {
               spawnBolt()
               if (Math.random() > 0.55) spawnBolt()
-              nextBolt = 0.12 + Math.random() * 0.45
+              nextBolt = 0.06 + Math.random() * 0.22
             }
           }
 
@@ -637,6 +637,20 @@ import '../styles/global.scss'
             ctx.fillStyle = fg; ctx.fill()
           }
 
+          // Macro aura — large ambient halo far beyond ring
+          if (rVis) {
+            const auraR = currentR * 2.6
+            const auraA = (0.18 + flashAlpha * 0.12) * ringFade * Math.min(t * 0.55, 1)
+            if (auraA > 0.005) {
+              const ag = ctx.createRadialGradient(cx, cy, currentR * 0.85, cx, cy, auraR)
+              ag.addColorStop(0,   `rgba(130,22,255,${auraA * 0.55})`)
+              ag.addColorStop(0.4, `rgba(90,10,210,${auraA * 0.28})`)
+              ag.addColorStop(1,   'rgba(30,0,80,0)')
+              ctx.beginPath(); ctx.arc(cx, cy, auraR, 0, Math.PI * 2)
+              ctx.fillStyle = ag; ctx.fill()
+            }
+          }
+
           // Outer glow halo
           if (rVis) {
             const gw = 82 + flashAlpha * 30
@@ -695,6 +709,18 @@ import '../styles/global.scss'
             ig.addColorStop(1,   'rgba(0,0,0,0)')
             ctx.beginPath(); ctx.arc(cx, cy, windowR * 0.80, 0, Math.PI * 2)
             ctx.fillStyle = ig; ctx.fill()
+          }
+
+          // ── Chromatic aberration — red/blue ring split at portal edge ─────
+          if (rVis && ringFade > 0.05 && phase !== 'forming') {
+            const ca = (0.28 + flashAlpha * 0.40) * ringFade
+            ctx.save()
+            ctx.globalCompositeOperation = 'screen'
+            ctx.beginPath(); ctx.arc(cx, cy, currentR - 2.5, 0, Math.PI * 2)
+            ctx.strokeStyle = `rgba(255,30,80,${ca * 0.72})`; ctx.lineWidth = 1.4; ctx.stroke()
+            ctx.beginPath(); ctx.arc(cx, cy, currentR + 2.5, 0, Math.PI * 2)
+            ctx.strokeStyle = `rgba(60,140,255,${ca * 0.72})`; ctx.lineWidth = 1.4; ctx.stroke()
+            ctx.restore()
           }
 
           // ── Sweep ring — iris edge sweeping to screen edge ─────────────
@@ -788,34 +814,52 @@ import '../styles/global.scss'
             ctx.restore()
           }
 
-          // Sparks — passe 1 : traînées arc (comet tails)
+          // Sparks — passe 1 : longues traînées dimmer
           for (const p of sparks) {
             const alpha = p.life * ringFade
             if (alpha < 0.02) continue
-            const trailLen = 0.13 + p.sz * 0.046
+            const trailLen = 0.22 + p.sz * 0.068
             ctx.beginPath()
             if (p.orbitSpd > 0) {
               ctx.arc(cx, cy, p.r, p.angle - trailLen, p.angle, false)
             } else {
               ctx.arc(cx, cy, p.r, p.angle, p.angle + trailLen, true)
             }
-            ctx.strokeStyle = `hsla(${p.hue},100%,68%,${alpha * 0.38})`
-            ctx.lineWidth   = p.sz * 0.48
+            ctx.strokeStyle = `hsla(${p.hue},100%,58%,${alpha * 0.22})`
+            ctx.lineWidth   = p.sz * 0.60
             ctx.stroke()
           }
-          // Sparks — passe 2 : têtes lumineuses
-          ctx.shadowColor = 'rgba(215,158,255,0.92)'
-          ctx.shadowBlur  = 11
+          // Sparks — passe 2 : traînées proches plus brillantes
+          for (const p of sparks) {
+            const alpha = p.life * ringFade
+            if (alpha < 0.02) continue
+            const trailLen = 0.08 + p.sz * 0.028
+            ctx.beginPath()
+            if (p.orbitSpd > 0) {
+              ctx.arc(cx, cy, p.r, p.angle - trailLen, p.angle, false)
+            } else {
+              ctx.arc(cx, cy, p.r, p.angle, p.angle + trailLen, true)
+            }
+            ctx.strokeStyle = `hsla(${p.hue},100%,80%,${alpha * 0.55})`
+            ctx.lineWidth   = p.sz * 0.38
+            ctx.stroke()
+          }
+          // Sparks — passe 3 : têtes additives (lighter = se blanchissent au croisement)
+          ctx.save()
+          ctx.globalCompositeOperation = 'lighter'
+          ctx.shadowColor = 'rgba(215,158,255,0.85)'
+          ctx.shadowBlur  = 9
           for (const p of sparks) {
             const alpha = p.life * ringFade
             if (alpha < 0.02) continue
             const x = cx + Math.cos(p.angle) * p.r
             const y = cy + Math.sin(p.angle) * p.r
             ctx.beginPath()
-            ctx.fillStyle = `hsla(${p.hue},100%,88%,${alpha})`
+            ctx.fillStyle = `hsla(${p.hue},100%,85%,${alpha * 0.72})`
             ctx.arc(x, y, p.sz * 0.58, 0, Math.PI * 2)
             ctx.fill()
           }
+          ctx.restore()
           // Hotspots — 3 points chauds qui orbitent sur l'anneau
           if (rVis && ringFade > 0.04) {
             ctx.save()
@@ -883,6 +927,17 @@ import '../styles/global.scss'
             ctx.fillStyle = `rgba(255,255,255,${coreAlpha * 0.94})`
             ctx.arc(cx, cy, Math.max(1.5, coreR * 0.11 * pulse), 0, Math.PI * 2)
             ctx.fill()
+            ctx.restore()
+          }
+
+          // Self-bloom — canvas se re-dessine sur lui-même flou en mode screen
+          if (rVis && phase !== 'done') {
+            ctx.save()
+            ctx.globalCompositeOperation = 'screen'
+            ctx.globalAlpha = 0.38
+            ctx.filter = 'blur(14px)'
+            ctx.drawImage(canvas, 0, 0)
+            ctx.filter = 'none'
             ctx.restore()
           }
         }
