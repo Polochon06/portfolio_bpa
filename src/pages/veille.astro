@@ -6,19 +6,22 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
 
 <ProjectLayout
   title="Veille Numerique | IA et Motion Design"
-  description="Veille numerique sur l'impact de l'intelligence artificielle dans le developpement web et le motion design — After Effects, Lottie, tendances visuelles 2025."
+  description="Veille numerique sur l'impact de l'intelligence artificielle dans le developpement web et le motion design."
   heroLabel="Veille Numerique 2025"
-  heroSub="L'intelligence artificielle transforme a la fois le developpement et le motion design. Analyse des tendances qui redessinent les pratiques creatives et techniques."
+  heroSub="L'intelligence artificielle transforme le developpement et le motion design. Analyse des tendances qui redessinent les pratiques creatives et techniques."
   techTags={["Intelligence Artificielle", "After Effects", "Lottie", "Motion Design", "Developpement Web"]}
+  heroBg={imgAe.src}
 >
   <Fragment slot="hero-title">VEILLE<br/>NUM</Fragment>
 
-  <!-- 01 INTRODUCTION -->
+  <!-- 01 -->
   <section class="p-section" data-reveal>
-    <div class="p-section__header">
-      <span class="p-section__num">01</span>
-      <h2 class="p-section__title">L'IA au coeur du numerique</h2>
-      <div class="p-section__line"></div>
+    <div class="v-header">
+      <img src={imgAe.src} alt="" class="v-header__img" style="--pos: center 20%" />
+      <div class="v-header__layer">
+        <span class="v-header__num">01</span>
+        <h2 class="v-header__title">L'IA au coeur du numerique</h2>
+      </div>
     </div>
 
     <div class="p-grid">
@@ -56,19 +59,21 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
           </div>
           <div class="veille-stat">
             <span class="veille-stat__num">40<span class="veille-stat__unit">%</span></span>
-            <span class="veille-stat__label">des offres d'emploi mentionnent des competences IA en 2025</span>
+            <span class="veille-stat__label">des offres d'emploi mentionnent l'IA en 2025</span>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 02 DEVELOPPEMENT -->
+  <!-- 02 -->
   <section class="p-section" data-reveal>
-    <div class="p-section__header">
-      <span class="p-section__num">02</span>
-      <h2 class="p-section__title">IA et Developpement — Le code augmente</h2>
-      <div class="p-section__line"></div>
+    <div class="v-header">
+      <img src={imgAe2.src} alt="" class="v-header__img" style="--pos: center 40%; --tint: 210deg" />
+      <div class="v-header__layer">
+        <span class="v-header__num">02</span>
+        <h2 class="v-header__title">IA et Developpement</h2>
+      </div>
     </div>
 
     <div class="p-grid">
@@ -77,13 +82,13 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
           Des assistants comme <strong>GitHub Copilot</strong>, <strong>Cursor</strong> ou
           <strong>Claude Code</strong> ont change la facon dont on ecrit du code.
           L'autocompletion ne se limite plus a une ligne : elle anticipe des fonctions entieres,
-          suggere des architectures et propose des corrections avant meme que l'erreur ne soit
-          identifiee.
+          suggere des architectures et propose des corrections avant meme que l'erreur
+          ne soit identifiee.
         </p>
         <p>
           Le developpeur passe ainsi d'un role d'executant a celui de <strong>chef d'orchestre</strong> :
           il definit l'intention, valide les choix techniques, et concentre son energie sur
-          ce que l'IA ne peut pas faire — le jugement, l'experience utilisateur, l'architecture
+          ce que l'IA ne peut pas faire — le jugement, l'experience utilisateur et l'architecture
           a long terme.
         </p>
         <p>
@@ -94,7 +99,7 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
       </div>
 
       <div class="p-card">
-        <span class="p-card__label">Outils IA — Developpement</span>
+        <span class="p-card__label">Outils IA pour le developpement</span>
         <div class="veille-tools">
 
           <div class="veille-tool">
@@ -142,88 +147,85 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     </div>
   </section>
 
-  <!-- 03 MOTION DESIGN -->
+  <!-- 03 -->
   <section class="p-section" data-reveal>
-    <div class="p-section__header">
-      <span class="p-section__num">03</span>
-      <h2 class="p-section__title">IA et Motion Design — After Effects evolue</h2>
-      <div class="p-section__line"></div>
+    <div class="v-header">
+      <img src={imgAe.src} alt="" class="v-header__img" style="--pos: center center" />
+      <div class="v-header__layer">
+        <span class="v-header__num">03</span>
+        <h2 class="v-header__title">IA et Motion Design</h2>
+      </div>
     </div>
 
-    <div class="veille-ae-full">
-      <div class="veille-ae-image">
-        <img src={imgAe.src} alt="After Effects interface" />
-        <div class="veille-ae-image__overlay">
-          <div class="veille-ae-image__badge">
-            <svg class="veille-ae-svg" viewBox="0 0 88 88" xmlns="http://www.w3.org/2000/svg">
-              <rect width="88" height="88" rx="14" fill="#0C0037"/>
-              <defs>
-                <linearGradient id="aeg2" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stop-color="#3030AA"/>
-                  <stop offset="100%" stop-color="#000020"/>
-                </linearGradient>
-              </defs>
-              <rect width="88" height="88" rx="14" fill="url(#aeg2)" opacity="0.6"/>
-              <text x="44" y="63" text-anchor="middle" fill="#8282FF"
-                font-family="'Helvetica Neue', Arial, sans-serif"
-                font-weight="900" font-size="44" letter-spacing="-1">Ae</text>
-            </svg>
-            <span>After Effects CC 2024</span>
-          </div>
-        </div>
+    <div class="p-grid">
+      <div class="p-body">
+        <p>
+          Les outils de motion design evoluent en parallele. Adobe integre l'IA dans
+          <strong>After Effects</strong> via la suite Adobe Sensei et les nouvelles
+          fonctionnalites de <strong>Firefly</strong> : suppression automatique d'arriere-plan,
+          suivi d'objets ameliore, generation de transitions et de textures a la volee.
+        </p>
+        <p>
+          Le <strong>rotoscoping automatique</strong> — autrefois une tache longue et
+          fastidieuse image par image — se fait aujourd'hui en quelques secondes avec
+          Roto Brush 2. Le suivi de camera et la stabilisation atteignent une precision
+          inegalee sans intervention manuelle.
+        </p>
+        <p>
+          Cela permet de se concentrer davantage sur la <strong>direction artistique</strong> :
+          l'intention creative, le rythme, l'emotion. L'IA gere le comment,
+          le motion designer reste maitre du pourquoi.
+        </p>
       </div>
 
-      <div class="p-grid veille-ae-grid">
-        <div class="p-body">
-          <p>
-            Les outils de motion design evoluent en parallele. Adobe integre l'IA dans
-            <strong>After Effects</strong> via la suite Adobe Sensei et les nouvelles
-            fonctionnalites de <strong>Firefly</strong> : suppression automatique d'arriere-plan,
-            suivi d'objets ameliore, generation de transitions et de textures a la volee.
-          </p>
-          <p>
-            Le <strong>rotoscoping automatique</strong> — autrefois une tache longue et
-            fastidieuse image par image — se fait aujourd'hui en quelques secondes avec
-            Roto Brush 2 alimente par IA. Le suivi de camera et la stabilisation atteignent
-            une precision inegalee sans intervention manuelle.
-          </p>
-          <p>
-            Cela permet de se concentrer davantage sur la <strong>direction artistique</strong> :
-            l'intention creative, le rythme, l'emotion. L'IA gere le comment,
-            le motion designer reste maitre du pourquoi.
-          </p>
+      <div class="p-card">
+        <div class="veille-ae-logo-row">
+          <svg class="veille-ae-svg" viewBox="0 0 88 88" xmlns="http://www.w3.org/2000/svg">
+            <rect width="88" height="88" rx="14" fill="#0C0037"/>
+            <defs>
+              <linearGradient id="aeg3" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#3030AA"/>
+                <stop offset="100%" stop-color="#000020"/>
+              </linearGradient>
+            </defs>
+            <rect width="88" height="88" rx="14" fill="url(#aeg3)" opacity="0.6"/>
+            <text x="44" y="63" text-anchor="middle" fill="#8282FF"
+              font-family="'Helvetica Neue', Arial, sans-serif"
+              font-weight="900" font-size="44" letter-spacing="-1">Ae</text>
+          </svg>
+          <div>
+            <strong>After Effects CC 2024</strong>
+            <span>Adobe Creative Cloud</span>
+          </div>
         </div>
-
-        <div class="p-card">
-          <span class="p-card__label">Fonctionnalites IA dans After Effects</span>
-          <div class="veille-ae-features">
-            <div class="veille-ae-row">
-              <span class="veille-ae-num">01</span>
-              <div>
-                <strong>Roto Brush 2</strong>
-                <p>Masquage automatique par IA — decoupe de personnages en temps reel</p>
-              </div>
+        <span class="p-card__label" style="margin-top:1.25rem; display:block;">Fonctionnalites IA</span>
+        <div class="veille-ae-features">
+          <div class="veille-ae-row">
+            <span class="veille-ae-num">01</span>
+            <div>
+              <strong>Roto Brush 2</strong>
+              <p>Masquage automatique par IA — decoupe de personnages en temps reel</p>
             </div>
-            <div class="veille-ae-row">
-              <span class="veille-ae-num">02</span>
-              <div>
-                <strong>Content-Aware Fill</strong>
-                <p>Suppression d'objets et reconstruction de l'arriere-plan frame par frame</p>
-              </div>
+          </div>
+          <div class="veille-ae-row">
+            <span class="veille-ae-num">02</span>
+            <div>
+              <strong>Content-Aware Fill</strong>
+              <p>Suppression d'objets et reconstruction de l'arriere-plan frame par frame</p>
             </div>
-            <div class="veille-ae-row">
-              <span class="veille-ae-num">03</span>
-              <div>
-                <strong>Camera Tracker</strong>
-                <p>Reconstruction 3D de scene avec correction de distorsion automatique</p>
-              </div>
+          </div>
+          <div class="veille-ae-row">
+            <span class="veille-ae-num">03</span>
+            <div>
+              <strong>Camera Tracker</strong>
+              <p>Reconstruction 3D de scene avec correction de distorsion automatique</p>
             </div>
-            <div class="veille-ae-row">
-              <span class="veille-ae-num">04</span>
-              <div>
-                <strong>Firefly (beta)</strong>
-                <p>Generation de textures et d'effets visuels depuis un prompt texte</p>
-              </div>
+          </div>
+          <div class="veille-ae-row">
+            <span class="veille-ae-num">04</span>
+            <div>
+              <strong>Firefly (beta)</strong>
+              <p>Generation de textures et d'effets depuis un prompt texte</p>
             </div>
           </div>
         </div>
@@ -231,12 +233,14 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     </div>
   </section>
 
-  <!-- 04 CONVERGENCE -->
+  <!-- 04 -->
   <section class="p-section" data-reveal>
-    <div class="p-section__header">
-      <span class="p-section__num">04</span>
-      <h2 class="p-section__title">La convergence Dev et Animation</h2>
-      <div class="p-section__line"></div>
+    <div class="v-header">
+      <img src={imgAe2.src} alt="" class="v-header__img" style="--pos: left center" />
+      <div class="v-header__layer">
+        <span class="v-header__num">04</span>
+        <h2 class="v-header__title">Dev et Animation</h2>
+      </div>
     </div>
 
     <div class="p-grid">
@@ -251,14 +255,12 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
           Ce pont entre les deux disciplines change la facon de concevoir les interfaces.
           Les animations ne sont plus des ajouts decoratifs — elles deviennent
           <strong>fonctionnelles</strong> : feedback utilisateur, onboarding, micro-interactions,
-          transitions de navigation. Le motion design est desormais un composant a part entiere
-          du developpement front-end.
+          transitions de navigation.
         </p>
         <p>
           Des bibliotheques comme <strong>GSAP</strong>, <strong>Framer Motion</strong> ou
-          <strong>Theatre.js</strong> poussent encore plus loin cette integration, permettant
-          au developpeur de creer des animations de niveau motion designer directement dans
-          le code.
+          <strong>Theatre.js</strong> permettent au developpeur de creer des animations
+          de niveau motion designer directement dans le code.
         </p>
       </div>
 
@@ -298,12 +300,14 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     </div>
   </section>
 
-  <!-- 05 TENDANCES -->
+  <!-- 05 -->
   <section class="p-section" data-reveal>
-    <div class="p-section__header">
-      <span class="p-section__num">05</span>
-      <h2 class="p-section__title">Styles visuels et tendances 2025</h2>
-      <div class="p-section__line"></div>
+    <div class="v-header">
+      <img src={imgAe.src} alt="" class="v-header__img" style="--pos: right center" />
+      <div class="v-header__layer">
+        <span class="v-header__num">05</span>
+        <h2 class="v-header__title">Styles visuels et tendances 2025</h2>
+      </div>
     </div>
 
     <div class="p-grid">
@@ -315,21 +319,15 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
           Le motion design doit capter l'attention en moins de 3 secondes.
         </p>
         <p>
-          Les esthetiques dominantes en 2025 incluent le <strong>glassmorphisme anime</strong>,
-          les <strong>degrades cinematiques</strong> avec grain et bruit, les <strong>typographies
-          cinetiques</strong> et le retour du <strong>minimalisme editorial</strong>
+          Les esthetiques dominantes en 2025 : le <strong>glassmorphisme anime</strong>,
+          les <strong>degrades cinematiques</strong> avec grain et bruit, les typographies
+          cinetiques et le retour du <strong>minimalisme editorial</strong>
           inspire de la presse de luxe.
         </p>
         <p>
           Le motion design est devenu un outil de communication essentiel : il explique
-          un produit, raconte une histoire, cree une emotion en quelques secondes.
-          Les marques qui maitrisent cette discipline ont un avantage concurrentiel
-          direct sur leurs plateformes.
+          un produit, raconte une histoire et cree une emotion en quelques secondes.
         </p>
-
-        <div class="veille-ae-image veille-ae-image--small" style="margin-top:2rem;">
-          <img src={imgAe2.src} alt="Motion design workflow" />
-        </div>
       </div>
 
       <div class="p-card">
@@ -337,7 +335,7 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
         <div class="veille-trends">
           <div class="veille-trend">
             <span class="veille-trend__tag">FORMAT</span>
-            <span>Vertical 9:16 — Reels, Shorts, TikTok</span>
+            <span>Vertical 9:16 pour Reels, Shorts, TikTok</span>
           </div>
           <div class="veille-trend">
             <span class="veille-trend__tag">ESTHETIQUE</span>
@@ -349,11 +347,11 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
           </div>
           <div class="veille-trend">
             <span class="veille-trend__tag">DUREE</span>
-            <span>5 a 15 secondes max — impact immediat</span>
+            <span>5 a 15 secondes max pour l'impact immediat</span>
           </div>
           <div class="veille-trend">
             <span class="veille-trend__tag">IA GEN</span>
-            <span>Midjourney et Runway pour les assets de fond</span>
+            <span>Midjourney et Runway pour les assets</span>
           </div>
           <div class="veille-trend">
             <span class="veille-trend__tag">STYLE</span>
@@ -364,12 +362,14 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     </div>
   </section>
 
-  <!-- 06 CONCLUSION -->
+  <!-- 06 -->
   <section class="p-section p-section--last" data-reveal>
-    <div class="p-section__header">
-      <span class="p-section__num">06</span>
-      <h2 class="p-section__title">Conclusion — Le profil hybride</h2>
-      <div class="p-section__line"></div>
+    <div class="v-header">
+      <img src={imgAe2.src} alt="" class="v-header__img" style="--pos: center bottom" />
+      <div class="v-header__layer">
+        <span class="v-header__num">06</span>
+        <h2 class="v-header__title">Conclusion</h2>
+      </div>
     </div>
 
     <div class="veille-conclusion">
@@ -381,20 +381,20 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
       <div class="veille-conclusion__body">
         <p>
           L'IA transforme simultanement le developpement et le motion design. Ces deux
-          disciplines, longtemps separees, convergent vers un meme espace de travail :
-          celui du <strong>creatif technique</strong>, capable de coder une interface
-          et d'en animer chaque element avec la meme maitrise.
+          disciplines convergent vers un meme espace de travail : celui du <strong>creatif
+          technique</strong>, capable de coder une interface et d'en animer chaque element
+          avec la meme maitrise.
         </p>
         <p>
-          Aujourd'hui, les profils les plus recherches sont ceux qui combinent
-          <strong>technique et creativite</strong> — qui comprennent autant les contraintes
-          du developpement que les exigences du motion design, et qui savent utiliser
-          l'IA comme un multiplicateur de leurs capacites.
+          Aujourd'hui, les profils les plus recherches combinent <strong>technique et
+          creativite</strong>. Ils comprennent autant les contraintes du developpement
+          que les exigences du motion design, et utilisent l'IA comme multiplicateur
+          de leurs capacites.
         </p>
         <p>
-          C'est precisement cette double competence — developpeur front-end et motion designer —
-          qui definit mon approche et que cette veille illustre a travers les outils,
-          les tendances et les pratiques que j'integre au quotidien.
+          C'est precisement cette double competence qui definit mon approche et que
+          cette veille illustre a travers les outils, les tendances et les pratiques
+          que j'integre au quotidien.
         </p>
       </div>
 
@@ -416,6 +416,60 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
 <style lang="scss">
   $c-primary:   #8b5cf6;
   $c-secondary: #000000;
+
+  /* ── Section image header ──────────────────────────────────────── */
+  .v-header {
+    position: relative;
+    width: 100%;
+    height: clamp(160px, 22vw, 280px);
+    overflow: hidden;
+    margin-bottom: 3rem;
+    border-radius: 3px;
+
+    &__img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: var(--pos, center);
+    }
+
+    &__layer {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(0, 0, 0, 0.82) 0%,
+        rgba(0, 0, 0, 0.50) 50%,
+        rgba(0, 0, 0, 0.25) 100%
+      );
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem 2.5rem;
+      gap: 0.5rem;
+    }
+
+    &__num {
+      font-family: font-family(fraktion);
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: color(primary);
+    }
+
+    &__title {
+      margin: 0;
+      font-family: font-family(bigger);
+      font-size: clamp(1.4rem, 3.5vw, 2.4rem);
+      font-weight: 400;
+      color: #fff;
+      line-height: 1.1;
+      letter-spacing: 0.01em;
+    }
+  }
 
   /* ── Stat card ─────────────────────────────────────────────────── */
   .veille-stat-card { display: flex; flex-direction: column; gap: 0; }
@@ -489,7 +543,7 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
       color: color(secondary);
       margin-top: 0.2rem;
       line-height: 1.4;
-      opacity: 0.7;
+      opacity: 0.65;
     }
 
     &__logo {
@@ -507,68 +561,44 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
       &--gh     { background: #24292e; }
       &--cursor { background: #1a1a2e; color: rgba($c-primary, 0.9); }
       &--claude { background: #d97757; }
-      &--v0     { background: #000; color: #fff; }
+      &--v0     { background: #000; }
     }
   }
 
-  /* ── AE full-width image block ─────────────────────────────────── */
-  .veille-ae-full {
+  /* ── AE logo ───────────────────────────────────────────────────── */
+  .veille-ae-logo-row {
     display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid rgba($c-secondary, 0.12);
 
-  .veille-ae-image {
-    position: relative;
-    border-radius: 4px;
-    overflow: hidden;
-    aspect-ratio: 16 / 6;
-
-    img {
+    strong {
       display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      font-family: font-family(fraktion);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: color(secondary);
     }
 
-    &--small {
-      aspect-ratio: 16 / 5;
-    }
-
-    &__overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to right, rgba(0,0,0,0.65) 0%, transparent 60%);
-      display: flex;
-      align-items: flex-end;
-      padding: 1.5rem;
-    }
-
-    &__badge {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-
-      span {
-        font-family: font-family(fraktion);
-        font-size: 0.65rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: rgba(255,255,255,0.85);
-      }
+    span {
+      display: block;
+      font-size: 0.7rem;
+      color: color(secondary);
+      opacity: 0.5;
+      margin-top: 0.15rem;
     }
   }
 
-  .veille-ae-svg { width: 2.5rem; height: 2.5rem; }
-
-  .veille-ae-grid { margin-top: 0; }
+  .veille-ae-svg { width: 2.8rem; height: 2.8rem; flex-shrink: 0; }
 
   /* ── AE features ───────────────────────────────────────────────── */
   .veille-ae-features {
     display: flex;
     flex-direction: column;
     gap: 0;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
   }
 
   .veille-ae-row {
@@ -593,7 +623,7 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
       margin: 0.2rem 0 0;
       font-size: 0.78rem;
       color: color(secondary);
-      opacity: 0.7;
+      opacity: 0.65;
       line-height: 1.4;
     }
   }
@@ -614,7 +644,6 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     flex-direction: column;
     gap: 0;
     margin-top: 1rem;
-    counter-reset: pipe;
   }
 
   .veille-pipeline__step {
@@ -623,7 +652,6 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     gap: 1rem;
     padding: 0.9rem 0;
     border-bottom: 1px solid rgba($c-secondary, 0.12);
-    position: relative;
 
     &:last-child { border-bottom: 0; }
 
@@ -640,12 +668,11 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
       display: block;
       font-size: 0.72rem;
       color: color(secondary);
-      opacity: 0.65;
+      opacity: 0.6;
       margin-top: 0.15rem;
     }
 
     &--result strong { color: color(primary); }
-    &--result span   { opacity: 1; color: color(primary); opacity: 0.75; }
   }
 
   .veille-pipeline__badge {
@@ -729,19 +756,9 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     flex-direction: column;
     gap: 1rem;
 
-    p {
-      margin: 0;
-      font-size: 0.9rem;
-      line-height: 1.7;
-      color: color(secondary);
-    }
-
+    p { margin: 0; font-size: 0.9rem; line-height: 1.7; color: color(secondary); }
     strong { color: color(secondary); }
   }
 
-  .veille-skills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
+  .veille-skills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 </style>
