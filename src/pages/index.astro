@@ -153,6 +153,12 @@ import '../styles/global.scss'
     import { ScrollTrigger } from 'gsap/ScrollTrigger'
     gsap.registerPlugin(ScrollTrigger)
 
+    import * as THREE from 'three'
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
+    import { RenderPass }     from 'three/addons/postprocessing/RenderPass.js'
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
+    import { OutputPass }      from 'three/addons/postprocessing/OutputPass.js'
+
     declare global {
       interface Window {
         safeWidth: number
@@ -384,55 +390,36 @@ import '../styles/global.scss'
       }
 
       /**
-       * Intro — Doctor Strange portal v4 (lightning, runes, sound, reveal)
+       * Intro — Three.js 3D portal (WebGL + GLSL shaders)
        */
       intro() {
-        const wrapper = document.querySelector('.js-site-wrapper') as HTMLElement
-        const intro  = document.querySelector('.js-intro') as HTMLElement
-        const mount  = document.querySelector('.js-mount') as HTMLElement
-        const canvas = intro.querySelector('.js-portal-canvas') as HTMLCanvasElement
-        const ctx    = canvas.getContext('2d') as CanvasRenderingContext2D
+        const wrapper  = document.querySelector('.js-site-wrapper') as HTMLElement
+        const introEl  = document.querySelector('.js-intro')        as HTMLElement
+        const mount    = document.querySelector('.js-mount')        as HTMLElement
+        const canvas   = introEl.querySelector('.js-portal-canvas') as HTMLCanvasElement
 
         canvas.width  = window.innerWidth
         canvas.height = window.innerHeight
 
-        const cx = canvas.width  / 2
-        const cy = canvas.height / 2
-        const R       = Math.min(canvas.width, canvas.height) * 0.30
-        const maxDim  = Math.max(canvas.width, canvas.height)
+        // ── Three.js renderer ─────────────────────────────────────────
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false })
+        renderer.setSize(canvas.width, canvas.height)
+        renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+        renderer.toneMapping = THREE.ACESFilmicToneMapping
+        renderer.toneMappingExposure = 1.1
 
-        // ── State ──────────────────────────────────────────────────────
-        let phase        = 'forming'
-        let t            = 0
-        let currentR     = 0
-        let openProgress = 0
-        let flashAlpha   = 0
-        let trailAlpha   = 0.05
-        let ringFade     = 1
+        const scene  = new THREE.Scene()
+        scene.background = new THREE.Color(0x000408)
+        const camera = new THREE.PerspectiveCamera(60, canvas.width / canvas.height, 0.01, 100)
+        camera.position.z = 4.0
 
-        const sparks:  any[] = []
-        const bolts:   any[] = []
-        const embers:  any[] = []
-        const ripples: any[] = []
-        let nextBolt   = 0.6
-        let nextRipple = 0.4
-
-        const nodeRings = [
-          { ratio: 0.38, count: 4, spd:  0.45, sz: 4.5, rgb: '80,180,255'  },
-          { ratio: 0.62, count: 6, spd: -0.28, sz: 3.2, rgb: '60,160,255'  },
-          { ratio: 0.86, count: 9, spd:  0.18, sz: 2.4, rgb: '100,210,255' },
-        ]
-
-        const inflows: any[] = []
-        let nextInflow = 0.0
-        const stars = Array.from({length: 65}, () => ({
-          frac:    0.06 + Math.random() * 0.80,
-          angle:   Math.random() * Math.PI * 2,
-          dA:      (Math.random() < 0.5 ? 1 : -1) * (0.0015 + Math.random() * 0.006),
-          sz:      0.18 + Math.random() * 0.52,
-          twinkle: Math.random() * Math.PI * 2,
-          twSpeed: 1.8 + Math.random() * 3.5,
-        }))
+        const composer  = new EffectComposer(renderer)
+        composer.addPass(new RenderPass(scene, camera))
+        const bloomPass = new UnrealBloomPass(
+          new THREE.Vector2(canvas.width, canvas.height), 1.5, 0.5, 0.08
+        )
+        composer.addPass(bloomPass)
+        composer.addPass(new OutputPass())
 
         // ── Web Audio (procedural, fails silently if blocked) ──────────
         ;(function initAudio() {
@@ -440,8 +427,6 @@ import '../styles/global.scss'
             const AC  = (window as any).AudioContext || (window as any).webkitAudioContext
             const ac  = new AC()
             const now = ac.currentTime
-
-            // Low hum
             const osc  = ac.createOscillator()
             osc.type   = 'sawtooth'
             osc.frequency.setValueAtTime(52, now)
@@ -452,8 +437,6 @@ import '../styles/global.scss'
             og.gain.setValueAtTime(0.06, now + 1.8)
             og.gain.linearRampToValueAtTime(0, now + 3.0)
             osc.connect(og); og.connect(ac.destination); osc.start(); osc.stop(now + 3.5)
-
-            // Electrical crackle (filtered noise)
             const buf = ac.createBuffer(1, ac.sampleRate * 4, ac.sampleRate)
             const d   = buf.getChannelData(0)
             for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1
@@ -466,8 +449,6 @@ import '../styles/global.scss'
             ng.gain.linearRampToValueAtTime(0.07, now + 1.8)
             ng.gain.linearRampToValueAtTime(0, now + 3.0)
             ns.connect(bpf); bpf.connect(ng); ng.connect(ac.destination); ns.start()
-
-            // Opening whoosh at t=3.4s
             setTimeout(() => {
               try {
                 const w  = ac.createOscillator(); w.type = 'sine'
@@ -483,683 +464,347 @@ import '../styles/global.scss'
           } catch(e) { /* autoplay blocked — silent */ }
         })()
 
-        // ── Spawn spark ────────────────────────────────────────────────
-        function spawnSpark() {
-          const cw   = Math.random() < 0.75
+        // ── GLSL — Wormhole disc (portal interior) ────────────────────
+        const wormholeVert = `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `
+        const wormholeFrag = `
+          uniform float uTime;
+          varying vec2 vUv;
+          float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
+          float n21(vec2 p) {
+            vec2 i = floor(p); vec2 f = fract(p);
+            f = f*f*(3.0-2.0*f);
+            return mix(mix(h21(i),h21(i+vec2(1,0)),f.x),mix(h21(i+vec2(0,1)),h21(i+vec2(1,1)),f.x),f.y);
+          }
+          float fbm(vec2 p) {
+            float v=0.0; float a=0.5;
+            for(int i=0;i<5;i++){v+=a*n21(p);p*=2.1;a*=0.5;}
+            return v;
+          }
+          void main() {
+            vec2 uv   = vUv * 2.0 - 1.0;
+            float r   = length(uv);
+            if(r > 1.0) discard;
+            float theta = atan(uv.y, uv.x);
+            float depth = 0.88 / max(r, 0.018);
+            float z     = fract(depth - uTime * 0.60);
+            vec2 wuv    = vec2(theta / 6.2832, depth * 0.22);
+            float w1    = fbm(wuv * 3.0 + vec2(uTime * 0.07, 0.0));
+            float w2    = fbm(wuv * 6.0 - vec2(0.0, uTime * 0.11));
+            float spiral = fract(theta / 6.2832 + depth * 0.18 + uTime * 0.055);
+            spiral = pow(1.0 - abs(spiral * 2.0 - 1.0), 5.0);
+            float ring  = 1.0 - smoothstep(0.0, 0.08, abs(z - 0.5));
+            ring       += smoothstep(0.96, 1.0, z) * 0.6;
+            float star  = step(0.92, h21(floor(uv * 14.0 + vec2(floor(depth * 3.0)))));
+            float sing  = exp(-r * 7.0) * 2.5;
+            float edge  = 1.0 - smoothstep(0.70, 1.0, r);
+            vec3 col = vec3(0.0, 0.03, 0.18);
+            col += vec3(0.00, 0.08, 0.40) * w1;
+            col += vec3(0.02, 0.14, 0.50) * w2 * 0.6;
+            col += vec3(0.15, 0.55, 1.00) * spiral * 0.8;
+            col += vec3(0.40, 0.80, 1.00) * ring;
+            col += vec3(0.90, 0.95, 1.00) * star * 0.6;
+            col += vec3(1.00, 0.92, 0.75) * sing;
+            col *= edge;
+            gl_FragColor = vec4(col, 1.0);
+          }
+        `
+
+        // ── GLSL — Energy ring ────────────────────────────────────────
+        const ringVert = `
+          varying vec3 vNormal;
+          varying vec2 vUv;
+          varying vec3 vViewDir;
+          void main() {
+            vNormal  = normalize(normalMatrix * normal);
+            vUv      = uv;
+            vec4 mv  = modelViewMatrix * vec4(position, 1.0);
+            vViewDir = normalize(-mv.xyz);
+            gl_Position = projectionMatrix * mv;
+          }
+        `
+        const ringFrag = `
+          uniform float uTime;
+          uniform float uFade;
+          varying vec3 vNormal;
+          varying vec2 vUv;
+          varying vec3 vViewDir;
+          void main() {
+            float fr = pow(1.0 - clamp(abs(dot(vNormal, vViewDir)), 0.0, 1.0), 1.5);
+            float s1 = sin(vUv.x * 48.0 - uTime * 8.0) * 0.5 + 0.5;
+            float s2 = sin(vUv.x * 24.0 + uTime * 4.8) * 0.5 + 0.5;
+            float cr = pow(max(0.0, sin(vUv.x * 96.0 - uTime * 14.0)), 9.0);
+            vec3 base  = vec3(0.00, 0.40, 1.00);
+            vec3 mid   = vec3(0.35, 0.80, 1.00);
+            vec3 white = vec3(0.90, 0.96, 1.00);
+            vec3 col   = base;
+            col = mix(col, mid,   s1 * 0.55 + s2 * 0.25);
+            col = mix(col, white, fr * 0.85);
+            col += white * cr * 2.0;
+            gl_FragColor = vec4(col * uFade, (0.70 + fr * 0.30) * uFade);
+          }
+        `
+
+        // ── GLSL — Orbital particles ──────────────────────────────────
+        const partVert = `
+          attribute float aAngle;
+          attribute float aRadius;
+          attribute float aSpeed;
+          attribute float aSize;
+          attribute float aPhase;
+          uniform float uTime;
+          varying float vAlpha;
+          varying float vRadFrac;
+          void main() {
+            float ang = aAngle + uTime * aSpeed;
+            float px  = cos(ang) * aRadius;
+            float py  = sin(ang) * aRadius;
+            float pz  = sin(uTime * 1.4 + aPhase) * 0.07;
+            vec4  mv  = modelViewMatrix * vec4(px, py, pz, 1.0);
+            gl_Position  = projectionMatrix * mv;
+            gl_PointSize = clamp(aSize * (90.0 / max(-mv.z, 1.5)), 1.0, 14.0);
+            vAlpha   = 0.55 + sin(uTime * 2.2 + aPhase) * 0.45;
+            vRadFrac = clamp((aRadius - 0.85) / 0.5, 0.0, 1.0);
+          }
+        `
+        const partFrag = `
+          varying float vAlpha;
+          varying float vRadFrac;
+          void main() {
+            vec2  c = gl_PointCoord - 0.5;
+            float r = length(c);
+            if(r > 0.5) discard;
+            float fade = 1.0 - r * 2.0;
+            vec3 col = mix(vec3(0.40,0.85,1.00), vec3(0.10,0.45,1.00), vRadFrac);
+            gl_FragColor = vec4(col, vAlpha * fade * fade);
+          }
+        `
+
+        // ── Scene geometry ────────────────────────────────────────────
+        const RING_R = 1.20
+        const TUBE_R = 0.055
+
+        // Wormhole disc (portal surface)
+        const discMat = new THREE.ShaderMaterial({
+          uniforms: { uTime: { value: 0 } },
+          vertexShader: wormholeVert,
+          fragmentShader: wormholeFrag,
+          side: THREE.FrontSide,
+          depthWrite: false,
+        })
+        const disc = new THREE.Mesh(new THREE.CircleGeometry(RING_R - TUBE_R, 128), discMat)
+        scene.add(disc)
+
+        // Main energy ring (torus)
+        const torusMat = new THREE.ShaderMaterial({
+          uniforms: { uTime: { value: 0 }, uFade: { value: 1.0 } },
+          vertexShader: ringVert,
+          fragmentShader: ringFrag,
+          transparent: true,
+          side: THREE.DoubleSide,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        })
+        const torus = new THREE.Mesh(new THREE.TorusGeometry(RING_R, TUBE_R, 32, 256), torusMat)
+        scene.add(torus)
+
+        // Outer decorative rings
+        const makeOuter = (r: number, tube: number, col: number, op: number) => {
+          const m = new THREE.MeshBasicMaterial({
+            color: col, transparent: true, opacity: op,
+            blending: THREE.AdditiveBlending, depthWrite: false,
+          })
+          return new THREE.Mesh(new THREE.TorusGeometry(r, tube, 12, 256), m)
+        }
+        const outerA = makeOuter(RING_R + 0.09, 0.006, 0x0055ff, 0.55)
+        const outerB = makeOuter(RING_R + 0.20, 0.004, 0x0088ff, 0.30)
+        const outerC = makeOuter(RING_R - 0.09, 0.004, 0x00ccff, 0.42)
+        scene.add(outerA, outerB, outerC)
+
+        // Orbital particle system
+        const PART_N = 4800
+        const pAng = new Float32Array(PART_N), pRad = new Float32Array(PART_N)
+        const pSpd = new Float32Array(PART_N), pSz  = new Float32Array(PART_N)
+        const pPhs = new Float32Array(PART_N)
+        for (let i = 0; i < PART_N; i++) {
           const lane = Math.random()
-          // 3 couches orbitales : inner / main / outer
-          const rMul = lane < 0.18 ? 0.87 : lane < 0.80 ? 1.0 : 1.13
-          sparks.push({
-            angle:    Math.random() * Math.PI * 2,
-            r:        currentR * rMul * (0.96 + Math.random() * 0.08),
-            orbitSpd: cw
-              ? (0.020 + Math.random() * 0.052) * (rMul < 1 ? 1.10 : rMul > 1 ? 0.91 : 1)
-              : -(0.014 + Math.random() * 0.040),
-            sz:       lane < 0.18 ? (0.20 + Math.random() * 0.85)
-                    : lane < 0.80 ? (0.28 + Math.random() * 1.55)
-                    : (0.18 + Math.random() * 0.75),
-            hue:      192 + Math.random() * 55,
-            life:     1.0,
-            decay:    0.22 + Math.random() * 0.52,
-          })
+          pAng[i] = Math.random() * Math.PI * 2
+          pRad[i] = lane < 0.30 ? RING_R * (0.68 + Math.random() * 0.22)
+                  : lane < 0.75 ? RING_R * (0.92 + Math.random() * 0.16)
+                  :               RING_R * (1.08 + Math.random() * 0.24)
+          pSpd[i] = (Math.random() > 0.5 ? 1 : -1) * (0.018 + Math.random() * 0.048)
+          pSz[i]  = 1.2 + Math.random() * 2.8
+          pPhs[i] = Math.random() * Math.PI * 2
         }
+        const partGeo = new THREE.BufferGeometry()
+        partGeo.setAttribute('aAngle',   new THREE.BufferAttribute(pAng, 1))
+        partGeo.setAttribute('aRadius',  new THREE.BufferAttribute(pRad, 1))
+        partGeo.setAttribute('aSpeed',   new THREE.BufferAttribute(pSpd, 1))
+        partGeo.setAttribute('aSize',    new THREE.BufferAttribute(pSz,  1))
+        partGeo.setAttribute('aPhase',   new THREE.BufferAttribute(pPhs, 1))
+        partGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(PART_N * 3), 3))
+        const partMat = new THREE.ShaderMaterial({
+          uniforms: { uTime: { value: 0 } },
+          vertexShader: partVert,
+          fragmentShader: partFrag,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        })
+        const particles = new THREE.Points(partGeo, partMat)
+        particles.frustumCulled = false
+        scene.add(particles)
 
-        // ── Spawn lightning bolt avec branche secondaire ───────────────
-        function spawnBolt() {
+        // Lightning arc group
+        const arcGroup = new THREE.Group()
+        scene.add(arcGroup)
+
+        type Arc = { line: THREE.Line; life: number; decay: number }
+
+        function buildArc(): Arc {
           const a1   = Math.random() * Math.PI * 2
-          const span = Math.PI * (0.20 + Math.random() * 0.80)
+          const span = Math.PI * (0.25 + Math.random() * 0.70)
           const a2   = a1 + span * (Math.random() > 0.5 ? 1 : -1)
-          const x1   = cx + Math.cos(a1) * currentR
-          const y1   = cy + Math.sin(a1) * currentR
-          const x2   = cx + Math.cos(a2) * currentR
-          const y2   = cy + Math.sin(a2) * currentR
-          const segs = 8 + Math.floor(Math.random() * 8)
-          const dx   = x2 - x1, dy = y2 - y1
-          const pts: {x:number,y:number}[] = [{x:x1,y:y1}]
-          for (let i = 1; i < segs; i++) {
-            const f = i / segs
-            pts.push({
-              x: x1 + dx * f + (Math.random() - 0.5) * 40,
-              y: y1 + dy * f + (Math.random() - 0.5) * 40,
-            })
+          const segs = 10 + Math.floor(Math.random() * 8)
+          const pts: THREE.Vector3[] = []
+          for (let i = 0; i <= segs; i++) {
+            const f   = i / segs
+            const ang = a1 + (a2 - a1) * f
+            const rr  = RING_R + (Math.random() - 0.5) * 0.04
+            pts.push(new THREE.Vector3(
+              Math.cos(ang) * rr + (Math.random() - 0.5) * 0.05,
+              Math.sin(ang) * rr + (Math.random() - 0.5) * 0.05,
+              (Math.random() - 0.5) * 0.02,
+            ))
           }
-          pts.push({x:x2, y:y2})
-          const hue = 200 + Math.random() * 40
-          bolts.push({ pts, life: 1.0, decay: 4.5 + Math.random() * 5, hue })
-          // Branche depuis un point médian aléatoire
-          if (Math.random() > 0.38) {
-            const bi  = 2 + Math.floor(Math.random() * (segs - 3))
-            const bp  = pts[bi]
-            const bPts: {x:number,y:number}[] = [{ x: bp.x, y: bp.y }]
-            const bLen = 3 + Math.floor(Math.random() * 3)
-            const bDx  = (Math.random() - 0.5) * 58
-            const bDy  = (Math.random() - 0.5) * 58
-            for (let i = 1; i <= bLen; i++) {
-              bPts.push({
-                x: bp.x + bDx * (i / bLen) + (Math.random() - 0.5) * 18,
-                y: bp.y + bDy * (i / bLen) + (Math.random() - 0.5) * 18,
-              })
-            }
-            bolts.push({ pts: bPts, life: 0.8, decay: 7 + Math.random() * 7, hue, isBranch: true })
-          }
-        }
-
-        // ── Spawn ember — particule qui s'échappe de l'anneau ──────────
-        function spawnEmber() {
-          const angle   = Math.random() * Math.PI * 2
-          const outward = Math.random() > 0.25
-          const speed   = 48 + Math.random() * 92
-          embers.push({
-            x:     cx + Math.cos(angle) * currentR,
-            y:     cy + Math.sin(angle) * currentR,
-            vx:    Math.cos(angle) * (outward ? 1 : -0.45) * speed
-                 + Math.cos(angle + Math.PI / 2) * (Math.random() - 0.5) * 30,
-            vy:    Math.sin(angle) * (outward ? 1 : -0.45) * speed
-                 + Math.sin(angle + Math.PI / 2) * (Math.random() - 0.5) * 30,
-            sz:    0.38 + Math.random() * 1.1,
-            hue:   192 + Math.random() * 55,
-            life:  1.0,
-            decay: 1.0 + Math.random() * 1.4,
+          const geo = new THREE.BufferGeometry().setFromPoints(pts)
+          const mat = new THREE.LineBasicMaterial({
+            color: new THREE.Color(0.5, 0.85, 1.0),
+            transparent: true,
+            opacity: 0.7 + Math.random() * 0.3,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
           })
+          return { line: new THREE.Line(geo, mat), life: 1.0, decay: 4 + Math.random() * 5 }
         }
 
-        // ── Spawn inflow — particule aspirée vers le portail ──────────
-        function spawnInflow() {
-          const side = Math.floor(Math.random() * 4)
-          let x: number, y: number
-          if      (side === 0) { x = Math.random() * canvas.width; y = -15 }
-          else if (side === 1) { x = canvas.width + 15;  y = Math.random() * canvas.height }
-          else if (side === 2) { x = Math.random() * canvas.width; y = canvas.height + 15 }
-          else                 { x = -15; y = Math.random() * canvas.height }
-          const dx = cx - x, dy = cy - y
-          const dist = Math.sqrt(dx * dx + dy * dy)
-          const spd  = 55 + Math.random() * 85
-          inflows.push({
-            x, y,
-            vx: (dx / dist) * spd,
-            vy: (dy / dist) * spd,
-            hue: 195 + Math.random() * 50,
-            sz:  0.35 + Math.random() * 0.90,
-            life: 1.0,
-          })
-        }
+        // ── Animation state ───────────────────────────────────────────
+        let phase        = 'forming'
+        let t3           = 0
+        let ringScale    = 0.01
+        let openProgress = 0
+        let ringFadeVal  = 1.0
+        let arcs: Arc[]  = []
+        let nextArc      = 0.5
+        let lastTime     = performance.now()
+        let rafId: any   = 0
 
-        // ── Update ──────────────────────────────────────────────────────
-        function update(dt: number) {
-          t        += dt
-          currentR  = phase === 'forming' ? Math.min(currentR + dt * R / 1.0, R) : R
+        // ── Animate loop ──────────────────────────────────────────────
+        function animate(now: number) {
+          rafId = requestAnimationFrame(animate)
+          const dt = Math.min((now - lastTime) / 1000, 0.05)
+          lastTime = now
+          t3 += dt
+
+          if (phase === 'forming') ringScale = Math.min(ringScale + dt * 1.1, 1.0)
 
           if (phase === 'opening') {
             openProgress = Math.min(openProgress + dt * 0.85, 1)
-            flashAlpha   = Math.max(flashAlpha - dt * 2.8, 0)
-            ringFade   = Math.max(0, 1 - openProgress * 3)
-            trailAlpha = 0.32 * Math.max(0, 1 - openProgress * 1.1)
+            ringFadeVal  = Math.max(0, 1 - openProgress * 3)
+            const ease   = 1 - Math.pow(1 - openProgress, 2.5)
+            camera.position.z  = 4.0 - ease * 3.92
+            bloomPass.strength = 1.5 + openProgress * 4.5
             if (openProgress >= 1) phase = 'done'
           }
 
-          if (phase !== 'done') {
-            const rate = phase === 'full' ? 80 : phase === 'opening' ? 22 : 12
-            for (let i = 0; i < rate * dt; i++) spawnSpark()
-          }
+          // Update shader uniforms
+          discMat.uniforms.uTime.value  = t3
+          torusMat.uniforms.uTime.value = t3
+          torusMat.uniforms.uFade.value = ringFadeVal
+          partMat.uniforms.uTime.value  = t3
 
-          // Lightning: only when ring is mature
-          if ((phase === 'full' || (phase === 'opening' && openProgress < 0.28)) && currentR > R * 0.6) {
-            nextBolt -= dt
-            if (nextBolt <= 0) {
-              spawnBolt()
-              if (Math.random() > 0.55) spawnBolt()
-              nextBolt = 0.06 + Math.random() * 0.22
+          // Scale all portal objects together during forming
+          disc.scale.setScalar(ringScale)
+          torus.scale.setScalar(ringScale)
+          outerA.scale.setScalar(ringScale)
+          outerB.scale.setScalar(ringScale)
+          outerC.scale.setScalar(ringScale)
+          particles.visible = ringScale > 0.15
+
+          // Slowly counter-rotate outer rings
+          outerA.rotation.z =  t3 * 0.22
+          outerB.rotation.z = -t3 * 0.14
+          outerC.rotation.z =  t3 * 0.35
+
+          // Fade outer rings on opening
+          ;(outerA.material as THREE.MeshBasicMaterial).opacity = 0.55 * ringFadeVal
+          ;(outerB.material as THREE.MeshBasicMaterial).opacity = 0.30 * ringFadeVal
+          ;(outerC.material as THREE.MeshBasicMaterial).opacity = 0.42 * ringFadeVal
+
+          // Lightning arcs during full / early opening
+          if ((phase === 'full' || (phase === 'opening' && openProgress < 0.30)) && ringScale > 0.6) {
+            nextArc -= dt
+            if (nextArc <= 0) {
+              const a = buildArc()
+              arcGroup.add(a.line)
+              arcs.push(a)
+              if (Math.random() > 0.5) {
+                const a2 = buildArc()
+                arcGroup.add(a2.line)
+                arcs.push(a2)
+              }
+              nextArc = 0.06 + Math.random() * 0.22
+            }
+          }
+          for (let i = arcs.length - 1; i >= 0; i--) {
+            arcs[i].life -= arcs[i].decay * dt
+            ;(arcs[i].line.material as THREE.LineBasicMaterial).opacity = Math.max(0, arcs[i].life * 0.8)
+            if (arcs[i].life <= 0) {
+              arcGroup.remove(arcs[i].line)
+              arcs[i].line.geometry.dispose()
+              ;(arcs[i].line.material as THREE.LineBasicMaterial).dispose()
+              arcs.splice(i, 1)
             }
           }
 
-          for (let i = sparks.length - 1; i >= 0; i--) {
-            const p = sparks[i]
-            p.angle += p.orbitSpd
-            p.r      = currentR + Math.sin(p.angle * 6 + t * 1.8) * currentR * 0.028
-            p.life  -= p.decay * dt
-            if (p.life <= 0) sparks.splice(i, 1)
-          }
-
-          for (let i = bolts.length - 1; i >= 0; i--) {
-            bolts[i].life -= bolts[i].decay * dt
-            if (bolts[i].life <= 0) bolts.splice(i, 1)
-          }
-
-          // Embers & ripples — phase full uniquement
-          if (phase === 'full' && currentR > R * 0.5) {
-            if (Math.random() < 14 * dt) spawnEmber()
-            nextRipple -= dt
-            if (nextRipple <= 0) {
-              ripples.push({ r: currentR, life: 1.0 })
-              nextRipple = 0.40 + Math.random() * 0.55
-            }
-          }
-
-          for (let i = embers.length - 1; i >= 0; i--) {
-            const e  = embers[i]
-            const dr = Math.pow(0.88, dt * 60)
-            e.x += e.vx * dt; e.vx *= dr
-            e.y += e.vy * dt; e.vy *= dr
-            e.life -= e.decay * dt
-            if (e.life <= 0) embers.splice(i, 1)
-          }
-
-          for (let i = ripples.length - 1; i >= 0; i--) {
-            ripples[i].r    += 55 * dt
-            ripples[i].life -= 0.85 * dt
-            if (ripples[i].life <= 0) ripples.splice(i, 1)
-          }
-
-          // Inflow particles — aspirées vers le centre
-          if ((phase === 'forming' || phase === 'full') && currentR > R * 0.25) {
-            nextInflow -= dt
-            if (nextInflow <= 0) {
-              spawnInflow()
-              nextInflow = 0.05 + Math.random() * 0.11
-            }
-          }
-          for (let i = inflows.length - 1; i >= 0; i--) {
-            const p  = inflows[i]
-            const dx = cx - p.x, dy = cy - p.y
-            const dist = Math.sqrt(dx * dx + dy * dy)
-            const accel = 180 / Math.max(dist, 32)
-            p.vx += (dx / dist) * accel * dt * 60
-            p.vy += (dy / dist) * accel * dt * 60
-            p.x  += p.vx * dt
-            p.y  += p.vy * dt
-            p.life -= dt * 0.32
-            if (p.life <= 0 || dist < currentR * 0.52) inflows.splice(i, 1)
-          }
-
-          // Stars slow orbit
-          for (const s of stars) s.angle += s.dA * dt * 60
+          composer.render()
         }
 
-        // ── Draw ────────────────────────────────────────────────────────
-        function draw() {
-          ctx.fillStyle = `rgba(0,4,18,${trailAlpha})`
-          ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-          const rVis = currentR > 8
-
-          // Flash — white burst on opening
-          if (flashAlpha > 0) {
-            const fg = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 2.0)
-            fg.addColorStop(0,    `rgba(255,255,255,${flashAlpha * 0.88})`)
-            fg.addColorStop(0.25, `rgba(120,200,255,${flashAlpha * 0.55})`)
-            fg.addColorStop(0.65, `rgba(20,80,255,${flashAlpha * 0.22})`)
-            fg.addColorStop(1,    'rgba(0,20,100,0)')
-            ctx.beginPath(); ctx.arc(cx, cy, R * 2.0, 0, Math.PI * 2)
-            ctx.fillStyle = fg; ctx.fill()
-          }
-
-          // Macro aura — large ambient halo far beyond ring
-          if (rVis) {
-            const auraR = currentR * 2.6
-            const auraA = (0.18 + flashAlpha * 0.12) * ringFade * Math.min(t * 0.55, 1)
-            if (auraA > 0.005) {
-              const ag = ctx.createRadialGradient(cx, cy, currentR * 0.85, cx, cy, auraR)
-              ag.addColorStop(0,   `rgba(0,80,255,${auraA * 0.55})`)
-              ag.addColorStop(0.4, `rgba(0,50,200,${auraA * 0.28})`)
-              ag.addColorStop(1,   'rgba(0,10,60,0)')
-              ctx.beginPath(); ctx.arc(cx, cy, auraR, 0, Math.PI * 2)
-              ctx.fillStyle = ag; ctx.fill()
-            }
-          }
-
-          // Outer glow halo
-          if (rVis) {
-            const gw = 82 + flashAlpha * 30
-            const ga = (0.44 + flashAlpha * 0.56) * ringFade
-            const rg = ctx.createRadialGradient(cx, cy, Math.max(0, currentR - gw * 0.55), cx, cy, currentR + gw)
-            rg.addColorStop(0,    'rgba(0,40,180,0)')
-            rg.addColorStop(0.26, `rgba(0,100,255,${ga * 0.68})`)
-            rg.addColorStop(0.50, `rgba(80,180,255,${ga})`)
-            rg.addColorStop(0.76, `rgba(140,210,255,${ga * 0.52})`)
-            rg.addColorStop(1,    'rgba(0,40,180,0)')
-            ctx.beginPath()
-            ctx.arc(cx, cy, currentR + gw, 0, Math.PI * 2)
-            ctx.fillStyle = rg
-            ctx.fill()
-          }
-
-          // Inflow particles — disparaissent dans le portail grâce à destination-out
-          if (rVis && inflows.length > 0) {
-            ctx.save()
-            ctx.globalCompositeOperation = 'screen'
-            ctx.shadowBlur = 6
-            for (const p of inflows) {
-              const a = p.life * 0.50
-              if (a < 0.02) continue
-              ctx.shadowColor = `hsla(${p.hue},90%,72%,${a * 0.8})`
-              ctx.beginPath(); ctx.arc(p.x, p.y, p.sz * 0.55, 0, Math.PI * 2)
-              ctx.fillStyle = `hsla(${p.hue},90%,82%,${a})`
-              ctx.fill()
-            }
-            ctx.restore()
-          }
-
-          // ── Portal window (destination-out) ───────────────────────────
-          let windowR: number
-          if (phase === 'forming')   windowR = currentR * 0.84
-          else                       windowR = R * 0.84
-          if (windowR > 2) {
-            ctx.save()
-            ctx.globalCompositeOperation = 'destination-out'
-            const hg = ctx.createRadialGradient(cx, cy, 0, cx, cy, windowR)
-            hg.addColorStop(0.80, 'rgba(0,0,0,1)')
-            hg.addColorStop(0.95, 'rgba(0,0,0,0.88)')
-            hg.addColorStop(1,    'rgba(0,0,0,0)')
-            ctx.beginPath()
-            ctx.arc(cx, cy, windowR, 0, Math.PI * 2)
-            ctx.fillStyle = hg
-            ctx.fill()
-            ctx.restore()
-          }
-
-          // ── Ripples — ondes concentriques pulsant depuis l'anneau ────────
-          for (const rp of ripples) {
-            const a = rp.life * 0.30 * ringFade
-            if (a < 0.01) continue
-            ctx.beginPath()
-            ctx.arc(cx, cy, rp.r, 0, Math.PI * 2)
-            ctx.strokeStyle = `rgba(80,170,255,${a})`
-            ctx.lineWidth   = rp.life * 1.8
-            ctx.stroke()
-          }
-
-          // ── Dimensional vortex — inside the portal ───────────────────────
-          if (windowR > 8) {
-            const vA = phase === 'forming'
-              ? Math.pow(Math.min(currentR / R, 1), 1.4)
-              : phase === 'full'
-                ? 1.0
-                : Math.max(0, 1 - openProgress * 6)
-            if (vA > 0.005) {
-              const clipR = Math.min(windowR * 0.89, R * 0.89)
-              ctx.save()
-              ctx.globalAlpha = vA
-              ctx.beginPath(); ctx.arc(cx, cy, clipR, 0, Math.PI * 2); ctx.clip()
-
-              // Base: deep space
-              const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, clipR)
-              bg.addColorStop(0,   'rgba(0,8,40,1)')
-              bg.addColorStop(0.55,'rgba(0,4,18,1)')
-              bg.addColorStop(1,   'rgba(0,0,0,0.92)')
-              ctx.fillStyle = bg; ctx.fillRect(cx - clipR, cy - clipR, clipR * 2, clipR * 2)
-
-              // Galactic vortex — 2 spiral arms rotating at different speeds
-              const vA       = Math.min(t * 0.65, 1)
-              const outerRot = t * 0.18
-              const innerRot = t * 0.28
-              ctx.shadowBlur = 0
-              // Outer arms — wide, deep blue
-              for (let arm = 0; arm < 2; arm++) {
-                const armOffset = arm * Math.PI
-                for (let s = 0; s < 11; s++) {
-                  const frac   = s / 10
-                  const radius = clipR * (0.18 + frac * 0.72)
-                  const ang    = outerRot + armOffset + frac * Math.PI * 2.6
-                  const span   = 0.92 - frac * 0.50
-                  const alpha  = (0.20 - frac * 0.12) * vA
-                  const lw     = Math.max(clipR * (0.15 - frac * 0.10), 2.5)
-                  ctx.beginPath(); ctx.arc(cx, cy, radius, ang, ang + span)
-                  ctx.strokeStyle = `rgba(30,110,255,${alpha})`
-                  ctx.lineWidth   = lw
-                  ctx.stroke()
-                }
-              }
-              // Inner arms — tighter, brighter cyan
-              for (let arm = 0; arm < 2; arm++) {
-                const armOffset = arm * Math.PI + 0.8
-                for (let s = 0; s < 6; s++) {
-                  const frac   = s / 5
-                  const radius = clipR * (0.07 + frac * 0.34)
-                  const ang    = -innerRot + armOffset + frac * Math.PI * 3.2
-                  const span   = 0.70 - frac * 0.30
-                  const alpha  = (0.28 - frac * 0.16) * vA
-                  const lw     = Math.max(clipR * (0.09 - frac * 0.055), 1.5)
-                  ctx.beginPath(); ctx.arc(cx, cy, radius, ang, ang + span)
-                  ctx.strokeStyle = `rgba(100,200,255,${alpha})`
-                  ctx.lineWidth   = lw
-                  ctx.stroke()
-                }
-              }
-
-              // Central singularity + accretion disk
-              const singPulse = 1 + Math.sin(t * 4.8) * 0.12
-              const singR     = clipR * (0.14 + Math.sin(t * 5.2) * 0.018) * singPulse
-              const singG     = ctx.createRadialGradient(cx, cy, 0, cx, cy, singR)
-              singG.addColorStop(0,    `rgba(255,255,255,${0.95 + flashAlpha * 0.05})`)
-              singG.addColorStop(0.15, `rgba(200,240,255,0.80)`)
-              singG.addColorStop(0.45, `rgba(40,140,255,0.32)`)
-              singG.addColorStop(0.85, `rgba(0,40,120,0.08)`)
-              singG.addColorStop(1,    'rgba(0,0,0,0)')
-              ctx.beginPath(); ctx.arc(cx, cy, singR, 0, Math.PI * 2)
-              ctx.fillStyle = singG; ctx.fill()
-              // Accretion disk — tilted glowing ring around singularity
-              ctx.save()
-              ctx.globalCompositeOperation = 'screen'
-              ctx.shadowColor = 'rgba(120,220,255,0.75)'
-              ctx.shadowBlur  = 14
-              ctx.beginPath()
-              ctx.ellipse(cx, cy, singR * 2.6, singR * 0.45, t * 0.28, 0, Math.PI * 2)
-              ctx.strokeStyle = `rgba(200,240,255,${0.55 * vA})`
-              ctx.lineWidth   = 1.8
-              ctx.stroke()
-              ctx.restore()
-
-              // Stars — points de lumière dans l'espace dimensionnel
-              ctx.shadowBlur = 0
-              for (const s of stars) {
-                const sr  = clipR * s.frac
-                const sx  = cx + Math.cos(s.angle) * sr
-                const sy  = cy + Math.sin(s.angle) * sr
-                const twi = 0.5 + Math.sin(t * s.twSpeed + s.twinkle) * 0.5
-                const a   = twi * 0.65
-                if (a < 0.05) continue
-                ctx.beginPath(); ctx.arc(sx, sy, s.sz, 0, Math.PI * 2)
-                ctx.fillStyle = `rgba(190,225,255,${a})`
-                ctx.fill()
-              }
-
-              ctx.restore()
-            }
-          }
-
-          // ── Chromatic aberration — red/blue ring split at portal edge ─────
-          if (rVis && ringFade > 0.05 && phase !== 'forming') {
-            const ca = (0.28 + flashAlpha * 0.40) * ringFade
-            ctx.save()
-            ctx.globalCompositeOperation = 'screen'
-            ctx.beginPath(); ctx.arc(cx, cy, currentR - 2.5, 0, Math.PI * 2)
-            ctx.strokeStyle = `rgba(255,30,80,${ca * 0.72})`; ctx.lineWidth = 1.4; ctx.stroke()
-            ctx.beginPath(); ctx.arc(cx, cy, currentR + 2.5, 0, Math.PI * 2)
-            ctx.strokeStyle = `rgba(60,140,255,${ca * 0.72})`; ctx.lineWidth = 1.4; ctx.stroke()
-            ctx.restore()
-          }
-
-          // ── Below: drawn over site content ────────────────────────────
-
-          // Orbital nodes — glowing points on concentric orbits with short trails
-          if (rVis) {
-            const baseA = Math.min(t * 1.1, 1) * ringFade
-            if (baseA > 0.01) {
-              ctx.save()
-              // Faint guide circles
-              ctx.strokeStyle = `rgba(60,140,255,${baseA * 0.10})`
-              ctx.lineWidth = 0.5
-              for (const nr of nodeRings) {
-                ctx.beginPath(); ctx.arc(cx, cy, currentR * nr.ratio, 0, Math.PI * 2); ctx.stroke()
-              }
-              // Glowing orbital nodes + trails
-              ctx.globalCompositeOperation = 'screen'
-              for (const nr of nodeRings) {
-                const r   = currentR * nr.ratio
-                const rot = t * nr.spd
-                for (let i = 0; i < nr.count; i++) {
-                  const ang   = (i / nr.count) * Math.PI * 2 + rot
-                  const pulse = 0.55 + Math.sin(t * 2.2 + i * 1.57) * 0.45
-                  const a     = baseA * pulse
-                  const nx    = cx + Math.cos(ang) * r
-                  const ny    = cy + Math.sin(ang) * r
-                  // Short trailing arc
-                  ctx.beginPath()
-                  if (nr.spd > 0) ctx.arc(cx, cy, r, ang - 0.20, ang, false)
-                  else            ctx.arc(cx, cy, r, ang, ang + 0.20, true)
-                  ctx.strokeStyle = `rgba(${nr.rgb},${a * 0.32})`
-                  ctx.lineWidth   = nr.sz * 0.65
-                  ctx.stroke()
-                  // Node radial glow
-                  const ng = ctx.createRadialGradient(nx, ny, 0, nx, ny, nr.sz * 2.8)
-                  ng.addColorStop(0,    `rgba(230,248,255,${a})`)
-                  ng.addColorStop(0.35, `rgba(${nr.rgb},${a * 0.45})`)
-                  ng.addColorStop(1,    'rgba(0,0,0,0)')
-                  ctx.beginPath(); ctx.arc(nx, ny, nr.sz * 2.8, 0, Math.PI * 2)
-                  ctx.fillStyle = ng; ctx.fill()
-                }
-              }
-              ctx.restore()
-            }
-          }
-
-          // Energy band — 2-pass electric ring
-          if (rVis) {
-            const sa = (phase === 'forming' ? currentR / R : 1) * (0.72 + flashAlpha * 0.28) * ringFade
-            if (sa > 0.01) {
-              ctx.save()
-              ctx.shadowColor = `rgba(0,140,255,${sa * 0.58})`
-              ctx.shadowBlur  = 32
-              ctx.beginPath(); ctx.arc(cx, cy, currentR, 0, Math.PI * 2)
-              ctx.strokeStyle = `rgba(0,80,220,${sa * 0.32})`
-              ctx.lineWidth   = 11
-              ctx.stroke()
-              ctx.shadowBlur  = 10
-              ctx.shadowColor = `rgba(180,230,255,${sa})`
-              ctx.beginPath(); ctx.arc(cx, cy, currentR - 1.2, 0, Math.PI * 2)
-              ctx.strokeStyle = `rgba(220,245,255,${sa * 0.88})`
-              ctx.lineWidth   = 1.4
-              ctx.stroke()
-              ctx.restore()
-            }
-          }
-
-          // Corona spikes — radial electric flashes from ring edge
-          if (rVis && ringFade > 0.02) {
-            const sa = (phase === 'forming' ? currentR / R : 1) * ringFade
-            ctx.save()
-            ctx.globalCompositeOperation = 'screen'
-            const spikeN = 32
-            for (let i = 0; i < spikeN; i++) {
-              const ang   = (i / spikeN) * Math.PI * 2 + t * 0.05
-              const pulse = Math.abs(Math.sin(t * 2.4 + i * 0.72))
-              const len   = currentR * (0.025 + pulse * 0.070) * sa
-              if (len < 1) continue
-              const x0 = cx + Math.cos(ang) * (currentR - 1)
-              const y0 = cy + Math.sin(ang) * (currentR - 1)
-              const x1 = cx + Math.cos(ang) * (currentR + len)
-              const y1 = cy + Math.sin(ang) * (currentR + len)
-              ctx.shadowColor = `rgba(100,210,255,${pulse * 0.50 * sa})`
-              ctx.shadowBlur  = 6
-              ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1)
-              ctx.strokeStyle = `rgba(200,242,255,${pulse * 0.58 * sa})`
-              ctx.lineWidth   = 0.5 + pulse * 0.8
-              ctx.stroke()
-            }
-            ctx.restore()
-          }
-
-          // Lightning bolts + branches
-          for (const b of bolts) {
-            const sc = b.isBranch ? 0.52 : 1.0
-            ctx.save()
-            ctx.shadowColor = `hsla(${b.hue},100%,72%,${b.life * sc})`
-            ctx.shadowBlur  = b.isBranch ? 8 : 18
-            ctx.strokeStyle = `hsla(${b.hue},100%,82%,${b.life * 0.90 * sc})`
-            ctx.lineWidth   = (b.isBranch ? 0.55 : 1.1) + b.life * (b.isBranch ? 0.38 : 0.88)
-            ctx.beginPath(); ctx.moveTo(b.pts[0].x, b.pts[0].y)
-            for (let i = 1; i < b.pts.length; i++) ctx.lineTo(b.pts[i].x, b.pts[i].y)
-            ctx.stroke()
-            ctx.shadowBlur  = b.isBranch ? 3 : 6
-            ctx.strokeStyle = `rgba(230,245,255,${b.life * (b.isBranch ? 0.38 : 0.60)})`
-            ctx.lineWidth   = b.isBranch ? 0.35 : 0.55
-            ctx.beginPath(); ctx.moveTo(b.pts[0].x, b.pts[0].y)
-            for (let i = 1; i < b.pts.length; i++) ctx.lineTo(b.pts[i].x, b.pts[i].y)
-            ctx.stroke()
-            ctx.restore()
-          }
-
-          // Sparks — lighter blend for electric additive glow
-          ctx.save()
-          ctx.globalCompositeOperation = 'lighter'
-          for (const p of sparks) {
-            const alpha = p.life * ringFade
-            if (alpha < 0.02) continue
-            const trailLen = 0.22 + p.sz * 0.068
-            ctx.beginPath()
-            if (p.orbitSpd > 0) {
-              ctx.arc(cx, cy, p.r, p.angle - trailLen, p.angle, false)
-            } else {
-              ctx.arc(cx, cy, p.r, p.angle, p.angle + trailLen, true)
-            }
-            ctx.strokeStyle = `hsla(${p.hue},100%,60%,${alpha * 0.28})`
-            ctx.lineWidth   = p.sz * 0.55
-            ctx.stroke()
-            const x = cx + Math.cos(p.angle) * p.r
-            const y = cy + Math.sin(p.angle) * p.r
-            ctx.shadowColor = `hsla(${p.hue},100%,80%,${alpha * 0.85})`
-            ctx.shadowBlur  = 8
-            ctx.beginPath()
-            ctx.fillStyle = `hsla(${p.hue},100%,90%,${alpha * 0.80})`
-            ctx.arc(x, y, p.sz * 0.58, 0, Math.PI * 2)
-            ctx.fill()
-          }
-          ctx.shadowBlur = 0
-          ctx.restore()
-
-          // Hotspots — 3 bright nodes orbiting the ring
-          if (rVis && ringFade > 0.04) {
-            ctx.save()
-            ctx.globalCompositeOperation = 'lighter'
-            for (let i = 0; i < 3; i++) {
-              const ha     = t * 0.28 + (i / 3) * Math.PI * 2
-              const hpulse = 0.24 + Math.sin(t * 1.9 + i * 2.4) * 0.11
-              ctx.shadowColor = `rgba(180,230,255,${ringFade * hpulse})`
-              ctx.shadowBlur  = 24
-              ctx.beginPath()
-              ctx.fillStyle = `rgba(240,252,255,${ringFade * hpulse * 0.88})`
-              ctx.arc(cx + Math.cos(ha) * currentR, cy + Math.sin(ha) * currentR, 3.5, 0, Math.PI * 2)
-              ctx.fill()
-            }
-            ctx.restore()
-          }
-
-          // Embers — particules qui s'échappent de l'anneau
-          ctx.shadowColor = 'rgba(100,190,255,0.75)'
-          ctx.shadowBlur  = 8
-          for (const e of embers) {
-            const a = e.life * ringFade
-            if (a < 0.02) continue
-            ctx.beginPath()
-            ctx.fillStyle = `hsla(${e.hue},100%,82%,${a * 0.88})`
-            ctx.arc(e.x, e.y, e.sz * 0.52, 0, Math.PI * 2)
-            ctx.fill()
-          }
-          ctx.shadowBlur = 0; ctx.shadowColor = 'transparent'
-
-          // Energy core — rotating rays + halo + white dot
-          const coreR     = phase === 'forming' ? Math.max(currentR * 0.09, 5) : R * 0.24
-          const pulse     = 1 + Math.sin(t * 6.5) * 0.10 + flashAlpha * 0.28
-          const coreAlpha = Math.max(0, 1 - openProgress * 2)
-          if (coreAlpha > 0.01) {
-            ctx.save()
-            ctx.shadowColor = `rgba(0,160,255,${coreAlpha * 0.52})`
-            ctx.shadowBlur  = 20
-            const beamRot = t * 0.35
-            for (let i = 0; i < 8; i++) {
-              const ba   = (i / 8) * Math.PI * 2 + beamRot
-              const bLen = coreR * pulse * (2.0 + Math.sin(t * 2.8 + i) * 0.32)
-              ctx.beginPath()
-              ctx.moveTo(cx, cy)
-              ctx.lineTo(cx + Math.cos(ba) * bLen, cy + Math.sin(ba) * bLen)
-              ctx.strokeStyle = `rgba(0,140,255,${coreAlpha * 0.15})`
-              ctx.lineWidth   = 1.7
-              ctx.stroke()
-            }
-            ctx.restore()
-            const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR * pulse * 1.55)
-            cg.addColorStop(0,    `rgba(255,255,255,${(0.82 + flashAlpha * 0.18) * coreAlpha})`)
-            cg.addColorStop(0.14, `rgba(120,210,255,${(0.78 + flashAlpha * 0.14) * coreAlpha})`)
-            cg.addColorStop(0.38, `rgba(0,120,255,${(0.50 + flashAlpha * 0.16) * coreAlpha})`)
-            cg.addColorStop(0.72, `rgba(0,40,170,${0.15 * coreAlpha})`)
-            cg.addColorStop(1,    'rgba(0,0,0,0)')
-            ctx.beginPath(); ctx.arc(cx, cy, coreR * pulse * 1.55, 0, Math.PI * 2)
-            ctx.fillStyle = cg; ctx.fill()
-            ctx.save()
-            ctx.shadowColor = `rgba(255,255,255,${coreAlpha * 0.92})`
-            ctx.shadowBlur  = 24
-            ctx.beginPath()
-            ctx.fillStyle = `rgba(255,255,255,${coreAlpha * 0.94})`
-            ctx.arc(cx, cy, Math.max(1.5, coreR * 0.11 * pulse), 0, Math.PI * 2)
-            ctx.fill()
-            ctx.restore()
-          }
-
-          // Self-bloom — canvas se re-dessine sur lui-même flou en mode screen
-          if (rVis && phase !== 'done') {
-            ctx.save()
-            ctx.globalCompositeOperation = 'screen'
-            ctx.globalAlpha = 0.38
-            ctx.filter = 'blur(14px)'
-            ctx.drawImage(canvas, 0, 0)
-            ctx.filter = 'none'
-            ctx.restore()
-          }
-
-          // Opening bloom — white radial explosion fills the entire screen
-          if (phase === 'opening') {
-            const fillA = Math.min(openProgress * 2.2, 1.0)
-            // Full-canvas white wash (covers dark edges)
-            ctx.fillStyle = `rgba(255,255,255,${fillA})`
-            ctx.fillRect(0, 0, canvas.width, canvas.height)
-            // Extra radial brightness at center while ramping up
-            if (fillA < 1) {
-              const ease   = 1 - Math.pow(1 - openProgress, 2.5)
-              const bloomR = R * 0.5 + ease * maxDim * 1.6
-              const cg     = ctx.createRadialGradient(cx, cy, 0, cx, cy, bloomR)
-              cg.addColorStop(0,    `rgba(255,255,255,${fillA})`)
-              cg.addColorStop(0.40, `rgba(180,228,255,${fillA * 0.55})`)
-              cg.addColorStop(1,    'rgba(0,0,0,0)')
-              ctx.fillStyle = cg
-              ctx.fillRect(0, 0, canvas.width, canvas.height)
-            }
-          }
-        }
-
-        // Pre-fill before first rAF to avoid flash
-        ctx.fillStyle = '#00040e'
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-        let lastTime = 0
-        let rafId: any = 0
-
-        const tick = (time: number) => {
-          const dt = Math.min((time - lastTime) / 1000, 0.05)
-          lastTime = time
-          update(dt)
-          draw()
-          if (phase !== 'done') rafId = requestAnimationFrame(tick)
-        }
-
-        rafId = requestAnimationFrame((ts: number) => {
-          lastTime = ts
-          rafId = requestAnimationFrame(tick)
+        window.addEventListener('resize', () => {
+          canvas.width  = window.innerWidth
+          canvas.height = window.innerHeight
+          camera.aspect = canvas.width / canvas.height
+          camera.updateProjectionMatrix()
+          renderer.setSize(canvas.width, canvas.height)
+          composer.setSize(canvas.width, canvas.height)
         })
 
-        const tl = gsap.timeline()
-        tl.set(wrapper, { opacity: '' })
+        rafId = requestAnimationFrame(animate)
 
-        tl.call(() => { phase = 'full' }, null, 1.0)
+        // Reveal site wrapper immediately — portal canvas covers it at z-index 50
+        wrapper.style.opacity = ''
 
-        tl.call(() => {
-          phase      = 'opening'
-          flashAlpha = 1
-          trailAlpha = 0.22
-          mount.style.opacity = '1'
-        }, null, 2.2)
-
-        tl.call(() => {
-          document.dispatchEvent(new CustomEvent('intro'))
-        }, null, 2.7)
-
-        tl.call(() => {
+        const endIntro = () => {
+          if (!introEl.parentNode) return
           cancelAnimationFrame(rafId)
-          gsap.to(intro, { opacity: 0, duration: 0.38, ease: 'power1.in', onComplete: () => {
-            intro.remove()
+          gsap.to(introEl, { opacity: 0, duration: 0.45, ease: 'power2.in', onComplete: () => {
+            introEl.remove()
+            try { renderer.dispose() } catch (_) {}
             document.documentElement.classList.remove('is-scroll-blocked')
             Ticker.nextTick(() => { Emitter.emit('updateViewport') })
           }})
-        }, null, 2.9)
+        }
+
+        setTimeout(() => { phase = 'full' },                                         1000)
+        setTimeout(() => { phase = 'opening'; mount.style.opacity = '1' },           2200)
+        setTimeout(() => { document.dispatchEvent(new CustomEvent('intro')) },        2700)
+        setTimeout(endIntro,                                                          2900)
+        setTimeout(endIntro,                                                          7000) // safety fallback
       }
     }
 
