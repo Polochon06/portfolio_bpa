@@ -129,15 +129,22 @@ import '../styles/global.scss'
       <SiteFoot />
     </div><!-- .site-wrapper -->
 
-    <div
-      class="site-intro js-intro"
-      style="opacity: 1; position: fixed; top: 0; left: 0; z-index: 50; width: 100%; height: 100%;"
-    >
-      <canvas class="js-portal-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
-      <div class="portal-label js-portal-label">
-        <span class="portal-label__name">PAUL BLANC</span>
-        <span class="portal-label__sep"></span>
-        <span class="portal-label__sub">Développeur · Motion Design</span>
+    <div class="site-intro js-intro">
+      <div class="intro-inner">
+        <div class="intro-line js-line"></div>
+        <h1 class="intro-name" aria-label="Paul Blanc">
+          <span class="intro-char js-char"><span class="js-char-inner">P</span></span>
+          <span class="intro-char js-char"><span class="js-char-inner">A</span></span>
+          <span class="intro-char js-char"><span class="js-char-inner">U</span></span>
+          <span class="intro-char js-char"><span class="js-char-inner">L</span></span>
+          <span class="intro-char intro-char--space">&thinsp;&thinsp;</span>
+          <span class="intro-char js-char"><span class="js-char-inner">B</span></span>
+          <span class="intro-char js-char"><span class="js-char-inner">L</span></span>
+          <span class="intro-char js-char"><span class="js-char-inner">A</span></span>
+          <span class="intro-char js-char"><span class="js-char-inner">N</span></span>
+          <span class="intro-char js-char"><span class="js-char-inner">C</span></span>
+        </h1>
+        <p class="intro-sub js-sub">Développeur &middot; Motion Design</p>
       </div>
     </div><!-- .site-intro -->
 
@@ -158,11 +165,6 @@ import '../styles/global.scss'
     import { ScrollTrigger } from 'gsap/ScrollTrigger'
     gsap.registerPlugin(ScrollTrigger)
 
-    import * as THREE from 'three'
-    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
-    import { RenderPass }     from 'three/addons/postprocessing/RenderPass.js'
-    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
-    import { OutputPass }      from 'three/addons/postprocessing/OutputPass.js'
 
     declare global {
       interface Window {
@@ -395,360 +397,76 @@ import '../styles/global.scss'
       }
 
       /**
-       * Intro — Three.js 3D portal (WebGL + GLSL shaders)
+       * Intro — cinematic motion design reveal (pure CSS + GSAP)
        */
       intro() {
-        const wrapper  = document.querySelector('.js-site-wrapper') as HTMLElement
-        const introEl  = document.querySelector('.js-intro')        as HTMLElement
-        const mount    = document.querySelector('.js-mount')        as HTMLElement
-        const canvas   = introEl.querySelector('.js-portal-canvas') as HTMLCanvasElement
+        const wrapper = document.querySelector('.js-site-wrapper') as HTMLElement
+        const introEl = document.querySelector('.js-intro')        as HTMLElement
+        const mount   = document.querySelector('.js-mount')        as HTMLElement
 
-        canvas.width  = window.innerWidth
-        canvas.height = window.innerHeight
-
-        // ── Three.js renderer ─────────────────────────────────────────
-        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false })
-        renderer.setSize(canvas.width, canvas.height)
-        renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
-        renderer.toneMapping = THREE.ACESFilmicToneMapping
-        renderer.toneMappingExposure = 0.9
-
-        const scene  = new THREE.Scene()
-        scene.background = new THREE.Color(0x000000)
-        const camera = new THREE.PerspectiveCamera(60, canvas.width / canvas.height, 0.01, 100)
-        camera.position.z = 3.5
-
-        const composer  = new EffectComposer(renderer)
-        composer.addPass(new RenderPass(scene, camera))
-        const bloomPass = new UnrealBloomPass(
-          new THREE.Vector2(canvas.width, canvas.height), 0.35, 0.5, 0.72
-        )
-        composer.addPass(bloomPass)
-        composer.addPass(new OutputPass())
-
-        // ── Web Audio (procedural, fails silently if blocked) ──────────
-        ;(function initAudio() {
-          try {
-            const AC  = (window as any).AudioContext || (window as any).webkitAudioContext
-            const ac  = new AC()
-            const now = ac.currentTime
-            const osc  = ac.createOscillator()
-            osc.type   = 'sawtooth'
-            osc.frequency.setValueAtTime(52, now)
-            osc.frequency.linearRampToValueAtTime(78, now + 3)
-            const og   = ac.createGain()
-            og.gain.setValueAtTime(0, now)
-            og.gain.linearRampToValueAtTime(0.06, now + 0.9)
-            og.gain.setValueAtTime(0.06, now + 1.8)
-            og.gain.linearRampToValueAtTime(0, now + 3.0)
-            osc.connect(og); og.connect(ac.destination); osc.start(); osc.stop(now + 3.5)
-            const buf = ac.createBuffer(1, ac.sampleRate * 4, ac.sampleRate)
-            const d   = buf.getChannelData(0)
-            for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1
-            const ns  = ac.createBufferSource(); ns.buffer = buf
-            const bpf = ac.createBiquadFilter(); bpf.type = 'bandpass'
-            bpf.frequency.value = 2400; bpf.Q.value = 1.5
-            const ng  = ac.createGain()
-            ng.gain.setValueAtTime(0, now)
-            ng.gain.linearRampToValueAtTime(0.04, now + 0.8)
-            ng.gain.linearRampToValueAtTime(0.07, now + 1.8)
-            ng.gain.linearRampToValueAtTime(0, now + 3.0)
-            ns.connect(bpf); bpf.connect(ng); ng.connect(ac.destination); ns.start()
-            setTimeout(() => {
-              try {
-                const w  = ac.createOscillator(); w.type = 'sine'
-                w.frequency.setValueAtTime(110, ac.currentTime)
-                w.frequency.exponentialRampToValueAtTime(2200, ac.currentTime + 0.6)
-                const wg = ac.createGain()
-                wg.gain.setValueAtTime(0.2, ac.currentTime)
-                wg.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 1.0)
-                w.connect(wg); wg.connect(ac.destination)
-                w.start(); w.stop(ac.currentTime + 1.2)
-              } catch(e) {}
-            }, 2000)
-          } catch(e) { /* autoplay blocked — silent */ }
-        })()
-
-        // ── GLSL — Wormhole disc (portal interior) ────────────────────
-        const wormholeVert = `
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `
-        const wormholeFrag = `
-          uniform float uTime;
-          varying vec2 vUv;
-
-          float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-          float noise(vec2 p) {
-            vec2 i = floor(p); vec2 f = fract(p);
-            f = f * f * (3.0 - 2.0 * f);
-            return mix(
-              mix(hash(i), hash(i + vec2(1,0)), f.x),
-              mix(hash(i + vec2(0,1)), hash(i + vec2(1,1)), f.x), f.y);
-          }
-
-          void main() {
-            vec2 uv  = vUv * 2.0 - 1.0;
-            float r  = length(uv);
-            if(r > 1.0) discard;
-
-            float theta = atan(uv.y, uv.x);
-
-            // Concentric interference — very slow, very faint
-            float ripple = sin(r * 20.0 - uTime * 0.35) * 0.5 + 0.5;
-            ripple = pow(ripple, 6.0);
-
-            // Slow dark rotation pattern
-            float ang   = theta * 0.4 + r * 2.5 - uTime * 0.06;
-            float grain = noise(vec2(ang * 2.2, r * 5.0 + uTime * 0.04));
-
-            // Centre glow — faint violet
-            float core  = exp(-r * 5.5) * 0.5;
-
-            // Hard vignette toward edge
-            float vign  = 1.0 - smoothstep(0.60, 1.0, r);
-
-            // Tiny singularity — bright enough to trigger bloom at center
-            float sing = exp(-r * 20.0) * 3.2;
-
-            vec3 col = vec3(0.0);
-            col += vec3(0.08, 0.02, 0.22) * ripple;   // dark violet rings
-            col += vec3(0.02, 0.02, 0.07) * grain;     // neutral dark grain
-            col += vec3(0.14, 0.04, 0.32) * core;      // violet center
-            col += vec3(0.55, 0.25, 1.00) * sing;      // singularity bloom seed
-
-            gl_FragColor = vec4(col * vign, 1.0);
-          }
-        `
-
-        // ── GLSL — Energy ring ────────────────────────────────────────
-        const ringVert = `
-          varying vec3 vNormal;
-          varying vec2 vUv;
-          varying vec3 vViewDir;
-          void main() {
-            vNormal  = normalize(normalMatrix * normal);
-            vUv      = uv;
-            vec4 mv  = modelViewMatrix * vec4(position, 1.0);
-            vViewDir = normalize(-mv.xyz);
-            gl_Position = projectionMatrix * mv;
-          }
-        `
-        const ringFrag = `
-          uniform float uTime;
-          uniform float uFade;
-          varying vec3 vNormal;
-          varying vec2 vUv;
-          varying vec3 vViewDir;
-          void main() {
-            float fr = pow(1.0 - clamp(abs(dot(vNormal, vViewDir)), 0.0, 1.0), 2.5);
-
-            // Subtle slow scan
-            float scan  = pow(sin(vUv.x * 55.0 - uTime * 4.0) * 0.5 + 0.5, 5.0) * 0.35;
-            // Rare sharp spark
-            float spark = pow(max(0.0, sin(vUv.x * 110.0 - uTime * 7.5)), 18.0) * 0.7;
-
-            // Platinum palette
-            vec3 body   = vec3(0.48, 0.50, 0.60); // dark steel
-            vec3 bright = vec3(0.90, 0.93, 1.00); // ice white
-
-            vec3 col = body;
-            col = mix(col, bright, fr * 0.95);       // edge → near white
-            col += bright * scan * (1.0 - fr * 0.4); // scan on body
-            col += bright * spark;                    // crisp sparks
-
-            float alpha = (0.50 + fr * 0.50) * uFade;
-            gl_FragColor = vec4(col * uFade, alpha);
-          }
-        `
-
-        // ── GLSL — Orbital particles ──────────────────────────────────
-        const partVert = `
-          attribute float aAngle;
-          attribute float aRadius;
-          attribute float aSpeed;
-          attribute float aSize;
-          attribute float aPhase;
-          uniform float uTime;
-          varying float vAlpha;
-          varying float vRadFrac;
-          void main() {
-            float ang = aAngle + uTime * aSpeed;
-            float px  = cos(ang) * aRadius;
-            float py  = sin(ang) * aRadius;
-            float pz  = sin(uTime * 0.9 + aPhase) * 0.04;
-            vec4  mv  = modelViewMatrix * vec4(px, py, pz, 1.0);
-            gl_Position  = projectionMatrix * mv;
-            gl_PointSize = clamp(aSize * (70.0 / max(-mv.z, 1.5)), 1.0, 5.0);
-            vAlpha   = 0.12 + sin(uTime * 1.2 + aPhase) * 0.10;
-            vRadFrac = clamp((aRadius - 1.0) / 0.3, 0.0, 1.0);
-          }
-        `
-        const partFrag = `
-          varying float vAlpha;
-          varying float vRadFrac;
-          void main() {
-            vec2  c = gl_PointCoord - 0.5;
-            float r = length(c);
-            if(r > 0.5) discard;
-            float fade = 1.0 - r * 2.0;
-            vec3 col = mix(vec3(0.80, 0.83, 0.95), vec3(0.95, 0.96, 1.00), vRadFrac);
-            gl_FragColor = vec4(col, vAlpha * fade);
-          }
-        `
-
-        // ── Scene geometry ────────────────────────────────────────────
-        const RING_R = 1.20
-        const TUBE_R = 0.030
-
-        // Wormhole disc (portal surface)
-        const discMat = new THREE.ShaderMaterial({
-          uniforms: { uTime: { value: 0 } },
-          vertexShader: wormholeVert,
-          fragmentShader: wormholeFrag,
-          side: THREE.FrontSide,
-          depthWrite: false,
-        })
-        const disc = new THREE.Mesh(new THREE.CircleGeometry(RING_R - TUBE_R, 128), discMat)
-        scene.add(disc)
-
-        // Main energy ring (torus)
-        const torusMat = new THREE.ShaderMaterial({
-          uniforms: { uTime: { value: 0 }, uFade: { value: 1.0 } },
-          vertexShader: ringVert,
-          fragmentShader: ringFrag,
-          transparent: true,
-          side: THREE.DoubleSide,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
-        })
-        const torus = new THREE.Mesh(new THREE.TorusGeometry(RING_R, TUBE_R, 32, 256), torusMat)
-        scene.add(torus)
-
-        // Single precision accent ring
-        const accentMat = new THREE.MeshBasicMaterial({
-          color: 0xc8d4f0, transparent: true, opacity: 0.12,
-          blending: THREE.AdditiveBlending, depthWrite: false,
-        })
-        const accentRing = new THREE.Mesh(new THREE.TorusGeometry(RING_R + 0.16, 0.002, 8, 256), accentMat)
-        scene.add(accentRing)
-
-        // Orbital particle system — sparse silver dust
-        const PART_N = 700
-        const pAng = new Float32Array(PART_N), pRad = new Float32Array(PART_N)
-        const pSpd = new Float32Array(PART_N), pSz  = new Float32Array(PART_N)
-        const pPhs = new Float32Array(PART_N)
-        for (let i = 0; i < PART_N; i++) {
-          pAng[i] = Math.random() * Math.PI * 2
-          pRad[i] = RING_R + (Math.random() - 0.5) * 0.22
-          pSpd[i] = (Math.random() > 0.5 ? 1 : -1) * (0.006 + Math.random() * 0.014)
-          pSz[i]  = 0.5 + Math.random() * 1.0
-          pPhs[i] = Math.random() * Math.PI * 2
-        }
-        const partGeo = new THREE.BufferGeometry()
-        partGeo.setAttribute('aAngle',   new THREE.BufferAttribute(pAng, 1))
-        partGeo.setAttribute('aRadius',  new THREE.BufferAttribute(pRad, 1))
-        partGeo.setAttribute('aSpeed',   new THREE.BufferAttribute(pSpd, 1))
-        partGeo.setAttribute('aSize',    new THREE.BufferAttribute(pSz,  1))
-        partGeo.setAttribute('aPhase',   new THREE.BufferAttribute(pPhs, 1))
-        partGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(PART_N * 3), 3))
-        const partMat = new THREE.ShaderMaterial({
-          uniforms: { uTime: { value: 0 } },
-          vertexShader: partVert,
-          fragmentShader: partFrag,
-          transparent: true,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
-        })
-        const particles = new THREE.Points(partGeo, partMat)
-        particles.frustumCulled = false
-        scene.add(particles)
-
-        // ── Animation state ───────────────────────────────────────────
-        let phase        = 'forming'
-        let t3           = 0
-        let ringScale    = 0.01
-        let openProgress = 0
-        let ringFadeVal  = 1.0
-        let lastTime     = performance.now()
-        let rafId: any   = 0
-
-        // ── Animate loop ──────────────────────────────────────────────
-        function animate(now: number) {
-          rafId = requestAnimationFrame(animate)
-          const dt = Math.min((now - lastTime) / 1000, 0.05)
-          lastTime = now
-          t3 += dt
-
-          if (phase === 'forming') ringScale = Math.min(ringScale + dt * 1.1, 1.0)
-
-          if (phase === 'opening') {
-            openProgress = Math.min(openProgress + dt * 0.75, 1)
-            ringFadeVal  = Math.max(0, 1 - openProgress * 2.5)
-            const ease   = 1 - Math.pow(1 - openProgress, 3.0)
-            camera.position.z  = 3.5 - ease * 0.8   // subtle zoom: 3.5 → 2.7
-            bloomPass.strength = 0.35 + openProgress * 0.20  // 0.35 → 0.55
-            if (openProgress >= 1) phase = 'done'
-          }
-
-          // Update shader uniforms
-          discMat.uniforms.uTime.value  = t3
-          torusMat.uniforms.uTime.value = t3
-          torusMat.uniforms.uFade.value = ringFadeVal
-          partMat.uniforms.uTime.value  = t3
-
-          // Scale all portal objects together during forming
-          disc.scale.setScalar(ringScale)
-          torus.scale.setScalar(ringScale)
-          accentRing.scale.setScalar(ringScale)
-          particles.visible = ringScale > 0.20
-
-          // Slow accent ring rotation
-          accentRing.rotation.z = t3 * 0.08
-
-          // Fade accent ring on opening
-          ;(accentRing.material as THREE.MeshBasicMaterial).opacity = 0.12 * ringFadeVal
-
-          composer.render()
-        }
-
-        window.addEventListener('resize', () => {
-          canvas.width  = window.innerWidth
-          canvas.height = window.innerHeight
-          camera.aspect = canvas.width / canvas.height
-          camera.updateProjectionMatrix()
-          renderer.setSize(canvas.width, canvas.height)
-          composer.setSize(canvas.width, canvas.height)
-        })
-
-        rafId = requestAnimationFrame(animate)
-
-        // Reveal site wrapper immediately — portal canvas covers it at z-index 50
         wrapper.style.opacity = ''
 
-        const labelEl = introEl.querySelector('.js-portal-label') as HTMLElement
+        const chars = introEl.querySelectorAll<HTMLElement>('.js-char-inner')
+        const sub   = introEl.querySelector<HTMLElement>('.js-sub')!
+        const line  = introEl.querySelector<HTMLElement>('.js-line')!
 
-        const endIntro = () => {
+        const cleanup = () => {
           if (!introEl.parentNode) return
-          cancelAnimationFrame(rafId)
-          gsap.to(introEl, { opacity: 0, duration: 0.55, ease: 'power2.in', onComplete: () => {
-            introEl.remove()
-            try { renderer.dispose() } catch (_) {}
-            document.documentElement.classList.remove('is-scroll-blocked')
-            Ticker.nextTick(() => { Emitter.emit('updateViewport') })
-          }})
+          introEl.remove()
+          document.documentElement.classList.remove('is-scroll-blocked')
+          Ticker.nextTick(() => { Emitter.emit('updateViewport') })
         }
 
-        setTimeout(() => { phase = 'full' },                                                      1000)
-        setTimeout(() => { labelEl.classList.add('is-visible') },                                  800)
-        setTimeout(() => { labelEl.classList.remove('is-visible') },                              2100)
-        setTimeout(() => { phase = 'opening'; mount.style.opacity = '1' },                        2400)
-        setTimeout(() => { document.dispatchEvent(new CustomEvent('intro')) },                     2900)
-        setTimeout(endIntro,                                                                       3100)
-        setTimeout(endIntro,                                                                       8000) // safety
+        const tl = gsap.timeline({ onComplete: cleanup })
+
+        tl
+          // Initial state
+          .set(chars, { yPercent: 115 })
+          .set(sub,   { opacity: 0, letterSpacing: '-0.06em' })
+          .set(line,  { scaleX: 0, transformOrigin: 'center center' })
+
+          // Line draws in from center
+          .to(line, { scaleX: 1, duration: 0.7, ease: 'power3.inOut' }, 0.25)
+
+          // Letters slide up from behind clip masks
+          .to(chars, {
+            yPercent: 0,
+            duration: 0.85,
+            ease: 'power3.out',
+            stagger: 0.045,
+          }, 0.5)
+
+          // Subtitle letter-spacing expands
+          .to(sub, {
+            opacity: 1,
+            letterSpacing: '0.32em',
+            duration: 1.1,
+            ease: 'power2.out',
+          }, 0.95)
+
+          // ── Hold ───────────────────────────────────────────────────
+
+          // Letters exit upward
+          .to(chars, {
+            yPercent: -115,
+            duration: 0.55,
+            ease: 'power3.in',
+            stagger: 0.028,
+          }, 2.45)
+          .to(sub,  { opacity: 0, y: -6, duration: 0.38, ease: 'power2.in' }, 2.45)
+          .to(line, { scaleX: 0,         duration: 0.42, ease: 'power3.in' }, 2.55)
+
+          // Show border frame
+          .call(() => { mount.style.opacity = '1' }, [], 2.85)
+
+          // Curtain: intro slides up revealing portfolio
+          .to(introEl, { yPercent: -100, duration: 0.78, ease: 'power3.inOut' }, 2.9)
+
+          // Fire intro event at mid-curtain
+          .call(() => { document.dispatchEvent(new CustomEvent('intro')) }, [], 3.3)
+
+        // Safety fallback
+        setTimeout(cleanup, 8000)
       }
     }
 
@@ -804,55 +522,65 @@ import '../styles/global.scss'
       left: 0;
       z-index: 50;
 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
       width: 100%;
       height: 100%;
 
-      background: transparent;
+      background: #000;
+      overflow: hidden;
     }
 
-    .portal-label {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+    .intro-inner {
       text-align: center;
-      pointer-events: none;
       user-select: none;
+      pointer-events: none;
+    }
 
-      opacity: 0;
-      transition: opacity 0.9s ease;
+    .intro-line {
+      width: clamp(60px, 10vw, 130px);
+      height: 1px;
+      margin: 0 auto 2.8rem;
+      background: rgba(167, 139, 250, 0.45);
+    }
 
-      &.is-visible { opacity: 1; }
+    .intro-name {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      margin: 0;
+      font-family: font-family(bigger);
+      font-size: clamp(2.6rem, 7.5vw, 6.5rem);
+      font-weight: 400;
+      color: #fff;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1;
+    }
 
-      &__name {
-        display: block;
-        font-size: 0.7rem;
-        letter-spacing: 0.5em;
-        text-transform: uppercase;
-        font-weight: 300;
-        color: rgba(200, 215, 245, 0.60);
-        white-space: nowrap;
-        padding-right: 0.5em; // offset letter-spacing on last char
+    .intro-char {
+      display: inline-block;
+      overflow: hidden;
+      line-height: 1.08;
+
+      &--space {
+        width: 0.28em;
       }
+    }
 
-      &__sep {
-        display: block;
-        width: 1px;
-        height: 18px;
-        background: rgba(160, 180, 220, 0.25);
-        margin: 1.1rem auto;
-      }
+    .js-char-inner {
+      display: inline-block;
+    }
 
-      &__sub {
-        display: block;
-        font-size: 0.58rem;
-        letter-spacing: 0.28em;
-        text-transform: uppercase;
-        font-weight: 300;
-        color: rgba(140, 160, 200, 0.30);
-        white-space: nowrap;
-        padding-right: 0.28em;
-      }
+    .intro-sub {
+      margin: 2.4rem 0 0;
+      padding-right: 0.32em;
+      font-family: font-family(fraktion);
+      font-size: clamp(0.5rem, 1.1vw, 0.65rem);
+      text-transform: uppercase;
+      color: rgba(167, 139, 250, 0.4);
     }
 
     .site-wrapper {
