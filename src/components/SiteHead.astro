@@ -279,8 +279,31 @@ const menu = [
 
     /**
      * Toggle contrast
+     * On the homepage: navigates to the veille page with a black curtain transition.
+     * On other pages: normal contrast toggle.
      */
     toggleContrast() {
+      const base = import.meta.env.BASE_URL
+      const isHome =
+        window.location.pathname === base ||
+        window.location.pathname === base.replace(/\/$/, '')
+
+      if (isHome) {
+        gsap.fromTo(
+          this.contrastMask,
+          { x: '-100%' },
+          {
+            x: '0%',
+            duration: 0.85,
+            ease: 'expo.inOut',
+            onComplete: () => {
+              window.location.href = base + 'veille'
+            },
+          },
+        )
+        return
+      }
+
       let fromX = '0'
       let toX = '-100%'
 
