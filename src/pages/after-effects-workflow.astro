@@ -8,7 +8,7 @@ import heroBgImg2 from '../assets/bg-after-effects2.jpg'
   title="After Effects | Edits & Motion Design"
   description="Création d'edits anime et motion design sous After Effects — montage rythmé, color grading cinématique, Saber, Twixtor, Optical Flares."
   heroLabel="Créations · After Effects & Edits"
-  heroSub="Montages anime et film sous After Effects — edits construits autour d'une musique, d'un personnage, d'une emotion. Color grading, effets visuels et timing précis."
+  heroSub="Montages anime et film sous After Effects — edits construits autour d'une musique, d'un personnage, d'une émotion. Color grading, effets visuels et timing précis."
   techTags={["After Effects CC 2024", "Saber", "Twixtor", "Optical Flares", "Trapcode Suite", "Media Encoder"]}
   heroBg={heroBgImg.src}
 >
@@ -38,7 +38,7 @@ import heroBgImg2 from '../assets/bg-after-effects2.jpg'
         </p>
         <p>
           Le plus grand défi des edits multi-sources est le <strong>color grading cross-anime</strong> :
-          harmoniser des séquences issues d'studios différents — chacune avec sa propre
+          harmoniser des séquences issues de studios différents — chacune avec sa propre
           direction artistique — pour obtenir un rendu visuel cohérent sur toute la durée de l'edit.
         </p>
 
@@ -49,20 +49,38 @@ import heroBgImg2 from '../assets/bg-after-effects2.jpg'
         </div>
       </div>
 
-      <div class="p-card">
-        <span class="p-card__label">Setup — Outils & Pipeline</span>
-        <div class="p-mono-block">
-          <div class="p-mono-block__group">
-            <div class="p-mono-block__title">Principal</div>
-            <div>After Effects CC 2024</div>
+      <div class="p-card ae-info-card">
+        <!-- AE Logo -->
+        <div class="ae-logo-row">
+          <svg class="ae-logo-svg" viewBox="0 0 88 88" xmlns="http://www.w3.org/2000/svg">
+            <rect width="88" height="88" rx="14" fill="#0C0037"/>
+            <rect width="88" height="88" rx="14" fill="url(#aeg)" opacity="0.6"/>
+            <defs>
+              <linearGradient id="aeg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#3030AA"/>
+                <stop offset="100%" stop-color="#000020"/>
+              </linearGradient>
+            </defs>
+            <text x="44" y="63" text-anchor="middle" fill="#8282FF"
+              font-family="'Helvetica Neue', Arial, sans-serif"
+              font-weight="900" font-size="44" letter-spacing="-1">Ae</text>
+          </svg>
+          <div class="ae-logo-info">
+            <span class="ae-logo-name">After Effects</span>
+            <span class="ae-logo-version">CC 2024 · v24.x</span>
+            <span class="ae-logo-platform">Adobe Creative Cloud</span>
           </div>
+        </div>
+
+        <span class="p-card__label" style="margin-top:1.5rem; display:block;">Pipeline — Outils & Formats</span>
+        <div class="p-mono-block">
           <div class="p-mono-block__group">
             <div class="p-mono-block__title">Sources</div>
             <div>Séquences anime & film — MKV, MP4 (24fps)</div>
           </div>
           <div class="p-mono-block__group">
             <div class="p-mono-block__title">Sync Audio</div>
-            <div>Beat markers + keyframes calés frame par frame</div>
+            <div>Beat markers manuels frame par frame</div>
           </div>
           <div class="p-mono-block__group">
             <div class="p-mono-block__title">Composition</div>
@@ -107,35 +125,35 @@ import heroBgImg2 from '../assets/bg-after-effects2.jpg'
         <div class="p-plugin__vendor">RE:Vision Effects</div>
         <span class="p-badge p-badge--arch">Essential</span>
         <h3>Twixtor</h3>
-        <p class="p-card__body">Slow-motion ultra-fluide sur du footage anime natif à 24fps. Twixtor analyse le mouvement optique entre frames et génère des intermédiaires haute qualité — le résultat est un ralenti cinématique impossible à obtenir avec le simple frame blending d'AE. Indispensable pour les scènes d'action où l'on veut suspendre un instant précis sans perte de fluidité.</p>
+        <p class="p-card__body">Slow-motion ultra-fluide sur du footage anime natif à 24fps. Twixtor analyse le mouvement optique entre frames et génère des intermédiaires haute qualité — le résultat est un ralenti cinématique impossible à obtenir avec le simple frame blending d'AE. Indispensable pour les scènes d'action où l'on veut suspendre un instant précis.</p>
       </div>
 
       <div class="p-plugin">
         <div class="p-plugin__vendor">Video Copilot</div>
         <span class="p-badge p-badge--ux">Cinéma</span>
         <h3>Optical Flares</h3>
-        <p class="p-card__body">Lens flares photoréalistes et effets de lumière parasite pour amplifier l'intensité des scènes clés — explosions, impacts, apparitions de personnages. Contrairement aux flares built-in d'AE, Optical Flares offre un contrôle total sur la forme, la dispersion chromatique et l'animation keyframée de chaque composant du flare.</p>
+        <p class="p-card__body">Lens flares photoréalistes et effets de lumière parasite pour amplifier l'intensité des scènes clés. Contrôle total sur la forme, la dispersion chromatique et l'animation keyframée de chaque composant du flare — bien au-delà des flares built-in d'After Effects.</p>
       </div>
 
       <div class="p-plugin">
         <div class="p-plugin__vendor">Red Giant</div>
         <span class="p-badge p-badge--ux">Atmosphère</span>
         <h3>Trapcode Suite</h3>
-        <p class="p-card__body">Particular pour injecter des particules atmosphériques sur les séquences de transition — poussière, lumière diffuse, debris. Form pour des textures de fond animées qui donnent de la profondeur et du mouvement aux plans fixes. Mir pour des surfaces géométriques procédurales en arrière-plan.</p>
+        <p class="p-card__body">Particular pour des particules atmosphériques sur les transitions — poussière, lumière diffuse, debris. Form pour des textures de fond animées. Mir pour des surfaces géométriques procédurales en arrière-plan des plans fixes.</p>
       </div>
 
       <div class="p-plugin">
         <div class="p-plugin__vendor">Video Copilot</div>
         <span class="p-badge p-badge--ux">3D</span>
         <h3>Element 3D</h3>
-        <p class="p-card__body">Rendu 3D temps réel directement dans AE pour les séquences d'introduction et les titres en volume. Permet d'importer des modèles 3D et de les animer sans sortir d'After Effects — les passes de rendu restent compositables avec tous les autres calques et effets.</p>
+        <p class="p-card__body">Rendu 3D temps réel directement dans AE pour les séquences d'introduction et les titres en volume. Permet d'importer des modèles 3D et de les animer sans quitter After Effects — les passes de rendu restent compositables avec tous les calques.</p>
       </div>
 
       <div class="p-plugin">
         <div class="p-plugin__vendor">Rowbyte</div>
         <span class="p-badge p-badge--ux">Géométrie</span>
         <h3>Plexus</h3>
-        <p class="p-card__body">Réseaux de points, lignes et triangles interconnectés en 3D pour les séquences d'intro et les transitions abstraites. La géométrie procédurale de Plexus réagit à l'audio et crée des arrière-plans dynamiques qui donnent une texture visuelle aux passages instrumentaux entre scènes.</p>
+        <p class="p-card__body">Réseaux de points, lignes et triangles interconnectés en 3D pour les séquences d'intro et les transitions abstraites. La géométrie procédurale réagit à l'audio et crée des arrière-plans dynamiques pour les passages instrumentaux.</p>
       </div>
     </div>
   </section>
@@ -153,23 +171,23 @@ import heroBgImg2 from '../assets/bg-after-effects2.jpg'
         <ol class="p-steps">
           <li>
             <strong>Sourcing & Direction Artistique</strong>
-            <span>Choix de la musique en premier, toujours. La track définit la durée, le rythme et l'émotion dominante. Vient ensuite la sélection des séquences : on cherche les plans dont le mouvement colle naturellement aux temps forts de la musique.</span>
+            <span>Choix de la musique en premier, toujours. La track définit la durée, le rythme et l'émotion dominante. Vient ensuite la sélection des séquences : on cherche les plans dont le mouvement colle naturellement aux temps forts.</span>
           </li>
           <li>
             <strong>Structure Rythmique</strong>
-            <span>Import de l'audio dans AE, placement des marqueurs de beat manuellement sur chaque kick, snare et changement de section. Cette grille temporelle sert de squelette — tous les cuts seront accrochés à ces repères, jamais posés au hasard.</span>
+            <span>Import de l'audio dans AE, placement des marqueurs de beat manuellement sur chaque kick, snare et changement de section. Cette grille temporelle sert de squelette — tous les cuts y sont accrochés.</span>
           </li>
           <li>
             <strong>Montage Brut</strong>
-            <span>Assemblage des séquences en suivant la grille audio. Travail des durées de chaque plan, des raccords de mouvement et des respirations entre les scènes actives. L'edit doit tenir debout sans aucun effet avant de passer à l'étape suivante.</span>
+            <span>Assemblage des séquences en suivant la grille audio. Travail des durées, des raccords de mouvement et des respirations. L'edit doit tenir debout sans aucun effet avant de passer à l'étape suivante.</span>
           </li>
           <li>
             <strong>Color Grading & Effets</strong>
-            <span>Harmonisation chromatique entre toutes les sources (Curves, Hue/Sat, Color Balance), puis ajout des effets plan par plan : Twixtor sur les moments à ralentir, Saber sur les personnages aux instants d'impact, Optical Flares sur les cuts les plus forts. Le grading est la dernière couche — il unifie tout.</span>
+            <span>Harmonisation chromatique entre toutes les sources (Curves, Hue/Sat, Color Balance), puis ajout des effets plan par plan : Twixtor sur les ralentis, Saber sur les impacts, Optical Flares sur les cuts forts.</span>
           </li>
           <li>
             <strong>Rendu & Diffusion</strong>
-            <span>Export via Media Encoder en H.264 deux passes, optimisé pour la compression YouTube. Création de la miniature dans Photoshop avec le même grading que l'edit pour une cohérence visuelle sur la chaîne.</span>
+            <span>Export via Media Encoder en H.264 deux passes, optimisé compression YouTube. Création de la miniature dans Photoshop avec le même grading que l'edit.</span>
           </li>
         </ol>
       </div>
@@ -179,33 +197,180 @@ import heroBgImg2 from '../assets/bg-after-effects2.jpg'
         <div class="p-body" style="font-size:0.95rem;">
           <p>
             <strong>Beat Sync au frame près</strong><br/>
-            <span style="opacity:0.7">Les marqueurs audio sont placés manuellement, jamais automatiquement. La précision au frame garantit que chaque cut a un impact physique ressenti à l'écoute.</span>
+            <span style="opacity:0.7">Les marqueurs sont posés manuellement — la précision au frame garantit que chaque cut a un impact physique ressenti à l'écoute.</span>
           </p>
           <p>
             <strong>Grading cross-sources</strong><br/>
-            <span style="opacity:0.7">Homogénéiser visuellement des animes d'studios différents (couleurs, contraste, grain) sans que le spectateur remarque la transition de source.</span>
+            <span style="opacity:0.7">Homogénéiser visuellement des animes d'studios différents sans que le spectateur remarque la transition de source.</span>
           </p>
           <p>
             <strong>Rotoscoping & Masking</strong><br/>
-            <span style="opacity:0.7">Isolation manuelle du sujet pour les effets de Saber et les surimpression — le masque suit le personnage frame par frame sur les plans critiques.</span>
-          </p>
-          <p>
-            <strong>Time Remapping expressif</strong><br/>
-            <span style="opacity:0.7">Freeze frames sur les percussions, accélérations brutales entre les temps — le temps de la vidéo devient un instrument à part entière.</span>
+            <span style="opacity:0.7">Isolation manuelle du sujet pour les effets Saber — le masque suit le personnage frame par frame sur les plans critiques.</span>
           </p>
           <p style="margin-bottom:0">
-            <strong>Twixtor — Réglages Optiques</strong><br/>
-            <span style="opacity:0.7">Motion sensitivity, artifact reduction et GPU acceleration réglés par plan selon la complexité du mouvement pour éviter les artefacts sur les tracés rapides.</span>
+            <strong>Time Remapping expressif</strong><br/>
+            <span style="opacity:0.7">Freeze frames sur les percussions, accélérations brutales entre les temps — le temps de la vidéo devient un instrument à part entière.</span>
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══ FEATURED 2 ══════════════════════════════════════════════ -->
-  <div class="p-featured" data-reveal>
-    <img src={heroBgImg2.src} alt="Color grading et effets visuels After Effects" loading="lazy" />
-    <div class="p-featured__caption">Color Grading · Twixtor Slow-Mo · Saber Glow · Time Remapping</div>
+  <!-- ═══ AE INTERFACE MOCKUP ══════════════════════════════════════ -->
+  <div class="ae-interface" data-reveal>
+    <!-- Window chrome -->
+    <div class="ae-win-bar">
+      <div class="ae-win-dots">
+        <span class="ae-dot ae-dot--r"></span>
+        <span class="ae-dot ae-dot--y"></span>
+        <span class="ae-dot ae-dot--g"></span>
+      </div>
+      <span class="ae-win-title">After Effects 2024 — Edit_Anime.aep</span>
+      <div class="ae-win-right">
+        <span class="ae-tc">00:00:02:14</span>
+        <span class="ae-res">1920×1080 · 24fps</span>
+      </div>
+    </div>
+
+    <!-- Menu bar simulation -->
+    <div class="ae-menubar">
+      {["File","Edit","Composition","Layer","Effect","Animation","View","Window","Help"].map(m => (
+        <span class="ae-menu">{m}</span>
+      ))}
+    </div>
+
+    <!-- Timeline section -->
+    <div class="ae-tl-area">
+      <!-- Layer name column -->
+      <div class="ae-tl-names">
+        <div class="ae-tl-row ae-tl-row--adj">
+          <span class="ae-tl-eye">👁</span>
+          <span class="ae-tl-label">Color Grade</span>
+          <span class="ae-tl-type">ADJ</span>
+        </div>
+        <div class="ae-tl-row ae-tl-row--fx">
+          <span class="ae-tl-eye">👁</span>
+          <span class="ae-tl-label">Saber — Impact Frames</span>
+          <span class="ae-tl-type">FX</span>
+        </div>
+        <div class="ae-tl-row ae-tl-row--fx">
+          <span class="ae-tl-eye">👁</span>
+          <span class="ae-tl-label">Twixtor — Slow-Motion</span>
+          <span class="ae-tl-type">FX</span>
+        </div>
+        <div class="ae-tl-row ae-tl-row--vid">
+          <span class="ae-tl-eye">👁</span>
+          <span class="ae-tl-label">INAYUSHIKI_cut_04.mp4</span>
+          <span class="ae-tl-type">VID</span>
+        </div>
+        <div class="ae-tl-row ae-tl-row--vid">
+          <span class="ae-tl-eye">👁</span>
+          <span class="ae-tl-label">ZORO_OP_action.mp4</span>
+          <span class="ae-tl-type">VID</span>
+        </div>
+        <div class="ae-tl-row ae-tl-row--null">
+          <span class="ae-tl-eye">👁</span>
+          <span class="ae-tl-label">Beat Markers</span>
+          <span class="ae-tl-type">NULL</span>
+        </div>
+        <div class="ae-tl-row ae-tl-row--audio">
+          <span class="ae-tl-eye">🔊</span>
+          <span class="ae-tl-label">Good_in_Goodbye.wav</span>
+          <span class="ae-tl-type">AUDIO</span>
+        </div>
+      </div>
+
+      <!-- Track / bar column -->
+      <div class="ae-tl-tracks">
+
+        <!-- Ruler -->
+        <div class="ae-ruler">
+          <span style="left:0%">0:00</span>
+          <span style="left:20%">1:00</span>
+          <span style="left:40%">2:00</span>
+          <span style="left:60%">3:00</span>
+          <span style="left:80%">4:00</span>
+          <!-- Beat markers lines -->
+          {[5,11,17,23,29,35,41,47,53,59,65,71,77,83,89,95].map(p => (
+            <div class="ae-beat-line" style={`left:${p}%`}></div>
+          ))}
+          <!-- Playhead -->
+          <div class="ae-playhead" style="left:34%"></div>
+        </div>
+
+        <!-- Color Grade — full width, adjustment -->
+        <div class="ae-track ae-track--adj">
+          <div class="ae-bar" style="left:0%;width:100%">
+            <span class="ae-kf" style="left:0%"></span>
+            <span class="ae-kf" style="left:23%"></span>
+            <span class="ae-kf" style="left:47%"></span>
+            <span class="ae-kf" style="left:71%"></span>
+            <span class="ae-kf" style="left:100%"></span>
+          </div>
+        </div>
+
+        <!-- Saber — 2 segments -->
+        <div class="ae-track ae-track--fx">
+          <div class="ae-bar" style="left:8%;width:22%">
+            <span class="ae-kf" style="left:0%"></span>
+            <span class="ae-kf" style="left:100%"></span>
+          </div>
+          <div class="ae-bar" style="left:62%;width:18%">
+            <span class="ae-kf" style="left:0%"></span>
+            <span class="ae-kf" style="left:100%"></span>
+          </div>
+        </div>
+
+        <!-- Twixtor — 1 segment middle -->
+        <div class="ae-track ae-track--fx">
+          <div class="ae-bar" style="left:38%;width:20%">
+            <span class="ae-kf" style="left:0%"></span>
+            <span class="ae-kf" style="left:50%"></span>
+            <span class="ae-kf" style="left:100%"></span>
+          </div>
+        </div>
+
+        <!-- INAYUSHIKI — first half -->
+        <div class="ae-track ae-track--vid">
+          <div class="ae-bar" style="left:0%;width:52%">
+            <span class="ae-bar-label">INAYUSHIKI_cut_04.mp4</span>
+          </div>
+        </div>
+
+        <!-- ZORO — second half -->
+        <div class="ae-track ae-track--vid">
+          <div class="ae-bar" style="left:50%;width:50%">
+            <span class="ae-bar-label">ZORO_OP_action.mp4</span>
+          </div>
+        </div>
+
+        <!-- Beat markers — dots at each beat -->
+        <div class="ae-track ae-track--null">
+          {[5,11,17,23,29,35,41,47,53,59,65,71,77,83,89,95].map(p => (
+            <div class="ae-beat-dot" style={`left:${p}%`}></div>
+          ))}
+        </div>
+
+        <!-- Audio — full width with waveform look -->
+        <div class="ae-track ae-track--audio">
+          <div class="ae-bar ae-bar--audio" style="left:0%;width:100%">
+            <div class="ae-waveform">
+              {Array.from({length: 80}, (_, i) => (
+                <span class="ae-wave-bar" style={`height:${20 + Math.sin(i * 0.8) * 10 + Math.sin(i * 2.3) * 8 + Math.random() * 12}%`}></span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Status bar -->
+    <div class="ae-statusbar">
+      <span>RAM Preview — 47 frames cached</span>
+      <span>GPU: NVIDIA RTX · OpenGL</span>
+      <span>Rendu : 00:00:04:22 / 00:00:06:00</span>
+    </div>
   </div>
 
   <!-- ═══ 04 · GALERIE VIDEO ═══════════════════════════════════════ -->
@@ -217,7 +382,7 @@ import heroBgImg2 from '../assets/bg-after-effects2.jpg'
     </div>
 
     <p class="p-body" style="max-width:600px; margin-bottom:3rem;">
-      <span style="opacity:0.6">Trois edits representatifs — un crossover de personnages anime, un character focus emotionnel, et une intro au style cinematique.</span>
+      <span style="opacity:0.6">Trois edits représentatifs — un crossover de personnages anime, un character focus émotionnel, et une intro au style cinématique.</span>
     </p>
 
     <div class="p-videos">
@@ -291,6 +456,47 @@ import heroBgImg2 from '../assets/bg-after-effects2.jpg'
 </ProjectLayout>
 
 <style lang="scss">
+  /* ── AE Logo row ───────────────────────────────── */
+  .ae-info-card { padding-bottom: 1.5rem; }
+
+  .ae-logo-row {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .ae-logo-svg {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    filter: drop-shadow(0 0 14px rgba(130, 130, 255, 0.35));
+  }
+
+  .ae-logo-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .ae-logo-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: color(secondary);
+    letter-spacing: 0.04em;
+  }
+
+  .ae-logo-version,
+  .ae-logo-platform {
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: color(secondary);
+    opacity: 0.4;
+  }
+
+  /* ── Video wrap ─────────────────────────────────── */
   .p-video-wrap {
     display: flex;
     flex-direction: column;
@@ -317,5 +523,278 @@ import heroBgImg2 from '../assets/bg-after-effects2.jpg'
       opacity: 0.35;
       text-transform: uppercase;
     }
+  }
+
+  /* ── AE Interface Mockup ────────────────────────── */
+  .ae-interface {
+    margin: 4rem 0;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: 'Helvetica Neue', 'Arial', sans-serif;
+    font-size: 11px;
+    background: #1a1a1a;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .ae-win-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 7px 12px;
+    background: #323232;
+    border-bottom: 1px solid #3f3f3f;
+  }
+
+  .ae-win-dots {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .ae-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+
+    &--r { background: #ff5f57; }
+    &--y { background: #febc2e; }
+    &--g { background: #28c840; }
+  }
+
+  .ae-win-title {
+    font-size: 11px;
+    color: #aaaaaa;
+    letter-spacing: 0.03em;
+    flex: 1;
+    text-align: center;
+  }
+
+  .ae-win-right {
+    display: flex;
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+
+  .ae-tc {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: #00d4ff;
+    letter-spacing: 0.05em;
+  }
+
+  .ae-res {
+    color: #666;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+
+  .ae-menubar {
+    display: flex;
+    gap: 0;
+    padding: 3px 8px;
+    background: #282828;
+    border-bottom: 1px solid #3a3a3a;
+  }
+
+  .ae-menu {
+    padding: 2px 8px;
+    color: #aaaaaa;
+    font-size: 11px;
+    cursor: default;
+
+    &:hover { background: #3a3a3a; color: #dddddd; }
+  }
+
+  /* Timeline layout */
+  .ae-tl-area {
+    display: flex;
+    height: 218px;
+    overflow: hidden;
+  }
+
+  .ae-tl-names {
+    width: 200px;
+    flex-shrink: 0;
+    border-right: 1px solid #3a3a3a;
+    background: #222222;
+  }
+
+  .ae-tl-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 8px;
+    border-bottom: 1px solid #2e2e2e;
+    font-size: 10px;
+    color: #888;
+
+    &--adj  { border-left: 2px solid #8060c0; }
+    &--fx   { border-left: 2px solid #905090; }
+    &--vid  { border-left: 2px solid #405088; }
+    &--null { border-left: 2px solid #556040; }
+    &--audio{ border-left: 2px solid #307068; }
+  }
+
+  .ae-tl-eye { font-size: 9px; opacity: 0.5; flex-shrink: 0; }
+
+  .ae-tl-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #999;
+  }
+
+  .ae-tl-type {
+    font-size: 8px;
+    letter-spacing: 0.05em;
+    color: #555;
+    flex-shrink: 0;
+  }
+
+  /* Tracks area */
+  .ae-tl-tracks {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: #1e1e1e;
+  }
+
+  .ae-ruler {
+    height: 18px;
+    background: #252525;
+    border-bottom: 1px solid #3a3a3a;
+    position: relative;
+    font-size: 9px;
+    color: #555;
+
+    span {
+      position: absolute;
+      top: 3px;
+      transform: translateX(-50%);
+      letter-spacing: 0.03em;
+    }
+  }
+
+  .ae-beat-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(245, 166, 35, 0.25);
+  }
+
+  .ae-playhead {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: #ff4444;
+    z-index: 10;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -4px;
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 6px solid #ff4444;
+    }
+  }
+
+  .ae-track {
+    height: 28px;
+    position: relative;
+    border-bottom: 1px solid #2a2a2a;
+    background: #1e1e1e;
+
+    &:nth-child(even) { background: #202020; }
+
+    &--adj  .ae-bar { background: #6050a0; opacity: 0.85; }
+    &--fx   .ae-bar { background: #7040a0; opacity: 0.80; }
+    &--vid  .ae-bar { background: #304878; opacity: 0.85; }
+    &--null { background: #1c1c1c; }
+    &--audio .ae-bar { background: transparent; border: 1px solid #307068; opacity: 0.9; }
+  }
+
+  .ae-bar {
+    position: absolute;
+    top: 4px;
+    height: 20px;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    padding: 0 5px;
+    overflow: hidden;
+  }
+
+  .ae-bar-label {
+    font-size: 9px;
+    color: rgba(255,255,255,0.5);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ae-kf {
+    position: absolute;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    background: #e0a020;
+    transform: translate(-50%, -50%) rotate(45deg);
+    border-radius: 1px;
+    flex-shrink: 0;
+  }
+
+  .ae-beat-dot {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 5px;
+    height: 5px;
+    background: #f5a623;
+    border-radius: 50%;
+    opacity: 0.6;
+  }
+
+  /* Waveform simulation */
+  .ae-bar--audio {
+    align-items: flex-end;
+    padding: 2px 1px;
+    gap: 0;
+  }
+
+  .ae-waveform {
+    display: flex;
+    align-items: flex-end;
+    gap: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ae-wave-bar {
+    flex: 1;
+    background: #40b090;
+    opacity: 0.7;
+    min-width: 1px;
+  }
+
+  .ae-statusbar {
+    display: flex;
+    gap: 2rem;
+    padding: 5px 12px;
+    background: #1a1a1a;
+    border-top: 1px solid #333;
+    font-size: 10px;
+    color: #555;
+    letter-spacing: 0.03em;
   }
 </style>
