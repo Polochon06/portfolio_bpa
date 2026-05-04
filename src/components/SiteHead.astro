@@ -284,9 +284,7 @@ const menu = [
      */
     toggleContrast() {
       const base = import.meta.env.BASE_URL
-      const isHome =
-        window.location.pathname === base ||
-        window.location.pathname === base.replace(/\/$/, '')
+      const isHome = document.body.dataset.page === 'home'
 
       if (isHome) {
         gsap.fromTo(
