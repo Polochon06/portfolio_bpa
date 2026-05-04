@@ -406,17 +406,17 @@ import '../styles/global.scss'
         renderer.setSize(canvas.width, canvas.height)
         renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
         renderer.toneMapping = THREE.ACESFilmicToneMapping
-        renderer.toneMappingExposure = 1.1
+        renderer.toneMappingExposure = 0.9
 
         const scene  = new THREE.Scene()
-        scene.background = new THREE.Color(0x000408)
+        scene.background = new THREE.Color(0x000000)
         const camera = new THREE.PerspectiveCamera(60, canvas.width / canvas.height, 0.01, 100)
-        camera.position.z = 4.0
+        camera.position.z = 3.5
 
         const composer  = new EffectComposer(renderer)
         composer.addPass(new RenderPass(scene, camera))
         const bloomPass = new UnrealBloomPass(
-          new THREE.Vector2(canvas.width, canvas.height), 1.5, 0.5, 0.08
+          new THREE.Vector2(canvas.width, canvas.height), 0.35, 0.5, 0.72
         )
         composer.addPass(bloomPass)
         composer.addPass(new OutputPass())
@@ -475,43 +475,43 @@ import '../styles/global.scss'
         const wormholeFrag = `
           uniform float uTime;
           varying vec2 vUv;
-          float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
-          float n21(vec2 p) {
+
+          float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+          float noise(vec2 p) {
             vec2 i = floor(p); vec2 f = fract(p);
-            f = f*f*(3.0-2.0*f);
-            return mix(mix(h21(i),h21(i+vec2(1,0)),f.x),mix(h21(i+vec2(0,1)),h21(i+vec2(1,1)),f.x),f.y);
+            f = f * f * (3.0 - 2.0 * f);
+            return mix(
+              mix(hash(i), hash(i + vec2(1,0)), f.x),
+              mix(hash(i + vec2(0,1)), hash(i + vec2(1,1)), f.x), f.y);
           }
-          float fbm(vec2 p) {
-            float v=0.0; float a=0.5;
-            for(int i=0;i<5;i++){v+=a*n21(p);p*=2.1;a*=0.5;}
-            return v;
-          }
+
           void main() {
-            vec2 uv   = vUv * 2.0 - 1.0;
-            float r   = length(uv);
+            vec2 uv  = vUv * 2.0 - 1.0;
+            float r  = length(uv);
             if(r > 1.0) discard;
+
             float theta = atan(uv.y, uv.x);
-            float depth = 0.88 / max(r, 0.018);
-            float z     = fract(depth - uTime * 0.60);
-            vec2 wuv    = vec2(theta / 6.2832, depth * 0.22);
-            float w1    = fbm(wuv * 3.0 + vec2(uTime * 0.07, 0.0));
-            float w2    = fbm(wuv * 6.0 - vec2(0.0, uTime * 0.11));
-            float spiral = fract(theta / 6.2832 + depth * 0.18 + uTime * 0.055);
-            spiral = pow(1.0 - abs(spiral * 2.0 - 1.0), 5.0);
-            float ring  = 1.0 - smoothstep(0.0, 0.08, abs(z - 0.5));
-            ring       += smoothstep(0.96, 1.0, z) * 0.6;
-            float star  = step(0.92, h21(floor(uv * 14.0 + vec2(floor(depth * 3.0)))));
-            float sing  = exp(-r * 7.0) * 2.5;
-            float edge  = 1.0 - smoothstep(0.70, 1.0, r);
-            vec3 col = vec3(0.0, 0.03, 0.18);
-            col += vec3(0.00, 0.08, 0.40) * w1;
-            col += vec3(0.02, 0.14, 0.50) * w2 * 0.6;
-            col += vec3(0.15, 0.55, 1.00) * spiral * 0.8;
-            col += vec3(0.40, 0.80, 1.00) * ring;
-            col += vec3(0.90, 0.95, 1.00) * star * 0.6;
-            col += vec3(1.00, 0.92, 0.75) * sing;
-            col *= edge;
-            gl_FragColor = vec4(col, 1.0);
+
+            // Concentric interference — very slow, very faint
+            float ripple = sin(r * 20.0 - uTime * 0.35) * 0.5 + 0.5;
+            ripple = pow(ripple, 6.0);
+
+            // Slow dark rotation pattern
+            float ang   = theta * 0.4 + r * 2.5 - uTime * 0.06;
+            float grain = noise(vec2(ang * 2.2, r * 5.0 + uTime * 0.04));
+
+            // Centre glow — faint violet
+            float core  = exp(-r * 5.5) * 0.5;
+
+            // Hard vignette toward edge
+            float vign  = 1.0 - smoothstep(0.60, 1.0, r);
+
+            vec3 col = vec3(0.0);
+            col += vec3(0.08, 0.02, 0.22) * ripple;   // dark violet rings
+            col += vec3(0.02, 0.02, 0.07) * grain;     // neutral dark grain
+            col += vec3(0.14, 0.04, 0.32) * core;      // violet center
+
+            gl_FragColor = vec4(col * vign, 1.0);
           }
         `
 
@@ -535,18 +535,24 @@ import '../styles/global.scss'
           varying vec2 vUv;
           varying vec3 vViewDir;
           void main() {
-            float fr = pow(1.0 - clamp(abs(dot(vNormal, vViewDir)), 0.0, 1.0), 1.5);
-            float s1 = sin(vUv.x * 48.0 - uTime * 8.0) * 0.5 + 0.5;
-            float s2 = sin(vUv.x * 24.0 + uTime * 4.8) * 0.5 + 0.5;
-            float cr = pow(max(0.0, sin(vUv.x * 96.0 - uTime * 14.0)), 9.0);
-            vec3 base  = vec3(0.00, 0.40, 1.00);
-            vec3 mid   = vec3(0.35, 0.80, 1.00);
-            vec3 white = vec3(0.90, 0.96, 1.00);
-            vec3 col   = base;
-            col = mix(col, mid,   s1 * 0.55 + s2 * 0.25);
-            col = mix(col, white, fr * 0.85);
-            col += white * cr * 2.0;
-            gl_FragColor = vec4(col * uFade, (0.70 + fr * 0.30) * uFade);
+            float fr = pow(1.0 - clamp(abs(dot(vNormal, vViewDir)), 0.0, 1.0), 2.5);
+
+            // Subtle slow scan
+            float scan  = pow(sin(vUv.x * 55.0 - uTime * 4.0) * 0.5 + 0.5, 5.0) * 0.35;
+            // Rare sharp spark
+            float spark = pow(max(0.0, sin(vUv.x * 110.0 - uTime * 7.5)), 18.0) * 0.7;
+
+            // Platinum palette
+            vec3 body   = vec3(0.48, 0.50, 0.60); // dark steel
+            vec3 bright = vec3(0.90, 0.93, 1.00); // ice white
+
+            vec3 col = body;
+            col = mix(col, bright, fr * 0.95);       // edge → near white
+            col += bright * scan * (1.0 - fr * 0.4); // scan on body
+            col += bright * spark;                    // crisp sparks
+
+            float alpha = (0.50 + fr * 0.50) * uFade;
+            gl_FragColor = vec4(col * uFade, alpha);
           }
         `
 
@@ -564,12 +570,12 @@ import '../styles/global.scss'
             float ang = aAngle + uTime * aSpeed;
             float px  = cos(ang) * aRadius;
             float py  = sin(ang) * aRadius;
-            float pz  = sin(uTime * 1.4 + aPhase) * 0.07;
+            float pz  = sin(uTime * 0.9 + aPhase) * 0.04;
             vec4  mv  = modelViewMatrix * vec4(px, py, pz, 1.0);
             gl_Position  = projectionMatrix * mv;
-            gl_PointSize = clamp(aSize * (90.0 / max(-mv.z, 1.5)), 1.0, 14.0);
-            vAlpha   = 0.55 + sin(uTime * 2.2 + aPhase) * 0.45;
-            vRadFrac = clamp((aRadius - 0.85) / 0.5, 0.0, 1.0);
+            gl_PointSize = clamp(aSize * (70.0 / max(-mv.z, 1.5)), 1.0, 5.0);
+            vAlpha   = 0.12 + sin(uTime * 1.2 + aPhase) * 0.10;
+            vRadFrac = clamp((aRadius - 1.0) / 0.3, 0.0, 1.0);
           }
         `
         const partFrag = `
@@ -580,14 +586,14 @@ import '../styles/global.scss'
             float r = length(c);
             if(r > 0.5) discard;
             float fade = 1.0 - r * 2.0;
-            vec3 col = mix(vec3(0.40,0.85,1.00), vec3(0.10,0.45,1.00), vRadFrac);
-            gl_FragColor = vec4(col, vAlpha * fade * fade);
+            vec3 col = mix(vec3(0.80, 0.83, 0.95), vec3(0.95, 0.96, 1.00), vRadFrac);
+            gl_FragColor = vec4(col, vAlpha * fade);
           }
         `
 
         // ── Scene geometry ────────────────────────────────────────────
         const RING_R = 1.20
-        const TUBE_R = 0.055
+        const TUBE_R = 0.030
 
         // Wormhole disc (portal surface)
         const discMat = new THREE.ShaderMaterial({
@@ -613,32 +619,24 @@ import '../styles/global.scss'
         const torus = new THREE.Mesh(new THREE.TorusGeometry(RING_R, TUBE_R, 32, 256), torusMat)
         scene.add(torus)
 
-        // Outer decorative rings
-        const makeOuter = (r: number, tube: number, col: number, op: number) => {
-          const m = new THREE.MeshBasicMaterial({
-            color: col, transparent: true, opacity: op,
-            blending: THREE.AdditiveBlending, depthWrite: false,
-          })
-          return new THREE.Mesh(new THREE.TorusGeometry(r, tube, 12, 256), m)
-        }
-        const outerA = makeOuter(RING_R + 0.09, 0.006, 0x0055ff, 0.55)
-        const outerB = makeOuter(RING_R + 0.20, 0.004, 0x0088ff, 0.30)
-        const outerC = makeOuter(RING_R - 0.09, 0.004, 0x00ccff, 0.42)
-        scene.add(outerA, outerB, outerC)
+        // Single precision accent ring
+        const accentMat = new THREE.MeshBasicMaterial({
+          color: 0xc8d4f0, transparent: true, opacity: 0.12,
+          blending: THREE.AdditiveBlending, depthWrite: false,
+        })
+        const accentRing = new THREE.Mesh(new THREE.TorusGeometry(RING_R + 0.16, 0.002, 8, 256), accentMat)
+        scene.add(accentRing)
 
-        // Orbital particle system
-        const PART_N = 4800
+        // Orbital particle system — sparse silver dust
+        const PART_N = 700
         const pAng = new Float32Array(PART_N), pRad = new Float32Array(PART_N)
         const pSpd = new Float32Array(PART_N), pSz  = new Float32Array(PART_N)
         const pPhs = new Float32Array(PART_N)
         for (let i = 0; i < PART_N; i++) {
-          const lane = Math.random()
           pAng[i] = Math.random() * Math.PI * 2
-          pRad[i] = lane < 0.30 ? RING_R * (0.68 + Math.random() * 0.22)
-                  : lane < 0.75 ? RING_R * (0.92 + Math.random() * 0.16)
-                  :               RING_R * (1.08 + Math.random() * 0.24)
-          pSpd[i] = (Math.random() > 0.5 ? 1 : -1) * (0.018 + Math.random() * 0.048)
-          pSz[i]  = 1.2 + Math.random() * 2.8
+          pRad[i] = RING_R + (Math.random() - 0.5) * 0.22
+          pSpd[i] = (Math.random() > 0.5 ? 1 : -1) * (0.006 + Math.random() * 0.014)
+          pSz[i]  = 0.5 + Math.random() * 1.0
           pPhs[i] = Math.random() * Math.PI * 2
         }
         const partGeo = new THREE.BufferGeometry()
@@ -660,47 +658,12 @@ import '../styles/global.scss'
         particles.frustumCulled = false
         scene.add(particles)
 
-        // Lightning arc group
-        const arcGroup = new THREE.Group()
-        scene.add(arcGroup)
-
-        type Arc = { line: THREE.Line; life: number; decay: number }
-
-        function buildArc(): Arc {
-          const a1   = Math.random() * Math.PI * 2
-          const span = Math.PI * (0.25 + Math.random() * 0.70)
-          const a2   = a1 + span * (Math.random() > 0.5 ? 1 : -1)
-          const segs = 10 + Math.floor(Math.random() * 8)
-          const pts: THREE.Vector3[] = []
-          for (let i = 0; i <= segs; i++) {
-            const f   = i / segs
-            const ang = a1 + (a2 - a1) * f
-            const rr  = RING_R + (Math.random() - 0.5) * 0.04
-            pts.push(new THREE.Vector3(
-              Math.cos(ang) * rr + (Math.random() - 0.5) * 0.05,
-              Math.sin(ang) * rr + (Math.random() - 0.5) * 0.05,
-              (Math.random() - 0.5) * 0.02,
-            ))
-          }
-          const geo = new THREE.BufferGeometry().setFromPoints(pts)
-          const mat = new THREE.LineBasicMaterial({
-            color: new THREE.Color(0.5, 0.85, 1.0),
-            transparent: true,
-            opacity: 0.7 + Math.random() * 0.3,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false,
-          })
-          return { line: new THREE.Line(geo, mat), life: 1.0, decay: 4 + Math.random() * 5 }
-        }
-
         // ── Animation state ───────────────────────────────────────────
         let phase        = 'forming'
         let t3           = 0
         let ringScale    = 0.01
         let openProgress = 0
         let ringFadeVal  = 1.0
-        let arcs: Arc[]  = []
-        let nextArc      = 0.5
         let lastTime     = performance.now()
         let rafId: any   = 0
 
@@ -714,11 +677,11 @@ import '../styles/global.scss'
           if (phase === 'forming') ringScale = Math.min(ringScale + dt * 1.1, 1.0)
 
           if (phase === 'opening') {
-            openProgress = Math.min(openProgress + dt * 0.85, 1)
-            ringFadeVal  = Math.max(0, 1 - openProgress * 3)
-            const ease   = 1 - Math.pow(1 - openProgress, 2.5)
-            camera.position.z  = 4.0 - ease * 3.92
-            bloomPass.strength = 1.5 + openProgress * 4.5
+            openProgress = Math.min(openProgress + dt * 0.75, 1)
+            ringFadeVal  = Math.max(0, 1 - openProgress * 2.5)
+            const ease   = 1 - Math.pow(1 - openProgress, 3.0)
+            camera.position.z  = 3.5 - ease * 0.8   // subtle zoom: 3.5 → 2.7
+            bloomPass.strength = 0.35 + openProgress * 0.20  // 0.35 → 0.55
             if (openProgress >= 1) phase = 'done'
           }
 
@@ -731,46 +694,14 @@ import '../styles/global.scss'
           // Scale all portal objects together during forming
           disc.scale.setScalar(ringScale)
           torus.scale.setScalar(ringScale)
-          outerA.scale.setScalar(ringScale)
-          outerB.scale.setScalar(ringScale)
-          outerC.scale.setScalar(ringScale)
-          particles.visible = ringScale > 0.15
+          accentRing.scale.setScalar(ringScale)
+          particles.visible = ringScale > 0.20
 
-          // Slowly counter-rotate outer rings
-          outerA.rotation.z =  t3 * 0.22
-          outerB.rotation.z = -t3 * 0.14
-          outerC.rotation.z =  t3 * 0.35
+          // Slow accent ring rotation
+          accentRing.rotation.z = t3 * 0.08
 
-          // Fade outer rings on opening
-          ;(outerA.material as THREE.MeshBasicMaterial).opacity = 0.55 * ringFadeVal
-          ;(outerB.material as THREE.MeshBasicMaterial).opacity = 0.30 * ringFadeVal
-          ;(outerC.material as THREE.MeshBasicMaterial).opacity = 0.42 * ringFadeVal
-
-          // Lightning arcs during full / early opening
-          if ((phase === 'full' || (phase === 'opening' && openProgress < 0.30)) && ringScale > 0.6) {
-            nextArc -= dt
-            if (nextArc <= 0) {
-              const a = buildArc()
-              arcGroup.add(a.line)
-              arcs.push(a)
-              if (Math.random() > 0.5) {
-                const a2 = buildArc()
-                arcGroup.add(a2.line)
-                arcs.push(a2)
-              }
-              nextArc = 0.06 + Math.random() * 0.22
-            }
-          }
-          for (let i = arcs.length - 1; i >= 0; i--) {
-            arcs[i].life -= arcs[i].decay * dt
-            ;(arcs[i].line.material as THREE.LineBasicMaterial).opacity = Math.max(0, arcs[i].life * 0.8)
-            if (arcs[i].life <= 0) {
-              arcGroup.remove(arcs[i].line)
-              arcs[i].line.geometry.dispose()
-              ;(arcs[i].line.material as THREE.LineBasicMaterial).dispose()
-              arcs.splice(i, 1)
-            }
-          }
+          // Fade accent ring on opening
+          ;(accentRing.material as THREE.MeshBasicMaterial).opacity = 0.12 * ringFadeVal
 
           composer.render()
         }
