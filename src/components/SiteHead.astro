@@ -62,6 +62,23 @@ const menu = [
       <span class="u-sr-only">Change contrast</span>
     </button><!-- .sb-contrast -->
 
+    <a
+      href="https://mtb849.sharepoint.com/:x:/r/sites/3-BTSSIOPromo2024-2026-LivretApprentissagePaulBlanc/Documents%20partages/Livret%20Apprentissage%20Paul%20Blanc/6-%20Annexe%206-1%20-%20Tableau%20de%20synth%C3%A8se%20-%20Epreuve%20E4%20-%20BTS%20SIO%202024.xlsx?d=w97f1eb4712824bfeb5c092c1436bc4c0&csf=1&web=1&e=JIaLG1"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="sb-synthese"
+      title="Tableau de synthese - Epreuve E4"
+    >
+      <svg class="sb__icon-svg" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="1" y="1" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="1" y1="7" x2="19" y2="7" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="1" y1="13" x2="19" y2="13" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="7" y1="7" x2="7" y2="19" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="13" y1="7" x2="13" y2="19" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <span class="u-sr-only">Tableau de synthese</span>
+    </a><!-- .sb-synthese -->
+
     <aside class="sb-availability">
       <p>
         <span class="sb__line">
@@ -798,6 +815,58 @@ const menu = [
       &:before,
       .sb__icon:before {
         transition: scale 0.3s ease(in-out-expo);
+      }
+    }
+
+    .sb-synthese {
+      @include flex(row, center, center);
+
+      position: relative;
+
+      width: 48px;
+      height: 96px;
+
+      color: color(secondary);
+      text-decoration: none;
+      border-left: 1px solid color(secondary);
+      cursor: pointer;
+
+      @include mq(tablet) {
+        order: 6;
+      }
+
+      @include mq(phone) {
+        height: 100%;
+      }
+
+      &:before {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        width: 100%;
+        height: 100%;
+
+        background: color(secondary);
+        scale: 0 1;
+        transform-origin: 0 50%;
+        transition: scale 0.3s ease(in-out-expo);
+
+        content: '';
+      }
+
+      .sb__icon-svg {
+        position: relative;
+        z-index: 1;
+        transition: color 0.3s ease(in-out-expo);
+      }
+
+      &:hover {
+        color: color(primary);
+
+        &:before {
+          scale: 1 1;
+        }
       }
     }
 

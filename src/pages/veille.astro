@@ -414,8 +414,7 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
 </ProjectLayout>
 
 <style lang="scss">
-  $c-primary:   #8b5cf6;
-  $c-secondary: #000000;
+  /* All colors use the ProjectLayout --p-* tokens (dark theme, bg #04000f) */
 
   /* ── Section image header ──────────────────────────────────────── */
   .v-header {
@@ -425,6 +424,7 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     overflow: hidden;
     margin-bottom: 3rem;
     border-radius: 3px;
+    border: 1px solid var(--p-border);
 
     &__img {
       position: absolute;
@@ -440,9 +440,9 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
       inset: 0;
       background: linear-gradient(
         135deg,
-        rgba(0, 0, 0, 0.82) 0%,
-        rgba(0, 0, 0, 0.50) 50%,
-        rgba(0, 0, 0, 0.25) 100%
+        rgba(4, 0, 15, 0.88) 0%,
+        rgba(4, 0, 15, 0.55) 55%,
+        rgba(4, 0, 15, 0.2) 100%
       );
       display: flex;
       flex-direction: column;
@@ -457,7 +457,7 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
       font-weight: 700;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: color(primary);
+      color: var(--p-accent);
     }
 
     &__title {
@@ -486,7 +486,7 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     align-items: baseline;
     gap: 1rem;
     padding: 1.1rem 0;
-    border-bottom: 1px solid rgba($c-secondary, 0.15);
+    border-bottom: 1px solid var(--p-border);
 
     &:last-child { border-bottom: 0; }
 
@@ -495,7 +495,7 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
       font-family: font-family(bigger);
       font-size: clamp(1.8rem, 4vw, 2.6rem);
       font-weight: 400;
-      color: color(primary);
+      color: var(--p-accent);
       line-height: 1;
     }
 
@@ -506,7 +506,7 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
       font-size: 0.68rem;
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      color: color(secondary);
+      color: var(--p-text);
       line-height: 1.4;
     }
   }
@@ -524,7 +524,7 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     align-items: center;
     gap: 1rem;
     padding: 1rem 0;
-    border-bottom: 1px solid rgba($c-secondary, 0.12);
+    border-bottom: 1px solid var(--p-border);
 
     &:last-child { border-bottom: 0; }
 
@@ -534,16 +534,15 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
       font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: color(secondary);
+      color: var(--p-text);
     }
 
     span {
       display: block;
       font-size: 0.78rem;
-      color: color(secondary);
+      color: var(--p-muted);
       margin-top: 0.2rem;
       line-height: 1.4;
-      opacity: 0.65;
     }
 
     &__logo {
@@ -559,9 +558,9 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
       svg { width: 1.1rem; height: 1.1rem; }
 
       &--gh     { background: #24292e; }
-      &--cursor { background: #1a1a2e; color: rgba($c-primary, 0.9); }
+      &--cursor { background: #1a1a2e; color: var(--p-accent); }
       &--claude { background: #d97757; }
-      &--v0     { background: #000; }
+      &--v0     { background: rgba(167,139,250,0.15); border: 1px solid var(--p-border); color: var(--p-accent); }
     }
   }
 
@@ -571,7 +570,7 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     align-items: center;
     gap: 1rem;
     padding-bottom: 1.25rem;
-    border-bottom: 1px solid rgba($c-secondary, 0.12);
+    border-bottom: 1px solid var(--p-border);
 
     strong {
       display: block;
@@ -579,14 +578,13 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
       font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: color(secondary);
+      color: var(--p-text);
     }
 
     span {
       display: block;
       font-size: 0.7rem;
-      color: color(secondary);
-      opacity: 0.5;
+      color: var(--p-muted);
       margin-top: 0.15rem;
     }
   }
@@ -606,7 +604,7 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     align-items: flex-start;
     gap: 1rem;
     padding: 1rem 0;
-    border-bottom: 1px solid rgba($c-secondary, 0.12);
+    border-bottom: 1px solid var(--p-border);
 
     &:last-child { border-bottom: 0; }
 
@@ -616,14 +614,13 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
       font-size: 0.68rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: color(secondary);
+      color: var(--p-text);
     }
 
     p {
       margin: 0.2rem 0 0;
       font-size: 0.78rem;
-      color: color(secondary);
-      opacity: 0.65;
+      color: var(--p-muted);
       line-height: 1.4;
     }
   }
@@ -633,7 +630,7 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     font-family: font-family(fraktion);
     font-size: 0.6rem;
     font-weight: 700;
-    color: color(primary);
+    color: var(--p-accent);
     width: 1.4rem;
     padding-top: 0.1rem;
   }
@@ -651,7 +648,7 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     align-items: center;
     gap: 1rem;
     padding: 0.9rem 0;
-    border-bottom: 1px solid rgba($c-secondary, 0.12);
+    border-bottom: 1px solid var(--p-border);
 
     &:last-child { border-bottom: 0; }
 
@@ -661,18 +658,18 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
       font-size: 0.68rem;
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      color: color(secondary);
+      color: var(--p-text);
     }
 
     span {
       display: block;
       font-size: 0.72rem;
-      color: color(secondary);
-      opacity: 0.6;
+      color: var(--p-muted);
       margin-top: 0.15rem;
     }
 
-    &--result strong { color: color(primary); }
+    &--result strong { color: var(--p-accent); }
+    &--result span   { color: var(--p-accent); opacity: 0.75; }
   }
 
   .veille-pipeline__badge {
@@ -687,15 +684,15 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    background: rgba($c-secondary, 0.07);
-    color: color(secondary);
-    border: 1px solid rgba($c-secondary, 0.18);
+    background: var(--p-accent-lo);
+    color: var(--p-text);
+    border: 1px solid var(--p-border);
     border-radius: 3px;
 
     &--live {
-      background: rgba($c-primary, 0.12);
-      color: color(primary);
-      border-color: rgba($c-primary, 0.3);
+      background: rgba(167, 139, 250, 0.18);
+      color: var(--p-accent);
+      border-color: var(--p-border-hi);
     }
   }
 
@@ -712,9 +709,9 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     align-items: baseline;
     gap: 0.85rem;
     padding: 0.9rem 0;
-    border-bottom: 1px solid rgba($c-secondary, 0.12);
+    border-bottom: 1px solid var(--p-border);
     font-size: 0.78rem;
-    color: color(secondary);
+    color: var(--p-text);
 
     &:last-child { border-bottom: 0; }
 
@@ -725,7 +722,7 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.07em;
-      color: color(primary);
+      color: var(--p-accent);
       width: 5rem;
     }
   }
@@ -741,13 +738,13 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
   .veille-quote {
     margin: 0;
     padding: 1.5rem 1.5rem 1.5rem 1.75rem;
-    border-left: 2px solid color(primary);
-    background: rgba($c-primary, 0.04);
+    border-left: 2px solid var(--p-accent);
+    background: var(--p-accent-lo);
     font-family: font-family(editorial);
     font-size: clamp(1.05rem, 2.2vw, 1.4rem);
     font-weight: 200;
     font-style: italic;
-    color: color(secondary);
+    color: var(--p-text);
     line-height: 1.5;
   }
 
@@ -756,8 +753,8 @@ import imgAe2 from '../assets/bg-after-effects2.jpg'
     flex-direction: column;
     gap: 1rem;
 
-    p { margin: 0; font-size: 0.9rem; line-height: 1.7; color: color(secondary); }
-    strong { color: color(secondary); }
+    p { margin: 0; font-size: 0.9rem; line-height: 1.7; color: var(--p-muted); }
+    strong { color: var(--p-text); }
   }
 
   .veille-skills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
