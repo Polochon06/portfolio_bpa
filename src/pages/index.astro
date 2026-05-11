@@ -681,8 +681,6 @@ import '../styles/global.scss'
 
     body {
       position: relative;
-      background-color: #000 !important; // canvas provides the background
-
       padding: 1rem;
       min-height: 100vh;
 
@@ -691,10 +689,10 @@ import '../styles/global.scss'
       }
     }
 
-    // ── Hero text: black → light so it reads on dark 3D background ──────
+    // ── Hero text: black, couleurs d'origine du site ───────────────────
     :global(.s-hero .char__inner::before),
     :global(.s-hero .char__inner::after) {
-      color: color(white) !important;
+      color: color(secondary) !important;
     }
 
     .site-contrast-mask {
@@ -900,7 +898,7 @@ import '../styles/global.scss'
       position: relative;
       z-index: 2;
 
-      background: transparent; // 3D canvas visible underneath
+      background: color(primary); // fond violet du site, texte noir lisible
       clip-path: inset(0 -1rem);
 
       @include mq(phone) {
