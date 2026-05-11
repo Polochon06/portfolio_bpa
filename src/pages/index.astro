@@ -118,6 +118,7 @@ import '../styles/global.scss'
       aria-hidden="true"
       tabindex="-1"
     ></iframe>
+    <div class="bg-overlay" aria-hidden="true"></div>
     <div class="site-wrapper js-site-wrapper" style="opacity: 0;">
       <SiteHead />
 
@@ -682,6 +683,15 @@ import '../styles/global.scss'
       pointer-events: none;
     }
 
+    // Overlay violet entre Spline (z:0) et contenu (z:2)
+    .bg-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background: rgba(139, 92, 246, 0.52);
+      pointer-events: none;
+    }
+
     body {
       position: relative;
       padding: 1rem;
@@ -895,7 +905,7 @@ import '../styles/global.scss'
       position: relative;
       z-index: 2;
 
-      background: color(primary); // fond violet du site, texte noir lisible
+      background: transparent;
       clip-path: inset(0 -1rem);
 
       @include mq(phone) {
