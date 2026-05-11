@@ -4,19 +4,19 @@
 @use 'sass:map';
 
 $theme-colors: (
-  default: (primary: #8b5cf6,
-    /* Violet Accent */
+  default: (primary: #c026d3,
+    /* Fuchsia warm — aligne avec le bg Spline */
     secondary: #000000,
-    /* Black Bg */
-    shadow: #4c1d95,
-    /* Dark Violet Shadow */
-    white: #ddd6fe,
-    /* Light Violet Text */
+    /* Black */
+    shadow: #701a75,
+    /* Deep fuchsia shadow */
+    white: #fdf4ff,
+    /* Pale fuchsia-white */
   ),
 
-  contrasted: (primary: #a78bfa,
+  contrasted: (primary: #d946ef,
     secondary: #000000,
-    shadow: #4c1d95,
-    white: #ede9fe,
+    shadow: #701a75,
+    white: #fdf4ff,
   ),
 );
