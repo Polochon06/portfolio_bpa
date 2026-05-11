@@ -110,7 +110,14 @@ import '../styles/global.scss'
   </head>
 
   <body data-page="home">
-    <canvas class="bg-3d js-bg3d" aria-hidden="true"></canvas>
+    <iframe
+      class="bg-spline"
+      src="https://my.spline.design/3dpathslines1copy-lcS33gFjrhz50Qs8U35s5Ng4/"
+      frameborder="0"
+      allowfullscreen
+      aria-hidden="true"
+      tabindex="-1"
+    ></iframe>
     <div class="site-wrapper js-site-wrapper" style="opacity: 0;">
       <SiteHead />
 
@@ -659,164 +666,15 @@ import '../styles/global.scss'
     }, { once: true })
   </script>
 
-  <script>
-    import * as THREE from 'three'
-    import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-
-    const canvas = document.querySelector('.js-bg3d') as HTMLCanvasElement
-    if (!canvas) throw new Error('[bg3d] canvas not found')
-
-    const W = () => window.innerWidth
-    const H = () => window.innerHeight
-
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
-    renderer.setSize(W(), H())
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
-    renderer.shadowMap.enabled = true
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap
-    renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 1.1
-
-    const scene = new THREE.Scene()
-    scene.background = new THREE.Color(0x000000)
-    scene.fog = new THREE.FogExp2(0x000000, 0.035)
-
-    const camera = new THREE.PerspectiveCamera(42, W() / H(), 0.1, 100)
-    camera.position.set(2.5, 2.2, 7)
-    camera.lookAt(0, 0.4, 0)
-
-    // ── Lighting ──────────────────────────────────────────────────────
-    // Ambient: très sombre, ton violet-bleu
-    scene.add(new THREE.AmbientLight(0x0d0520, 6))
-
-    // Key light: blanc chaud, haut droite
-    const key = new THREE.DirectionalLight(0xfff5e0, 4.5)
-    key.position.set(6, 10, 4)
-    key.castShadow = true
-    key.shadow.mapSize.set(2048, 2048)
-    key.shadow.camera.near = 1
-    key.shadow.camera.far  = 30
-    key.shadow.bias = -0.0004
-    scene.add(key)
-
-    // Fill: bleu froid, gauche
-    const fill = new THREE.DirectionalLight(0x3050ff, 1.0)
-    fill.position.set(-8, 4, 2)
-    scene.add(fill)
-
-    // Rim: violet depuis derrière (signature couleur du site)
-    const rim = new THREE.DirectionalLight(0x8b5cf6, 3.5)
-    rim.position.set(-1, 6, -9)
-    scene.add(rim)
-
-    // Under-glow: violet très subtil venant du sol
-    const under = new THREE.PointLight(0x6d28d9, 1.8, 12)
-    under.position.set(0, -1.2, 0)
-    scene.add(under)
-
-    // ── Ground plane (reflet miroir sombre) ───────────────────────────
-    const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(28, 28),
-      new THREE.MeshStandardMaterial({
-        color: 0x000000,
-        roughness: 0.08,
-        metalness: 0.85,
-        transparent: true,
-        opacity: 0.55,
-      })
-    )
-    ground.rotation.x = -Math.PI / 2
-    ground.position.y = -1.05
-    ground.receiveShadow = true
-    scene.add(ground)
-
-    // ── Load car.glb ─────────────────────────────────────────────────
-    let carGroup: THREE.Group | null = null
-
-    const loader = new GLTFLoader()
-    loader.load(
-      '/models/car.glb',
-      (gltf) => {
-        carGroup = gltf.scene
-
-        // Centre + normalise la taille
-        const box    = new THREE.Box3().setFromObject(carGroup)
-        const center = box.getCenter(new THREE.Vector3())
-        const size   = box.getSize(new THREE.Vector3())
-        const scale  = 3.8 / Math.max(size.x, size.y, size.z)
-
-        carGroup.scale.setScalar(scale)
-        carGroup.position.copy(center.multiplyScalar(-scale))
-        carGroup.position.y = -1.05 + 0.02
-
-        carGroup.traverse((child) => {
-          if (child instanceof THREE.Mesh) {
-            child.castShadow    = true
-            child.receiveShadow = true
-            const mat = child.material
-            if (mat instanceof THREE.MeshStandardMaterial) {
-              mat.roughness         = Math.min(mat.roughness * 0.7, 0.45)
-              mat.metalness         = Math.max(mat.metalness, 0.4)
-              mat.envMapIntensity   = 1.4
-            }
-          }
-        })
-
-        scene.add(carGroup)
-      },
-      undefined,
-      (err) => console.warn('[bg3d] model not found — place car.glb in /public/models/', err)
-    )
-
-    // ── Mouse parallax ────────────────────────────────────────────────
-    let tX = 0, tY = 0, oX = 0, oY = 0
-    const onMouse = (e: MouseEvent) => {
-      tX = (e.clientX / window.innerWidth  - 0.5) * 0.6
-      tY = (e.clientY / window.innerHeight - 0.5) * 0.2
-    }
-    window.addEventListener('mousemove', onMouse, { passive: true })
-
-    // ── Scroll-linked camera lift ─────────────────────────────────────
-    let scrollY = 0
-    window.addEventListener('scroll', () => { scrollY = window.scrollY }, { passive: true })
-
-    // ── Resize ────────────────────────────────────────────────────────
-    window.addEventListener('resize', () => {
-      renderer.setSize(W(), H())
-      camera.aspect = W() / H()
-      camera.updateProjectionMatrix()
-    }, { passive: true })
-
-    // ── RAF loop ──────────────────────────────────────────────────────
-    const BASE_Y = 2.2
-    const animate = () => {
-      requestAnimationFrame(animate)
-      const t = performance.now() * 0.001
-
-      if (carGroup) {
-        carGroup.rotation.y = t * 0.11
-      }
-
-      oX += (tX - oX) * 0.025
-      oY += (tY - oY) * 0.025
-
-      camera.position.x = 2.5 + oX * 1.8
-      camera.position.y = BASE_Y - oY - scrollY * 0.0008
-      camera.lookAt(0, 0.4, 0)
-
-      renderer.render(scene, camera)
-    }
-    animate()
-  </script>
-
   <style lang="scss">
-    // ── 3D background canvas ────────────────────────────────────────────
-    .bg-3d {
+    // ── Spline 3D background ────────────────────────────────────────────
+    .bg-spline {
       position: fixed;
       inset: 0;
       z-index: 0;
       width: 100%;
       height: 100%;
+      border: none;
       pointer-events: none;
       display: block;
     }
