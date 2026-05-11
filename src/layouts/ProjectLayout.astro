@@ -39,6 +39,7 @@ const base = import.meta.env.BASE_URL
   </head>
 
   <body>
+    <div class="p-progress js-progress" aria-hidden="true"></div>
     <div class="site-wrapper js-site-wrapper">
       <SiteHead />
 
@@ -188,6 +189,17 @@ const base = import.meta.env.BASE_URL
       siteLoaded() {
         document.documentElement.classList.add('is-loaded')
         Emitter.emit('siteLoaded')
+
+        // Reading progress bar
+        const prog = document.querySelector('.js-progress') as HTMLElement
+        if (prog) {
+          const updateProg = () => {
+            const max = document.documentElement.scrollHeight - window.innerHeight
+            prog.style.transform = max > 0 ? `scaleX(${window.scrollY / max})` : 'scaleX(0)'
+          }
+          window.addEventListener('scroll', updateProg, { passive: true })
+          updateProg()
+        }
       }
 
       resizeThrottle() {
@@ -254,12 +266,24 @@ const base = import.meta.env.BASE_URL
     --p-max:       1320px;
     --p-pad:       clamp(1.5rem, 5vw, 5rem);
 
+    position: relative;
     background: var(--p-bg);
     background-image: radial-gradient(rgba(139,92,246,0.06) 1px, transparent 1px);
     background-size: 28px 28px;
     color: var(--p-text);
     font-family: var(--font-family-editorial);
     overflow-x: hidden;
+  }
+
+  .p-page::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 140px 140px;
+    opacity: 0.022;
+    pointer-events: none;
+    z-index: 9999;
   }
 
   /* Utility: mono text */
@@ -350,9 +374,13 @@ const base = import.meta.env.BASE_URL
   .p-hero__back {
     color: var(--p-muted);
     text-decoration: none;
-    transition: color 0.2s;
+    transition: color 0.2s, letter-spacing 0.25s;
+    cursor: pointer;
   }
-  .p-hero__back:hover { color: var(--p-text); }
+  .p-hero__back:hover {
+    color: var(--p-text);
+    letter-spacing: 0.2em;
+  }
 
   .p-hero__center {
     display: flex;
@@ -417,7 +445,14 @@ const base = import.meta.env.BASE_URL
   .p-hero__line {
     flex: 1;
     height: 1px;
-    background: var(--p-border);
+    background: linear-gradient(to right, var(--p-accent), transparent);
+    animation: hero-line-pulse 2.5s ease-in-out infinite;
+    transform-origin: left center;
+  }
+
+  @keyframes hero-line-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.85; }
   }
 
   /* ─── CONTENT WRAPPER ──────────────────────────────────────────── */
@@ -465,7 +500,7 @@ const base = import.meta.env.BASE_URL
     line-height: 0.9;
     letter-spacing: 0.02em;
     text-transform: uppercase;
-    background: linear-gradient(135deg, #fff 0%, rgba(237,233,254,0.88) 100%);
+    background: linear-gradient(135deg, #ffffff 0%, rgba(209,196,255,0.92) 55%, rgba(139,92,246,0.75) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -545,13 +580,27 @@ const base = import.meta.env.BASE_URL
   .p-card {
     padding: 2.5rem;
     border: 1px solid var(--p-border);
-    background: rgba(139,92,246,0.06);
-    transition: border-color 0.35s, background 0.35s, transform 0.3s;
+    background: rgba(139,92,246,0.04);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.4s, background 0.4s, transform 0.35s, box-shadow 0.4s;
+  }
+  .p-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(167,139,250,0.22), transparent);
+    pointer-events: none;
   }
   .p-card:hover {
-    border-color: var(--p-border-hi);
-    background: rgba(139,92,246,0.12);
-    transform: translateY(-2px);
+    border-color: rgba(167,139,250,0.42);
+    background: rgba(139,92,246,0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 56px rgba(139,92,246,0.18), 0 2px 10px rgba(0,0,0,0.4);
+  }
+  .p-card:hover::before {
+    background: linear-gradient(to right, transparent, rgba(167,139,250,0.5), transparent);
   }
 
   .p-card__label {
@@ -649,10 +698,15 @@ const base = import.meta.env.BASE_URL
   .p-cat-item:hover { background: var(--p-accent-lo); }
 
   .p-cat-icon {
-    font-size: 2rem;
     display: block;
-    margin-bottom: 0.75rem;
-    filter: grayscale(1);
+    margin: 0 auto 0.75rem;
+    color: rgba(167,139,250,0.4);
+    width: 16px;
+    height: 16px;
+    transition: color 0.2s;
+  }
+  .p-cat-item:hover .p-cat-icon {
+    color: rgba(167,139,250,0.85);
   }
 
   .p-cat-name {
@@ -719,11 +773,23 @@ const base = import.meta.env.BASE_URL
   .p-challenge {
     padding: 2rem;
     border: 1px solid var(--p-border);
-    transition: border-color 0.35s, box-shadow 0.35s, transform 0.3s;
+    border-left: 2px solid rgba(167,139,250,0.25);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.35s, border-left-color 0.35s, box-shadow 0.35s, transform 0.3s;
+  }
+  .p-challenge::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, rgba(167,139,250,0.3), transparent);
+    pointer-events: none;
   }
   .p-challenge:hover {
-    border-color: var(--p-border-hi);
-    box-shadow: 0 0 30px rgba(167,139,250,0.1);
+    border-color: rgba(167,139,250,0.38);
+    border-left-color: var(--p-accent);
+    box-shadow: 0 8px 40px rgba(167,139,250,0.12), -4px 0 20px rgba(167,139,250,0.08);
     transform: translateY(-2px);
   }
 
@@ -762,7 +828,15 @@ const base = import.meta.env.BASE_URL
     border: 1px solid var(--p-border);
     overflow: hidden;
     margin: 5rem 0;
-    box-shadow: 0 0 60px rgba(167,139,250,0.08), inset 0 1px 0 rgba(167,139,250,0.15);
+    position: relative;
+    box-shadow: 0 0 80px rgba(167,139,250,0.1), inset 0 1px 0 rgba(167,139,250,0.2);
+  }
+  .p-stats::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(139,92,246,0.05) 0%, transparent 100%);
+    pointer-events: none;
   }
 
   @media (max-width: 700px) {
@@ -785,6 +859,12 @@ const base = import.meta.env.BASE_URL
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    animation: stat-glow 4s ease-in-out infinite;
+  }
+
+  @keyframes stat-glow {
+    0%, 100% { filter: brightness(1); }
+    50%       { filter: brightness(1.18) drop-shadow(0 0 18px rgba(167,139,250,0.45)); }
   }
 
   .p-stat__label {
@@ -895,19 +975,37 @@ const base = import.meta.env.BASE_URL
 
   /* ─── CTA ──────────────────────────────────────────────────────── */
   .p-cta {
-    padding: 8rem var(--p-pad);
+    padding: 9rem var(--p-pad);
     border-top: 1px solid var(--p-border);
+    position: relative;
+    overflow: hidden;
+  }
+  .p-cta::before {
+    content: '';
+    position: absolute;
+    top: -80%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 500px;
+    background: radial-gradient(ellipse, rgba(139,92,246,0.07) 0%, transparent 70%);
+    pointer-events: none;
   }
 
   .p-cta__link {
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 1.5rem;
     text-decoration: none;
     color: var(--p-text);
-    transition: color 0.2s;
+    transition: color 0.3s, gap 0.35s;
+    cursor: pointer;
   }
-  .p-cta__link:hover { color: var(--p-accent); }
+  .p-cta__link:hover {
+    color: var(--p-accent);
+    gap: 2.25rem;
+  }
 
   .p-cta__label {
     color: var(--p-muted);
@@ -917,11 +1015,16 @@ const base = import.meta.env.BASE_URL
 
   .p-cta__text {
     font-family: var(--font-family-bigger);
-    font-size: clamp(2.5rem, 6vw, 6rem);
+    font-size: clamp(3.5rem, 9vw, 9rem);
     font-weight: 700;
     text-transform: uppercase;
-    line-height: 1;
+    line-height: 0.88;
     letter-spacing: -0.02em;
+    text-shadow: 0 0 100px rgba(139,92,246,0.18);
+    transition: text-shadow 0.4s;
+  }
+  .p-cta__link:hover .p-cta__text {
+    text-shadow: 0 0 140px rgba(139,92,246,0.5), 0 0 40px rgba(167,139,250,0.2);
   }
 
   /* ─── SITE WRAPPER overrides ────────────────────────────────────── */
@@ -935,11 +1038,66 @@ const base = import.meta.env.BASE_URL
   /* ─── REVEAL ANIMATION ─────────────────────────────────────────── */
   [data-reveal] {
     opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.65s ease, transform 0.65s ease;
+    transform: translateY(32px);
+    transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
   }
   [data-reveal].is-in-view {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  /* ─── READING PROGRESS BAR ─────────────────────────────────────── */
+  .p-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 200;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, var(--p-accent, #a78bfa), rgba(196,181,253,0.55));
+    transform-origin: left center;
+    transform: scaleX(0);
+    pointer-events: none;
+    box-shadow: 0 0 8px rgba(167,139,250,0.5);
+  }
+
+  /* ─── FEATURED IMAGE hover ─────────────────────────────────────── */
+  .p-featured {
+    cursor: default;
+  }
+  .p-featured::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(139,92,246,0.12) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+  .p-featured:hover::before {
+    opacity: 1;
+  }
+
+  /* ─── PLUGIN CARD ──────────────────────────────────────────────── */
+  .p-plugin {
+    border-left: 2px solid rgba(167,139,250,0.18);
+  }
+  .p-plugin:hover {
+    border-left-color: var(--p-accent);
+  }
+
+  /* ─── STEP LIST ────────────────────────────────────────────────── */
+  .p-steps li {
+    transition: background 0.2s;
+  }
+  .p-steps li:hover {
+    background: rgba(167,139,250,0.04);
+    padding-left: 0.5rem;
+  }
+
+  /* ─── VIDEO container ──────────────────────────────────────────── */
+  .p-video {
+    background: rgba(139,92,246,0.03);
   }
 </style>
