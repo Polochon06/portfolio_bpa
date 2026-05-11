@@ -668,9 +668,9 @@ import '../styles/global.scss'
   </script>
 
   <style lang="scss">
-    // html aussi en violet — cohérence totale du background
+    // html fallback derrière le Spline
     :global(html) {
-      background-color: color(primary);
+      background-color: #0a000f;
     }
 
     .bg-spline {
@@ -683,13 +683,12 @@ import '../styles/global.scss'
       pointer-events: none;
     }
 
-    // Overlay violet-prune entre Spline (z:0) et contenu (z:2)
+    // Overlay fuchsia-rose entre Spline (z:0) et contenu (z:2)
     .bg-overlay {
       position: fixed;
       inset: 0;
       z-index: 1;
-      background: color(primary);
-      opacity: 0.28;
+      background: rgba(180, 15, 195, 0.18);
       pointer-events: none;
     }
 
@@ -929,6 +928,33 @@ import '../styles/global.scss'
       will-change: border-width;
 
       pointer-events: none;
+    }
+
+    // ── Transparence sections — laisse le Spline respirer ───────────────
+    :global(.s-work) {
+      background: rgba(160, 20, 175, 0.48) !important;
+    }
+    :global(.s-work .s__inner) {
+      background: rgba(4, 0, 8, 0.68) !important;
+    }
+    :global(.s-work .s__mask__path-outer),
+    :global(.s-work .s__mask__path-inner) {
+      fill: rgba(150, 18, 165, 0.76) !important;
+    }
+    :global(.s-about .s__award) {
+      background: rgba(160, 20, 175, 0.55) !important;
+    }
+    :global(.s-about .s__award__mask) {
+      background: rgba(0, 0, 0, 0.70) !important;
+    }
+    :global(.s-about .s__award__mask::before) {
+      background: rgba(160, 20, 175, 0.80) !important;
+    }
+    :global(.s-about .s__title) {
+      background: rgba(0, 0, 0, 0.72) !important;
+    }
+    :global(.s-cta) {
+      background: transparent !important;
     }
   </style>
 </html>
