@@ -4,19 +4,17 @@
 @use 'sass:map';
 
 $theme-colors: (
-  default: (primary: #c026d3,
-    /* Fuchsia warm — aligne avec le bg Spline */
+  default: (primary: #7c3aed,
+    /* Violet-prune profond */
     secondary: #000000,
-    /* Black */
-    shadow: #701a75,
-    /* Deep fuchsia shadow */
-    white: #fdf4ff,
-    /* Pale fuchsia-white */
+    shadow: #4c1d95,
+    white: #f5f3ff,
   ),
 
-  contrasted: (primary: #d946ef,
+  contrasted: (primary: #9333ea,
+    /* Violet chaud, harmonise avec le Spline */
     secondary: #000000,
-    shadow: #701a75,
-    white: #fdf4ff,
+    shadow: #4c1d95,
+    white: #f5f3ff,
   ),
 );
