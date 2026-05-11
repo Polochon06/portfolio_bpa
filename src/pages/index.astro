@@ -110,6 +110,14 @@ import '../styles/global.scss'
   </head>
 
   <body data-page="home">
+    <iframe
+      class="bg-spline"
+      src="https://my.spline.design/3dpathslines1copy-lcS33gFjrhz50Qs8U35s5Ng4/"
+      frameborder="0"
+      allowfullscreen
+      aria-hidden="true"
+      tabindex="-1"
+    ></iframe>
     <div class="site-wrapper js-site-wrapper" style="opacity: 0;">
       <SiteHead />
 
@@ -662,6 +670,16 @@ import '../styles/global.scss'
     // html aussi en violet — cohérence totale du background
     :global(html) {
       background-color: color(primary);
+    }
+
+    .bg-spline {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      pointer-events: none;
     }
 
     body {
