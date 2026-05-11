@@ -130,6 +130,7 @@ import '../styles/global.scss'
     </div><!-- .site-wrapper -->
 
     <div class="site-intro js-intro">
+      <div class="intro-glow"></div>
       <div class="intro-inner">
         <div class="intro-line js-line"></div>
         <h1 class="intro-name" aria-label="Paul Blanc">
@@ -145,6 +146,15 @@ import '../styles/global.scss'
           <span class="intro-char js-char"><span class="js-char-inner">C</span></span>
         </h1>
         <p class="intro-sub js-sub">Développeur &middot; Motion Design</p>
+      </div><!-- .intro-inner -->
+      <div class="intro-corners">
+        <span class="intro-corner js-corner"></span>
+        <span class="intro-corner js-corner"></span>
+        <span class="intro-corner js-corner"></span>
+        <span class="intro-corner js-corner"></span>
+      </div>
+      <div class="intro-loader">
+        <span class="js-loader-num">00</span>%
       </div>
     </div><!-- .site-intro -->
 
@@ -400,15 +410,18 @@ import '../styles/global.scss'
        * Intro — cinematic motion design reveal (pure CSS + GSAP)
        */
       intro() {
-        const wrapper = document.querySelector('.js-site-wrapper') as HTMLElement
-        const introEl = document.querySelector('.js-intro')        as HTMLElement
-        const mount   = document.querySelector('.js-mount')        as HTMLElement
+        const wrapper  = document.querySelector('.js-site-wrapper') as HTMLElement
+        const introEl  = document.querySelector('.js-intro')        as HTMLElement
+        const mount    = document.querySelector('.js-mount')        as HTMLElement
 
         wrapper.style.opacity = ''
 
-        const chars = introEl.querySelectorAll<HTMLElement>('.js-char-inner')
-        const sub   = introEl.querySelector<HTMLElement>('.js-sub')!
-        const line  = introEl.querySelector<HTMLElement>('.js-line')!
+        const chars      = introEl.querySelectorAll<HTMLElement>('.js-char-inner')
+        const sub        = introEl.querySelector<HTMLElement>('.js-sub')!
+        const line       = introEl.querySelector<HTMLElement>('.js-line')!
+        const corners    = introEl.querySelectorAll<HTMLElement>('.js-corner')
+        const loaderNum  = introEl.querySelector<HTMLElement>('.js-loader-num')!
+        const glow       = introEl.querySelector<HTMLElement>('.intro-glow')!
 
         const cleanup = () => {
           if (!introEl.parentNode) return
@@ -417,18 +430,42 @@ import '../styles/global.scss'
           Ticker.nextTick(() => { Emitter.emit('updateViewport') })
         }
 
+        const counter = { val: 0 }
+
         const tl = gsap.timeline({ onComplete: cleanup })
 
         tl
-          // Initial state
-          .set(chars, { yPercent: 115 })
-          .set(sub,   { opacity: 0, letterSpacing: '-0.06em' })
-          .set(line,  { scaleX: 0, transformOrigin: 'center center' })
+          // ── Initial states ─────────────────────────────────────────
+          .set(chars,   { yPercent: 115 })
+          .set(sub,     { opacity: 0, letterSpacing: '-0.06em' })
+          .set(line,    { scaleX: 0, transformOrigin: 'center center' })
+          .set(corners, { opacity: 0, scale: 0.7 })
+          .set(glow,    { opacity: 0, scale: 0.6 })
 
-          // Line draws in from center
+          // ── Ambient glow blooms in ──────────────────────────────────
+          .to(glow, { opacity: 1, scale: 1, duration: 1.6, ease: 'power2.out' }, 0)
+
+          // ── Corner brackets appear ─────────────────────────────────
+          .to(corners, {
+            opacity: 1, scale: 1,
+            duration: 0.55, ease: 'power3.out',
+            stagger: { amount: 0.15, from: 'random' },
+          }, 0.1)
+
+          // ── Loading counter (00 → 100) ─────────────────────────────
+          .to(counter, {
+            val: 100,
+            duration: 2.2,
+            ease: 'power1.inOut',
+            onUpdate: () => {
+              loaderNum.textContent = String(Math.round(counter.val)).padStart(2, '0')
+            },
+          }, 0.1)
+
+          // ── Line draws in from center ──────────────────────────────
           .to(line, { scaleX: 1, duration: 0.7, ease: 'power3.inOut' }, 0.25)
 
-          // Letters slide up from behind clip masks
+          // ── Letters slide up from clip masks ───────────────────────
           .to(chars, {
             yPercent: 0,
             duration: 0.85,
@@ -436,7 +473,7 @@ import '../styles/global.scss'
             stagger: 0.045,
           }, 0.5)
 
-          // Subtitle letter-spacing expands
+          // ── Subtitle letter-spacing expands ────────────────────────
           .to(sub, {
             opacity: 1,
             letterSpacing: '0.32em',
@@ -446,7 +483,10 @@ import '../styles/global.scss'
 
           // ── Hold ───────────────────────────────────────────────────
 
-          // Letters exit upward
+          // ── Glow pulses brighter before exit ──────────────────────
+          .to(glow, { opacity: 0.5, scale: 1.15, duration: 0.4, ease: 'power2.in' }, 2.25)
+
+          // ── Letters exit upward ────────────────────────────────────
           .to(chars, {
             yPercent: -115,
             duration: 0.55,
@@ -456,13 +496,22 @@ import '../styles/global.scss'
           .to(sub,  { opacity: 0, y: -6, duration: 0.38, ease: 'power2.in' }, 2.45)
           .to(line, { scaleX: 0,         duration: 0.42, ease: 'power3.in' }, 2.55)
 
-          // Show border frame
+          // ── Corners & loader fade out ──────────────────────────────
+          .to(corners, {
+            opacity: 0, scale: 0.8,
+            duration: 0.3, ease: 'power2.in',
+            stagger: 0.04,
+          }, 2.5)
+          .to('.intro-loader', { opacity: 0, duration: 0.3, ease: 'power2.in' }, 2.5)
+          .to(glow,   { opacity: 0, scale: 0.5, duration: 0.5, ease: 'power2.in' }, 2.6)
+
+          // ── Show border frame ──────────────────────────────────────
           .call(() => { mount.style.opacity = '1' }, [], 2.85)
 
-          // Curtain: intro slides up revealing portfolio
+          // ── Curtain: intro slides up revealing portfolio ───────────
           .to(introEl, { yPercent: -100, duration: 0.78, ease: 'power3.inOut' }, 2.9)
 
-          // Fire intro event at mid-curtain
+          // ── Fire intro event at mid-curtain ────────────────────────
           .call(() => { document.dispatchEvent(new CustomEvent('intro')) }, [], 3.3)
 
         // Safety fallback
@@ -529,11 +578,38 @@ import '../styles/global.scss'
       width: 100%;
       height: 100%;
 
-      background: #000;
+      background: radial-gradient(ellipse 90% 80% at 50% 50%, #140028 0%, #07000f 55%, #000 100%);
       overflow: hidden;
+
+      // Film-grain noise texture
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 140px 140px;
+        opacity: 0.045;
+        pointer-events: none;
+        z-index: 0;
+      }
+    }
+
+    .intro-glow {
+      position: absolute;
+      width: clamp(320px, 55vw, 720px);
+      height: clamp(320px, 55vw, 720px);
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -55%);
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.14) 0%, rgba(109, 40, 217, 0.05) 45%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      will-change: transform, opacity;
     }
 
     .intro-inner {
+      position: relative;
+      z-index: 1;
       text-align: center;
       user-select: none;
       pointer-events: none;
@@ -543,7 +619,8 @@ import '../styles/global.scss'
       width: clamp(60px, 10vw, 130px);
       height: 1px;
       margin: 0 auto 2.8rem;
-      background: rgba(167, 139, 250, 0.45);
+      background: linear-gradient(90deg, transparent, rgba(167, 139, 250, 0.7) 25%, rgba(200, 180, 255, 0.9) 50%, rgba(167, 139, 250, 0.7) 75%, transparent);
+      box-shadow: 0 0 10px rgba(167, 139, 250, 0.25);
     }
 
     .intro-name {
@@ -558,6 +635,7 @@ import '../styles/global.scss'
       letter-spacing: 0.08em;
       text-transform: uppercase;
       line-height: 1;
+      text-shadow: 0 0 80px rgba(167, 139, 250, 0.18), 0 0 140px rgba(139, 92, 246, 0.1);
     }
 
     .intro-char {
@@ -580,7 +658,77 @@ import '../styles/global.scss'
       font-family: font-family(fraktion);
       font-size: clamp(0.5rem, 1.1vw, 0.65rem);
       text-transform: uppercase;
-      color: rgba(167, 139, 250, 0.4);
+      color: rgba(167, 139, 250, 0.55);
+      letter-spacing: -0.06em;
+    }
+
+    .intro-corners {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .intro-corner {
+      position: absolute;
+      width: 1.4rem;
+      height: 1.4rem;
+      border-color: rgba(167, 139, 250, 0.4);
+      border-style: solid;
+      border-width: 0;
+
+      &:nth-child(1) {
+        top: 2rem; left: 2rem;
+        border-top-width: 1px;
+        border-left-width: 1px;
+      }
+      &:nth-child(2) {
+        top: 2rem; right: 2rem;
+        border-top-width: 1px;
+        border-right-width: 1px;
+      }
+      &:nth-child(3) {
+        bottom: 2rem; left: 2rem;
+        border-bottom-width: 1px;
+        border-left-width: 1px;
+      }
+      &:nth-child(4) {
+        bottom: 2rem; right: 2rem;
+        border-bottom-width: 1px;
+        border-right-width: 1px;
+      }
+
+      @include mq(phone) {
+        &:nth-child(1), &:nth-child(2) { top: 1.25rem; }
+        &:nth-child(3), &:nth-child(4) { bottom: 1.25rem; }
+        &:nth-child(1), &:nth-child(3) { left: 1.25rem; }
+        &:nth-child(2), &:nth-child(4) { right: 1.25rem; }
+      }
+    }
+
+    .intro-loader {
+      position: absolute;
+      bottom: 2.5rem;
+      right: 2.5rem;
+      z-index: 1;
+
+      font-family: font-family(fraktion);
+      font-size: clamp(0.48rem, 0.85vw, 0.58rem);
+      color: rgba(167, 139, 250, 0.35);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      pointer-events: none;
+
+      @include mq(phone) {
+        bottom: 1.5rem;
+        right: 1.5rem;
+      }
+    }
+
+    .js-loader-num {
+      display: inline-block;
+      min-width: 1.5em;
+      text-align: right;
     }
 
     .site-wrapper {
