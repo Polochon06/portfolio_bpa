@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;1,6..96,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet" />
-  <link rel="preload" href="/portfolio_bpa/footage/video-1.mp4" as="video" type="video/mp4" />
+  <link rel="preload" href="/portfolio_bpa/footage/photo-1.webp" as="image" type="image/webp" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -38,19 +38,20 @@
       position: fixed; inset: 0; z-index: 0;
       overflow: hidden;
     }
-    .bg-vid {
+    .bg-photo {
       position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: -5%; left: -5%;
+      width: 110%; height: 110%;
       object-fit: cover;
       opacity: 0;
       pointer-events: none;
-      /* GPU layer — no filter (degrades quality) */
+      transform-origin: center center;
+      /* GPU layer — no filter */
       transform: translateZ(0);
       backface-visibility: hidden;
-      will-change: opacity;
+      will-change: opacity, transform;
     }
-    /* Pas de .bg-vid.active — GSAP contrôle l'opacité */
+    /* GSAP contrôle opacity + Ken Burns */
     /* Vignette */
     #cinematic-bg::after {
       content: '';
@@ -381,32 +382,16 @@
   <div class="lbox lbox-t"></div>
   <div class="lbox lbox-b"></div>
 
-  <!-- ── BACKGROUND VIDEOS ─────────────────────────────────────────── -->
+  <!-- ── BACKGROUND PHOTOS (Ken Burns) ────────────────────────────── -->
   <div id="cinematic-bg">
-    <video class="bg-vid active" id="vid1" muted playsinline preload="auto">
-      <source src="/portfolio_bpa/footage/video-1.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-vid" id="vid2" muted playsinline preload="metadata">
-      <source src="/portfolio_bpa/footage/video-2.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-vid" id="vid3" muted playsinline preload="metadata">
-      <source src="/portfolio_bpa/footage/video-3.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-vid" id="vid4" muted playsinline preload="none">
-      <source src="/portfolio_bpa/footage/video-4.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-vid" id="vid5" muted playsinline preload="none">
-      <source src="/portfolio_bpa/footage/video-5.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-vid" id="vid6" muted playsinline preload="none">
-      <source src="/portfolio_bpa/footage/video-6.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-vid" id="vid7" muted playsinline preload="none">
-      <source src="/portfolio_bpa/footage/video-7.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-vid" id="vid8" muted playsinline preload="none">
-      <source src="/portfolio_bpa/footage/video-8.mp4" type="video/mp4" />
-    </video>
+    <img class="bg-photo" src="/portfolio_bpa/footage/photo-1.webp" alt="" aria-hidden="true" fetchpriority="high" />
+    <img class="bg-photo" src="/portfolio_bpa/footage/photo-2.webp" alt="" aria-hidden="true" loading="lazy" />
+    <img class="bg-photo" src="/portfolio_bpa/footage/photo-3.webp" alt="" aria-hidden="true" loading="lazy" />
+    <img class="bg-photo" src="/portfolio_bpa/footage/photo-4.webp" alt="" aria-hidden="true" loading="lazy" />
+    <img class="bg-photo" src="/portfolio_bpa/footage/photo-5.webp" alt="" aria-hidden="true" loading="lazy" />
+    <img class="bg-photo" src="/portfolio_bpa/footage/photo-6.webp" alt="" aria-hidden="true" loading="lazy" />
+    <img class="bg-photo" src="/portfolio_bpa/footage/photo-7.webp" alt="" aria-hidden="true" loading="lazy" />
+    <img class="bg-photo" src="/portfolio_bpa/footage/photo-8.webp" alt="" aria-hidden="true" loading="lazy" />
   </div>
 
   <!-- ── FIXED UI ──────────────────────────────────────────────────── -->
@@ -640,39 +625,59 @@
     // ── ELEMENTS ────────────────────────────────────────────────────────
     const scenes      = Array.from(document.querySelectorAll<HTMLElement>('.scene'))
     const navDots     = Array.from(document.querySelectorAll<HTMLElement>('.nav-dot'))
-    const videos      = Array.from(document.querySelectorAll<HTMLVideoElement>('.bg-vid'))
+    const photos      = Array.from(document.querySelectorAll<HTMLImageElement>('.bg-photo'))
     const barStatus   = document.getElementById('bar-status')!
     const progressBar = document.getElementById('progress-bar')!
     const overlay     = document.getElementById('scene-overlay')!
 
     type SceneInfo = {
-      el: HTMLElement; vidIndex: number
+      el: HTMLElement; photoIdx: number
       lines: HTMLElement[]; fades: HTMLElement[]; status: string
     }
     const SD: SceneInfo[] = scenes.map(el => ({
       el,
-      vidIndex: parseInt(el.dataset.vid ?? '1') - 1,
+      photoIdx: parseInt(el.dataset.vid ?? '1') - 1,
       lines: Array.from(el.querySelectorAll<HTMLElement>('.ti')),
       fades: Array.from(el.querySelectorAll<HTMLElement>('.fade-in')),
       status: el.dataset.status ?? '',
     }))
 
-    // ── VIDEO ───────────────────────────────────────────────────────────
-    let curVid = 0
-    gsap.set(videos[0], { opacity: 1 })
+    // ── KEN BURNS ───────────────────────────────────────────────────────
+    // Each scene: different direction for visual variety
+    const KB = [
+      { xs: '0%',    ys: '0%',    xe: '-1.5%', ye: '-1%'  },
+      { xs: '-1.5%', ys: '-1%',   xe: '0.5%',  ye: '0.5%' },
+      { xs: '1.5%',  ys: '0.5%',  xe: '-0.5%', ye: '-1%'  },
+      { xs: '0%',    ys: '-1.5%', xe: '-1%',   ye: '0.5%' },
+      { xs: '-1.5%', ys: '0%',    xe: '1%',    ye: '-1%'  },
+      { xs: '1%',    ys: '-1%',   xe: '-1%',   ye: '0%'   },
+      { xs: '-1%',   ys: '-0.5%', xe: '1.5%',  ye: '0.5%' },
+      { xs: '0%',    ys: '1%',    xe: '-1%',   ye: '-1%'  },
+    ]
+
+    function kenBurnsStart(photo: HTMLImageElement, idx: number) {
+      const k = KB[idx % KB.length]
+      gsap.fromTo(photo,
+        { scale: 1.0, x: k.xs, y: k.ys },
+        { scale: 1.07, x: k.xe, y: k.ye, duration: 8, ease: 'power1.inOut' })
+    }
+
+    function kenBurnsStop(photo: HTMLImageElement) {
+      gsap.killTweensOf(photo, 'scale,x,y')
+    }
+
+    // ── PHOTO CROSSFADE ─────────────────────────────────────────────────
+    let curPhoto = 0
+    gsap.set(photos[0], { opacity: 1 })
+    kenBurnsStart(photos[0], 0)
 
     function crossfade(to: number) {
-      if (to === curVid) return
-      const next = videos[to], prev = videos[curVid]
-      if (next.preload === 'none') { next.preload = 'auto'; next.load() }
-      const after = videos[to + 1]
-      if (after?.preload === 'none') { after.preload = 'metadata'; after.load() }
-      // Hidden behind overlay so crossfade happens in the dark — seamless
-      gsap.to(prev, { opacity: 0, duration: 0.6, ease: 'power1.out', onComplete: () => prev.pause() })
-      gsap.fromTo(next, { opacity: 0 }, { opacity: 1, duration: 0.9, ease: 'power1.out' })
-      next.currentTime = 0
-      next.play().catch(() => {})
-      curVid = to
+      if (to === curPhoto) return
+      const next = photos[to], prev = photos[curPhoto]
+      gsap.to(prev,   { opacity: 0, duration: 0.6, ease: 'power1.out', onComplete: () => kenBurnsStop(prev) })
+      gsap.fromTo(next, { opacity: 0 }, { opacity: 1, duration: 0.9, ease: 'power1.out',
+        onComplete: () => kenBurnsStart(next, to) })
+      curPhoto = to
     }
 
     // ── LETTERBOX ───────────────────────────────────────────────────────
@@ -697,12 +702,15 @@
     // ── NAVIGATION ──────────────────────────────────────────────────────
     let active  = 0
     let lastNav = 0
-    const NAV_COOLDOWN = 950  // ms — matches overlay + crossfade duration
+    let pendingReveal: gsap.core.Tween | null = null
+    const NAV_COOLDOWN = 950
 
     function goTo(idx: number) {
       if (Date.now() - lastNav < NAV_COOLDOWN) return
       if (idx === active || idx < 0 || idx >= scenes.length) return
       lastNav = Date.now()
+
+      if (pendingReveal) { pendingReveal.kill(); pendingReveal = null }
 
       const from = SD[active]
       const to   = SD[idx]
@@ -712,22 +720,22 @@
       barStatus.textContent = to.status
       progressBar.style.width = `${(idx / (scenes.length - 1)) * 100}%`
 
-      // Cinematic transition — fade to dark, swap, emerge
+      // Cinematic overlay — fade to dark, swap photo, emerge
       gsap.to(overlay, {
         opacity: 1, duration: 0.32, ease: 'power2.inOut',
         onComplete() {
           from.el.classList.remove('active')
           to.el.classList.add('active')
-          crossfade(to.vidIndex)
+          crossfade(to.photoIdx)
           gsap.to(overlay, {
             opacity: 0, duration: 0.65, ease: 'power2.out', delay: 0.06,
             onComplete() {
-              const vid = videos[to.vidIndex]
-              vid.addEventListener('ended', () => {
+              // Text reveals after Ken Burns has played ~5.5s
+              pendingReveal = gsap.delayedCall(5.5, () => {
                 if (active !== idx) return
-                vid.pause()
                 showText(to)
-              }, { once: true })
+                pendingReveal = null
+              })
             }
           })
         }
@@ -751,34 +759,25 @@
         { y: '110%' },
         { y: '0%', duration: 1.1, stagger: 0.15, ease: 'power3.out' }, '-=0.35')
       tl.to(sub,  { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.55')
-      tl.to(hint, { opacity: 1, duration: 0.7, ease: 'power2.out' }, '-=0.45')
-
-      videos[0].play().catch(() => {})
-      videos[0].addEventListener('ended', () => {
-        if (active !== 0) return
-        videos[0].pause()
-        gsap.to(hint, { opacity: 0.85, y: -5, repeat: -1, yoyo: true, duration: 1.2, ease: 'sine.inOut' })
-      })
+      tl.to(hint, { opacity: 1, duration: 0.7, ease: 'power2.out' }, '-=0.45',
+        () => {
+          // After hero intro, pulse hint
+          gsap.to(hint, { opacity: 0.85, y: -5, repeat: -1, yoyo: true, duration: 1.2, ease: 'sine.inOut', delay: 2 })
+        })
     })()
 
-    // ── WHEEL — velocity-based accumulator (pas de debounce lag) ────────
+    // ── WHEEL — velocity-based (pas de debounce lag) ─────────────────────
     let wVel = 0
     let wRaf = 0
 
     function wheelTick() {
       if (Math.abs(wVel) > 8) {
         goTo(active + (wVel > 0 ? 1 : -1))
-        wVel = 0
-        wRaf = 0
-        return
+        wVel = 0; wRaf = 0; return
       }
       wVel *= 0.80
-      if (Math.abs(wVel) > 0.4) {
-        wRaf = requestAnimationFrame(wheelTick)
-      } else {
-        wVel = 0
-        wRaf = 0
-      }
+      if (Math.abs(wVel) > 0.4) { wRaf = requestAnimationFrame(wheelTick) }
+      else { wVel = 0; wRaf = 0 }
     }
 
     window.addEventListener('wheel', e => {
