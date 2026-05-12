@@ -4,769 +4,888 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <title>Paul Blanc — Développeur Créatif</title>
+  <title>Paul Blanc — Creative Developer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Portfolio de Paul Blanc, Développeur Créatif. Java, Motion Design, Architecture Logicielle." />
+  <meta name="description" content="Paul Blanc — Développeur Créatif. Java, React, Motion Design." />
   <meta name="robots" content="noindex, nofollow" />
   <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
-  <link rel="preload" href="/fonts/Bigger-Display.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-  <link rel="preload" href="/fonts/PPFraktionMono-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-  <link rel="preload" href="/fonts/PPEditorialNew-Ultralight.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet" />
+  <link rel="preload" href="/portfolio_bpa/footage/video-1.mp4" as="video" type="video/mp4" />
   <style>
-    @font-face { font-family:'Bigger';   src:url('/fonts/Bigger-Display.woff2') format('woff2');            font-display:block; }
-    @font-face { font-family:'Fraktion'; src:url('/fonts/PPFraktionMono-Regular.woff2') format('woff2');    font-display:block; }
-    @font-face { font-family:'Editorial';src:url('/fonts/PPEditorialNew-Ultralight.woff2') format('woff2'); font-display:block; font-weight:200; }
-
-    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    /* ── RESET & BASE ───────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --gold:   #c9a84c;
-      --gold2:  rgba(201,168,76,0.15);
-      --white:  #f5f0e8;
-      --muted:  rgba(245,240,232,0.5);
-      --dark:   #060409;
-      --border: rgba(201,168,76,0.18);
+      --gold-d: rgba(201,168,76,0.12);
+      --cream:  #f0ebe0;
+      --muted:  rgba(240,235,224,0.45);
+      --dark:   #06040a;
+      --line:   rgba(201,168,76,0.2);
     }
+    html { background: var(--dark); }
+    body {
+      background: var(--dark);
+      color: var(--cream);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+    ::selection { background: rgba(201,168,76,0.25); }
 
-    html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
-    body { background: var(--dark); color: var(--white); font-family: 'Editorial', serif; overflow-x: hidden; }
-
-    /* ── VIDEO BG ── */
-    .bg-video-wrap {
+    /* ── CINEMATIC VIDEO BG ─────────────────────────────────────────── */
+    #cinematic-bg {
       position: fixed; inset: 0; z-index: 0;
       overflow: hidden;
-      pointer-events: none;
     }
-    .bg-video {
+    .bg-vid {
       position: absolute;
       top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      /* 16:9 — couvre tout l'écran */
+      transform: translate(-50%,-50%) scale(1.06);
       width: max(100vw, 177.78vh);
       height: max(56.25vw, 100vh);
-      border: none;
-      opacity: 0.48;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1.4s cubic-bezier(0.4,0,0.2,1);
       pointer-events: none;
+      will-change: opacity, transform;
     }
-    .bg-overlay {
-      position: fixed; inset: 0; z-index: 1;
-      background: linear-gradient(180deg, rgba(6,4,9,0.55) 0%, rgba(6,4,9,0.35) 40%, rgba(6,4,9,0.65) 100%);
+    .bg-vid.active { opacity: 1; }
+
+    /* Photo fallback layers */
+    .bg-photo {
+      position: absolute; inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1.4s cubic-bezier(0.4,0,0.2,1);
+      will-change: opacity;
+    }
+    .bg-photo.active { opacity: 1; }
+
+    /* Global dark vignette */
+    #cinematic-bg::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 2;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 50%, transparent 40%, rgba(6,4,10,0.65) 100%),
+        linear-gradient(180deg, rgba(6,4,10,0.5) 0%, transparent 20%, transparent 80%, rgba(6,4,10,0.7) 100%);
       pointer-events: none;
-    }
-    .bg-noise {
-      position: fixed; inset: 0; z-index: 2;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 160px; opacity: 0.032; pointer-events: none;
     }
 
-    /* ── NAV ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.8rem 3rem;
-      border-bottom: 1px solid transparent;
-      transition: border-color 0.4s, backdrop-filter 0.4s, background 0.4s;
+    /* Noise grain */
+    #cinematic-bg::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 3;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 180px;
+      opacity: 0.03;
+      pointer-events: none;
     }
-    nav.scrolled {
-      background: rgba(6,4,9,0.75);
-      backdrop-filter: blur(18px);
-      border-color: var(--border);
+
+    /* Cinematic letterbox */
+    .letterbox-top, .letterbox-bot {
+      position: fixed; left: 0; right: 0; z-index: 80;
+      height: 0;
+      background: #000;
+      transition: height 0.8s cubic-bezier(0.4,0,0.2,1);
+      pointer-events: none;
     }
-    .nav-logo {
-      font-family: 'Fraktion', monospace;
-      font-size: 0.6rem;
+    .letterbox-top { top: 0; }
+    .letterbox-bot { bottom: 0; }
+    body.cinematic .letterbox-top,
+    body.cinematic .letterbox-bot { height: 5vh; }
+
+    /* ── NAV ────────────────────────────────────────────────────────── */
+    #scene-nav {
+      position: fixed; right: 2.5rem; top: 50%;
+      transform: translateY(-50%);
+      z-index: 90;
+      display: flex; flex-direction: column; gap: 1rem;
+      opacity: 0; transition: opacity 0.6s;
+    }
+    #scene-nav.visible { opacity: 1; }
+    .nav-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: rgba(201,168,76,0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .nav-dot::before {
+      content: attr(data-label);
+      position: absolute;
+      right: 1.4rem; top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Jost', sans-serif;
+      font-size: 0.5rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(201,168,76,0.6);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+    .nav-dot:hover::before { opacity: 1; }
+    .nav-dot.active { background: var(--gold); transform: scale(1.6); }
+
+    /* Top bar */
+    #top-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 90;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 2rem 3rem;
+      opacity: 0; transition: opacity 0.6s;
+    }
+    #top-bar.visible { opacity: 1; }
+    .bar-logo {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.58rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+    }
+    .bar-hint {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.5rem;
       letter-spacing: 0.25em;
       text-transform: uppercase;
-      color: var(--gold);
-      text-decoration: none;
-    }
-    .nav-links {
-      display: flex; gap: 2.5rem; list-style: none;
-    }
-    .nav-links a {
-      font-family: 'Fraktion', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
       color: var(--muted);
-      text-decoration: none;
-      transition: color 0.2s;
     }
-    .nav-links a:hover { color: var(--white); }
-    .nav-cta {
-      font-family: 'Fraktion', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 0.2em;
+
+    /* ── SCROLL CONTAINER ───────────────────────────────────────────── */
+    #scroll-container {
+      position: relative; z-index: 10;
+    }
+
+    /* ── SCENE BASE ─────────────────────────────────────────────────── */
+    .scene {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      overflow: hidden;
+    }
+    .scene-inner {
+      position: relative; z-index: 5;
+      padding: 0 7vw;
+      max-width: 900px;
+    }
+
+    /* ── CINEMATIC TEXT ELEMENTS ────────────────────────────────────── */
+    .scene-tag {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.52rem;
+      letter-spacing: 0.32em;
       text-transform: uppercase;
       color: var(--gold);
-      text-decoration: none;
-      border: 1px solid var(--border);
-      padding: 0.6rem 1.4rem;
-      transition: background 0.25s, color 0.25s;
+      margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
     }
-    .nav-cta:hover { background: var(--gold2); color: var(--white); }
+    .scene-tag::before {
+      content: '';
+      width: 32px; height: 1px;
+      background: var(--gold);
+      flex-shrink: 0;
+    }
 
-    /* ── SECTIONS ── */
-    section {
-      position: relative; z-index: 10;
-      min-height: 100vh;
-      scroll-snap-align: start;
+    .scene-title {
+      font-family: 'Bodoni Moda', serif;
+      font-size: clamp(3.5rem, 8vw, 8rem);
+      font-weight: 400;
+      line-height: 0.92;
+      letter-spacing: -0.01em;
+      margin-bottom: 2rem;
+    }
+    .scene-title em {
+      font-style: italic;
+      color: rgba(240,235,224,0.65);
+    }
+
+    .scene-body {
+      font-family: 'Jost', sans-serif;
+      font-size: clamp(0.9rem, 1.3vw, 1.1rem);
+      font-weight: 200;
+      line-height: 1.8;
+      color: var(--muted);
+      max-width: 480px;
+    }
+    .scene-body strong { color: var(--cream); font-weight: 400; }
+
+    .gold-line {
+      width: 48px; height: 1px;
+      background: var(--gold);
+      margin-bottom: 2rem;
+    }
+
+    /* ── SCENE 1 — ISLAND INTRO ─────────────────────────────────────── */
+    #s1 { justify-content: center; align-items: flex-end; padding-bottom: 12vh; }
+    #s1 .scene-inner { text-align: center; max-width: 700px; padding: 0 7vw; }
+    #s1 .scene-tag { justify-content: center; }
+    #s1 .scene-tag::before { display: none; }
+    #s1 .scene-title { font-size: clamp(5rem, 13vw, 13rem); letter-spacing: 0.06em; }
+
+    .scroll-cue {
+      position: absolute; bottom: 3rem; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.45rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(201,168,76,0.55);
+      animation: scrollBounce 3s ease-in-out infinite;
+    }
+    .scroll-cue-line {
+      width: 1px; height: 48px;
+      background: linear-gradient(180deg, var(--gold), transparent);
+    }
+    @keyframes scrollBounce {
+      0%,100% { opacity: 0.6; transform: translateX(-50%) translateY(0); }
+      50%      { opacity: 1;   transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ── SCENE 2 — APPROACH ─────────────────────────────────────────── */
+    #s2 { align-items: flex-end; padding-bottom: 14vh; }
+
+    /* ── SCENE 3 — ENTRANCE ─────────────────────────────────────────── */
+    #s3 { justify-content: center; align-items: center; text-align: center; }
+    #s3 .scene-inner { padding: 0 7vw; max-width: 800px; }
+
+    /* ── SCENE 4 — ABOUT ────────────────────────────────────────────── */
+    #s4 .scene-inner { max-width: 620px; }
+
+    /* ── SCENE 5 — PROJECTS ─────────────────────────────────────────── */
+    #s5 { align-items: stretch; padding: 0; }
+    .projects-scene {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: 100vh;
+      width: 100%;
+    }
+    .proj-half {
+      position: relative;
       display: flex; flex-direction: column;
-      justify-content: center;
-    }
-
-    /* ── HERO ── */
-    #hero {
-      padding: 0 6vw;
       justify-content: flex-end;
-      padding-bottom: 10vh;
+      padding: 4rem 3.5rem;
+      border-right: 1px solid var(--line);
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.4s;
     }
-    .hero-tag {
-      font-family: 'Fraktion', monospace;
-      font-size: 0.55rem;
+    .proj-half:last-child { border-right: none; }
+    .proj-half:hover { background: rgba(201,168,76,0.04); }
+    .proj-half::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(0deg, rgba(6,4,10,0.8) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .proj-half-bg {
+      position: absolute; inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0.3;
+      transition: opacity 0.5s, transform 0.8s cubic-bezier(0.4,0,0.2,1);
+    }
+    .proj-half:hover .proj-half-bg { opacity: 0.5; transform: scale(1.04); }
+    .proj-num {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.48rem;
       letter-spacing: 0.28em;
       text-transform: uppercase;
       color: var(--gold);
-      margin-bottom: 1.8rem;
-      opacity: 0; animation: fadeUp 0.9s 0.1s ease forwards;
+      margin-bottom: 0.8rem;
+      position: relative; z-index: 2;
     }
-    .hero-title {
-      font-family: 'Bigger', sans-serif;
-      font-size: clamp(4rem, 10vw, 10rem);
+    .proj-name {
+      font-family: 'Bodoni Moda', serif;
+      font-size: clamp(1.8rem, 3vw, 3rem);
       font-weight: 400;
-      line-height: 0.88;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 2.5rem;
-      opacity: 0; animation: fadeUp 1.1s 0.25s cubic-bezier(0.16,1,0.3,1) forwards;
-    }
-    .hero-title em {
-      font-style: normal;
-      background: linear-gradient(135deg, #fff 30%, var(--gold));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-    .hero-sub {
-      font-family: 'Editorial', serif;
-      font-size: clamp(1rem, 1.8vw, 1.4rem);
-      font-weight: 200;
-      color: var(--muted);
-      max-width: 520px;
-      line-height: 1.65;
-      margin-bottom: 3rem;
-      opacity: 0; animation: fadeUp 1s 0.45s ease forwards;
-    }
-    .hero-actions {
-      display: flex; gap: 1.2rem; align-items: center;
-      opacity: 0; animation: fadeUp 1s 0.6s ease forwards;
-    }
-    .btn-primary {
-      font-family: 'Fraktion', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--dark);
-      background: var(--gold);
-      padding: 0.9rem 2.2rem;
-      text-decoration: none;
-      transition: opacity 0.2s;
-    }
-    .btn-primary:hover { opacity: 0.85; }
-    .btn-ghost {
-      font-family: 'Fraktion', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--white);
-      border: 1px solid var(--border);
-      padding: 0.9rem 2.2rem;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-    .btn-ghost:hover { background: var(--gold2); }
-
-    /* Hotspots sur la vidéo */
-    .hotspots {
-      position: absolute; inset: 0; z-index: 5; pointer-events: none;
-    }
-    .hotspot {
-      position: absolute;
-      pointer-events: all;
-      cursor: pointer;
-      display: flex; align-items: center; gap: 0.7rem;
-      opacity: 0; animation: fadeIn 0.8s forwards;
-    }
-    .hotspot-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--gold);
-      box-shadow: 0 0 0 0 rgba(201,168,76,0.6);
-      animation: ripple 2.5s ease-in-out infinite;
-    }
-    .hotspot-label {
-      font-family: 'Fraktion', monospace;
-      font-size: 0.5rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(201,168,76,0.8);
-      white-space: nowrap;
-    }
-    @keyframes ripple {
-      0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.5); }
-      50%      { box-shadow: 0 0 0 8px rgba(201,168,76,0); }
-    }
-
-    /* ── ABOUT ── */
-    #about { padding: 0 6vw; }
-    .section-num {
-      font-family: 'Fraktion', monospace;
-      font-size: 0.5rem;
-      letter-spacing: 0.3em;
-      color: var(--gold);
-      margin-bottom: 4rem;
-    }
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8vw;
-      align-items: end;
-    }
-    .about-title {
-      font-family: 'Bigger', sans-serif;
-      font-size: clamp(3rem, 6vw, 6.5rem);
-      font-weight: 400;
-      text-transform: uppercase;
-      line-height: 0.9;
-      letter-spacing: 0.04em;
-    }
-    .about-body {
-      font-family: 'Editorial', serif;
-      font-size: clamp(0.95rem, 1.4vw, 1.15rem);
-      font-weight: 200;
-      color: var(--muted);
-      line-height: 1.75;
-    }
-    .about-body p + p { margin-top: 1.2rem; }
-    .about-body strong { color: var(--white); font-weight: 400; }
-    .stats {
-      display: flex; gap: 3rem; margin-top: 3.5rem;
-      border-top: 1px solid var(--border);
-      padding-top: 2rem;
-    }
-    .stat-num {
-      font-family: 'Bigger', sans-serif;
-      font-size: 2.8rem;
-      line-height: 1;
-      color: var(--gold);
-    }
-    .stat-label {
-      font-family: 'Fraktion', monospace;
-      font-size: 0.5rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-top: 0.3rem;
-    }
-
-    /* ── PROJECTS ── */
-    #projects { padding: 0 6vw; }
-    .projects-header {
-      display: flex; justify-content: space-between; align-items: baseline;
-      margin-bottom: 5rem;
-    }
-    .section-title {
-      font-family: 'Bigger', sans-serif;
-      font-size: clamp(3rem, 6vw, 6rem);
-      font-weight: 400;
-      text-transform: uppercase;
-      line-height: 0.9;
-      letter-spacing: 0.04em;
-    }
-    .project-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5px;
-    }
-    .project-card {
-      position: relative;
-      background: rgba(6,4,9,0.55);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border);
-      padding: 2.5rem;
-      text-decoration: none;
-      color: inherit;
-      overflow: hidden;
-      transition: border-color 0.3s;
-      display: block;
-    }
-    .project-card:hover { border-color: rgba(201,168,76,0.45); }
-    .project-card:hover .card-arrow { transform: translate(4px, -4px); }
-    .card-num {
-      font-family: 'Fraktion', monospace;
-      font-size: 0.48rem;
-      letter-spacing: 0.25em;
-      color: var(--gold);
-      margin-bottom: 3rem;
-    }
-    .card-title {
-      font-family: 'Bigger', sans-serif;
-      font-size: clamp(1.6rem, 2.5vw, 2.4rem);
-      font-weight: 400;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
       line-height: 0.95;
-      margin-bottom: 1.2rem;
+      margin-bottom: 1rem;
+      position: relative; z-index: 2;
     }
-    .card-desc {
-      font-family: 'Editorial', serif;
-      font-size: 0.9rem;
+    .proj-desc {
+      font-size: 0.85rem;
       font-weight: 200;
       color: var(--muted);
       line-height: 1.6;
-      margin-bottom: 2rem;
+      max-width: 340px;
+      position: relative; z-index: 2;
     }
-    .card-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-    .card-tag {
-      font-family: 'Fraktion', monospace;
-      font-size: 0.45rem;
+    .proj-tags {
+      display: flex; flex-wrap: wrap; gap: 0.4rem;
+      margin-top: 1.2rem;
+      position: relative; z-index: 2;
+    }
+    .proj-tag {
+      font-size: 0.42rem;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: var(--gold);
-      border: 1px solid var(--border);
-      padding: 0.3rem 0.7rem;
+      border: 1px solid var(--line);
+      padding: 0.25rem 0.6rem;
+      color: rgba(201,168,76,0.7);
     }
-    .card-arrow {
-      position: absolute; top: 2rem; right: 2rem;
-      font-size: 1.2rem;
-      color: var(--gold);
-      transition: transform 0.25s;
+    .proj-arrow {
+      position: absolute; top: 2.5rem; right: 2.5rem; z-index: 5;
+      font-size: 1.1rem; color: var(--gold);
+      opacity: 0; transform: translate(-4px, 4px);
+      transition: all 0.3s;
     }
-    .card-featured {
-      grid-column: 1 / -1;
-    }
-    .card-featured .card-title { font-size: clamp(2rem, 4vw, 4rem); }
+    .proj-half:hover .proj-arrow { opacity: 1; transform: translate(0,0); }
 
-    /* ── SKILLS ── */
-    #skills { padding: 0 6vw; }
-    .skills-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      margin-top: 4rem;
+    /* ── SCENE 6 — SKILLS ───────────────────────────────────────────── */
+    #s6 { justify-content: flex-end; }
+    #s6 .scene-inner { max-width: 100%; width: 100%; }
+    .skills-row {
+      display: flex;
+      gap: 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 2.5rem 0;
+      margin-top: 2.5rem;
     }
-    .skill-block {
-      background: rgba(6,4,9,0.5);
-      backdrop-filter: blur(6px);
-      border: 1px solid var(--border);
-      padding: 2.5rem;
+    .skill-col {
+      flex: 1;
+      padding: 0 2.5rem;
+      border-right: 1px solid var(--line);
     }
-    .skill-category {
-      font-family: 'Fraktion', monospace;
+    .skill-col:first-child { padding-left: 0; }
+    .skill-col:last-child { border-right: none; }
+    .skill-col-title {
+      font-family: 'Jost', sans-serif;
       font-size: 0.48rem;
       letter-spacing: 0.25em;
       text-transform: uppercase;
       color: var(--gold);
       margin-bottom: 1.5rem;
     }
-    .skill-list {
-      list-style: none;
-      display: flex; flex-direction: column; gap: 0.6rem;
-    }
-    .skill-list li {
-      font-family: 'Editorial', serif;
-      font-size: 1.05rem;
+    .skill-item {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.9rem;
       font-weight: 200;
       color: var(--muted);
-      display: flex; align-items: center; gap: 0.7rem;
+      line-height: 1;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(201,168,76,0.08);
+      display: flex; align-items: center; gap: 0.6rem;
     }
-    .skill-list li::before {
+    .skill-item::before {
       content: '';
-      width: 4px; height: 4px; border-radius: 50%;
+      width: 3px; height: 3px; border-radius: 50%;
       background: var(--gold); flex-shrink: 0;
     }
 
-    /* ── CONTACT ── */
-    #contact {
-      padding: 0 6vw;
-      align-items: center;
-      text-align: center;
-    }
-    .contact-tag {
-      font-family: 'Fraktion', monospace;
-      font-size: 0.52rem;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 2rem;
-    }
-    .contact-title {
-      font-family: 'Bigger', sans-serif;
-      font-size: clamp(4rem, 9vw, 9rem);
-      font-weight: 400;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      line-height: 0.88;
-      margin-bottom: 2rem;
-    }
-    .contact-sub {
-      font-family: 'Editorial', serif;
-      font-size: 1.1rem;
-      font-weight: 200;
-      color: var(--muted);
-      max-width: 480px;
-      line-height: 1.65;
-      margin: 0 auto 3rem;
-    }
-    .contact-email {
-      font-family: 'Fraktion', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--gold);
-      text-decoration: none;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 0.3rem;
-      transition: border-color 0.2s;
-    }
-    .contact-email:hover { border-color: var(--gold); }
-    .socials {
-      display: flex; gap: 1.5rem; justify-content: center;
+    /* ── SCENE 7 — MOTION ───────────────────────────────────────────── */
+    #s7 { justify-content: center; align-items: center; }
+    #s7 .scene-inner { text-align: center; }
+    .vfx-grid {
+      display: flex; gap: 1px;
       margin-top: 3rem;
     }
-    .social-link {
-      font-family: 'Fraktion', monospace;
-      font-size: 0.5rem;
-      letter-spacing: 0.2em;
+    .vfx-item {
+      flex: 1;
+      aspect-ratio: 9/16;
+      max-height: 55vh;
+      overflow: hidden;
+      position: relative;
+    }
+    .vfx-item video, .vfx-item img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.7;
+      transition: opacity 0.4s, transform 0.8s cubic-bezier(0.4,0,0.2,1);
+    }
+    .vfx-item:hover video,
+    .vfx-item:hover img { opacity: 1; transform: scale(1.05); }
+
+    /* ── SCENE 8 — CONTACT ──────────────────────────────────────────── */
+    #s8 { justify-content: center; align-items: center; text-align: center; }
+    #s8 .scene-inner { max-width: 700px; }
+    .contact-links {
+      display: flex; gap: 2.5rem;
+      justify-content: center;
+      margin-top: 3rem;
+    }
+    .contact-link {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.52rem;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
       color: var(--muted);
       text-decoration: none;
-      transition: color 0.2s;
+      border-bottom: 1px solid transparent;
+      padding-bottom: 0.2rem;
+      transition: color 0.2s, border-color 0.2s;
     }
-    .social-link:hover { color: var(--gold); }
+    .contact-link:hover { color: var(--gold); border-color: var(--gold); }
+    .contact-email {
+      font-family: 'Bodoni Moda', serif;
+      font-size: clamp(1.1rem, 2vw, 1.6rem);
+      font-style: italic;
+      color: var(--cream);
+      text-decoration: none;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 0.4rem;
+      display: inline-block;
+      margin-top: 2rem;
+      transition: border-color 0.3s;
+    }
+    .contact-email:hover { border-color: var(--gold); }
 
-    /* ── FOOTER ── */
+    /* ── STATS ──────────────────────────────────────────────────────── */
+    .stat-row {
+      display: flex; gap: 3.5rem;
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--line);
+    }
+    .stat-val {
+      font-family: 'Bodoni Moda', serif;
+      font-size: 3rem;
+      font-weight: 400;
+      line-height: 1;
+      color: var(--gold);
+    }
+    .stat-lbl {
+      font-size: 0.48rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+
+    /* ── SCENE TRANSITIONS ──────────────────────────────────────────── */
+    .scene-content { will-change: opacity, transform; }
+
+    /* ── FOOTER ─────────────────────────────────────────────────────── */
     footer {
       position: relative; z-index: 10;
       display: flex; justify-content: space-between; align-items: center;
-      padding: 1.5rem 6vw;
-      border-top: 1px solid var(--border);
+      padding: 1.5rem 3rem;
+      border-top: 1px solid var(--line);
     }
-    .footer-copy {
-      font-family: 'Fraktion', monospace;
-      font-size: 0.48rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .footer-back {
-      font-family: 'Fraktion', monospace;
-      font-size: 0.48rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--gold);
-      text-decoration: none;
-      transition: opacity 0.2s;
-    }
-    .footer-back:hover { opacity: 0.7; }
-
-    /* ── SCROLL INDICATOR ── */
-    .scroll-hint {
-      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
-      font-family: 'Fraktion', monospace;
+    .foot-copy {
       font-size: 0.45rem;
-      letter-spacing: 0.25em;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
       color: var(--muted);
-      animation: fadeIn 1s 1.2s ease both;
-    }
-    .scroll-line {
-      width: 1px; height: 40px;
-      background: linear-gradient(180deg, var(--gold), transparent);
-      animation: scrollPulse 2s ease-in-out infinite;
-    }
-    @keyframes scrollPulse {
-      0%,100% { opacity: 0.4; transform: scaleY(1); }
-      50%      { opacity: 1;   transform: scaleY(1.15); }
     }
 
-    /* ── DIVIDER LINE ── */
-    .h-line {
-      width: 100%; height: 1px;
-      background: var(--border);
-      margin: 0;
+    /* ── TRANSITIONS INDICATOR ──────────────────────────────────────── */
+    #progress-bar {
+      position: fixed; bottom: 0; left: 0; z-index: 90;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), rgba(201,168,76,0.3));
+      width: 0%;
+      transition: width 0.1s;
     }
 
-    /* ── ANIMATIONS ── */
+    /* ── ANIMATIONS ─────────────────────────────────────────────────── */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from { opacity:0; transform: translateY(24px); }
+      to   { opacity:1; transform: translateY(0); }
     }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
+    .anim-in { animation: fadeUp 1.2s cubic-bezier(0.16,1,0.3,1) both; }
+    .anim-in-2 { animation: fadeUp 1.2s 0.2s cubic-bezier(0.16,1,0.3,1) both; }
+    .anim-in-3 { animation: fadeUp 1.2s 0.4s cubic-bezier(0.16,1,0.3,1) both; }
 
-    .reveal {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1), transform 0.85s cubic-bezier(0.16,1,0.3,1);
-    }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      nav { padding: 1.2rem 1.5rem; }
-      .nav-links { display: none; }
-      #hero { padding: 0 6vw 8vh; }
-      .about-grid { grid-template-columns: 1fr; gap: 3rem; }
-      .project-grid { grid-template-columns: 1fr; }
-      .card-featured { grid-column: 1; }
-      .skills-grid { grid-template-columns: 1fr; }
-      section { min-height: auto; padding-top: 8rem; padding-bottom: 5rem; scroll-snap-align: none; }
-      html { scroll-snap-type: none; }
+    /* ── RESPONSIVE ─────────────────────────────────────────────────── */
+    @media(max-width:768px) {
+      #scene-nav { display:none; }
+      .projects-scene { grid-template-columns: 1fr; height: auto; }
+      .proj-half { min-height: 50vh; }
+      .skills-row { flex-direction: column; gap: 2rem; padding: 2rem 0; }
+      .skill-col { border-right: none; border-bottom: 1px solid var(--line); padding: 0 0 2rem; }
+      .skill-col:last-child { border-bottom: none; }
+      .vfx-grid { flex-direction: column; }
+      .vfx-item { aspect-ratio: 16/9; max-height: 240px; }
+      #top-bar { padding: 1.2rem 1.5rem; }
+      .scene-inner { padding: 0 6vw !important; }
     }
   </style>
 </head>
-<body>
+<body class="cinematic">
 
-  <!-- Vidéo fond YouTube -->
-  <div class="bg-video-wrap">
-    <iframe class="bg-video"
-      src="https://www.youtube.com/embed/Q5jVRIh7oBI?autoplay=1&mute=1&loop=1&playlist=Q5jVRIh7oBI&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
-      allow="autoplay; encrypted-media"
-      tabindex="-1"
-      aria-hidden="true"
-    ></iframe>
+  <!-- Letterbox -->
+  <div class="letterbox-top"></div>
+  <div class="letterbox-bot"></div>
+
+  <!-- ── CINEMATIC BACKGROUND ───────────────────────────────────────── -->
+  <div id="cinematic-bg">
+    <video class="bg-vid active" id="vid1" autoplay muted loop playsinline preload="auto">
+      <source src="/portfolio_bpa/footage/video-1.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-vid" id="vid2" muted loop playsinline preload="none">
+      <source src="/portfolio_bpa/footage/video-2.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-vid" id="vid3" muted loop playsinline preload="none">
+      <source src="/portfolio_bpa/footage/video-3.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-vid" id="vid4" muted loop playsinline preload="none">
+      <source src="/portfolio_bpa/footage/video-4.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-vid" id="vid5" muted loop playsinline preload="none">
+      <source src="/portfolio_bpa/footage/video-5.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-vid" id="vid6" muted loop playsinline preload="none">
+      <source src="/portfolio_bpa/footage/video-6.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-vid" id="vid7" muted loop playsinline preload="none">
+      <source src="/portfolio_bpa/footage/video-7.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-vid" id="vid8" muted loop playsinline preload="none">
+      <source src="/portfolio_bpa/footage/video-8.mp4" type="video/mp4" />
+    </video>
   </div>
-  <div class="bg-overlay"></div>
-  <div class="bg-noise"></div>
 
-  <!-- Nav -->
-  <nav id="nav">
-    <a href="#hero" class="nav-logo">Paul Blanc</a>
-    <ul class="nav-links">
-      <li><a href="#about">À propos</a></li>
-      <li><a href="#projects">Projets</a></li>
-      <li><a href="#skills">Stack</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-    <a href="mailto:zebi6073@gmail.com" class="nav-cta">Me contacter</a>
+  <!-- Top bar -->
+  <div id="top-bar" class="visible">
+    <a href="#s1" class="bar-logo">Paul Blanc</a>
+    <span class="bar-hint">Scroll pour explorer</span>
+  </div>
+
+  <!-- Scene nav dots -->
+  <nav id="scene-nav" class="visible" aria-label="Navigation scènes">
+    <div class="nav-dot active" data-scene="0" data-label="Intro"></div>
+    <div class="nav-dot" data-scene="1" data-label="Arrivée"></div>
+    <div class="nav-dot" data-scene="2" data-label="Entrée"></div>
+    <div class="nav-dot" data-scene="3" data-label="À Propos"></div>
+    <div class="nav-dot" data-scene="4" data-label="Projets"></div>
+    <div class="nav-dot" data-scene="5" data-label="Stack"></div>
+    <div class="nav-dot" data-scene="6" data-label="Créations"></div>
+    <div class="nav-dot" data-scene="7" data-label="Contact"></div>
   </nav>
 
-  <!-- ══ HERO ══════════════════════════════════════════════════════════════ -->
-  <section id="hero">
-    <div class="hotspots">
-      <div class="hotspot" style="top:38%;left:55%;animation-delay:1.4s">
-        <div class="hotspot-dot"></div>
-        <span class="hotspot-label">Villa Principale</span>
-      </div>
-      <div class="hotspot" style="top:62%;left:72%;animation-delay:1.8s">
-        <div class="hotspot-dot"></div>
-        <span class="hotspot-label">Infinity Pool</span>
-      </div>
-      <div class="hotspot" style="top:48%;left:28%;animation-delay:2.2s">
-        <div class="hotspot-dot"></div>
-        <span class="hotspot-label">Jardin Privé</span>
-      </div>
-    </div>
+  <!-- Progress bar -->
+  <div id="progress-bar"></div>
 
-    <p class="hero-tag">— Développeur Créatif · BTS SIO SLAM · Normandie</p>
-    <h1 class="hero-title">
-      <em>Paul</em><br/>Blanc
-    </h1>
-    <p class="hero-sub">
-      Je crée des expériences numériques à l'intersection du code, du motion design et de l'architecture logicielle. Spécialisé Java, React et VFX.
-    </p>
-    <div class="hero-actions">
-      <a href="#projects" class="btn-primary">Voir les projets</a>
-      <a href="#contact" class="btn-ghost">Me contacter</a>
-    </div>
+  <!-- ── SCROLL CONTAINER ────────────────────────────────────────────── -->
+  <div id="scroll-container">
 
-    <div class="scroll-hint">
-      <div class="scroll-line"></div>
-      Scroll
-    </div>
-  </section>
-
-  <div class="h-line" style="position:relative;z-index:10;"></div>
-
-  <!-- ══ ABOUT ══════════════════════════════════════════════════════════════ -->
-  <section id="about">
-    <p class="section-num reveal">01 / À Propos</p>
-    <div class="about-grid">
-      <div class="reveal">
-        <h2 class="about-title">Creative<br/>Develo<br/>per.</h2>
+    <!-- ═══ SCENE 1 — L'ÎLE ═══════════════════════════════════════════ -->
+    <section class="scene" id="s1" data-vid="1">
+      <div class="scene-inner">
+        <div class="scene-tag anim-in">Île Privée · Normandie · 2025</div>
+        <h1 class="scene-title anim-in-2">
+          Paul<br/><em>Blanc</em>
+        </h1>
+        <p class="scene-body anim-in-3">
+          Développeur Créatif — à l'intersection du code, du motion design et de l'architecture logicielle.
+        </p>
       </div>
-      <div class="reveal" style="transition-delay:0.15s">
-        <div class="about-body">
-          <p>Je suis <strong>Paul Blanc</strong>, étudiant en <strong>BTS SIO option SLAM</strong> basé en Normandie. Passionné par le développement depuis 2020, je mélange expertise technique et vision artistique.</p>
-          <p>Spécialisé dans l'<strong>écosystème Java</strong>, l'architecture logicielle MVC/DAO et le <strong>Motion Design</strong> avec After Effects. Je cherche à repousser les limites de ce qu'on peut faire sur le web.</p>
-          <p>Chaque projet est une opportunité de créer quelque chose qui <strong>n'existe pas encore</strong>.</p>
-        </div>
-        <div class="stats">
+      <div class="scroll-cue">
+        <div class="scroll-cue-line"></div>
+        Explorer
+      </div>
+    </section>
+
+    <!-- ═══ SCENE 2 — L'ARRIVÉE ═══════════════════════════════════════ -->
+    <section class="scene" id="s2" data-vid="2">
+      <div class="scene-inner scene-content">
+        <div class="scene-tag">L'Approche</div>
+        <div class="gold-line"></div>
+        <h2 class="scene-title">
+          Chaque<br/>projet<br/><em>compte.</em>
+        </h2>
+        <p class="scene-body" style="margin-top:1.5rem">
+          Je construis des expériences numériques qui ont du sens. Chaque ligne de code, chaque pixel, chaque transition — pensés avec précision.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══ SCENE 3 — L'ENTRÉE ════════════════════════════════════════ -->
+    <section class="scene" id="s3" data-vid="3">
+      <div class="scene-inner scene-content">
+        <div class="scene-tag">BTS SIO SLAM · Promo 2025</div>
+        <h2 class="scene-title" style="font-size:clamp(2.5rem,6vw,6rem)">
+          Bienvenue<br/><em>dans mon univers.</em>
+        </h2>
+        <p class="scene-body" style="margin:1.5rem auto 0; text-align:center">
+          Basé en Normandie, passionné par le développement depuis 2020. Je mélange expertise technique Java/React et vision artistique After Effects.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══ SCENE 4 — À PROPOS ════════════════════════════════════════ -->
+    <section class="scene" id="s4" data-vid="4">
+      <div class="scene-inner scene-content">
+        <div class="scene-tag">À Propos</div>
+        <h2 class="scene-title">
+          Archi<br/>tecture<br/><em>&amp; Art.</em>
+        </h2>
+        <p class="scene-body" style="margin-top:1.5rem">
+          Spécialisé dans l'<strong>écosystème Java</strong> (MVC, DAO, RBAC), le développement <strong>React/Node.js</strong> full-stack, et le <strong>Motion Design</strong> cinématique avec After Effects, Element 3D et Trapcode Suite.
+        </p>
+        <div class="stat-row">
           <div>
-            <div class="stat-num">2+</div>
-            <div class="stat-label">Années d'expérience</div>
+            <div class="stat-val">2+</div>
+            <div class="stat-lbl">Années</div>
           </div>
           <div>
-            <div class="stat-num">4</div>
-            <div class="stat-label">Projets réalisés</div>
+            <div class="stat-val">4</div>
+            <div class="stat-lbl">Projets</div>
           </div>
           <div>
-            <div class="stat-num">∞</div>
-            <div class="stat-label">Curiosité</div>
+            <div class="stat-val">∞</div>
+            <div class="stat-lbl">Curiosité</div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <div class="h-line" style="position:relative;z-index:10;"></div>
+    <!-- ═══ SCENE 5 — PROJETS ═════════════════════════════════════════ -->
+    <section class="scene" id="s5" data-vid="5">
+      <div class="projects-scene">
+        <a href="/portfolio_bpa/mt-conges" class="proj-half">
+          <div class="proj-half-bg" style="background-image:url('/portfolio_bpa/footage/photo-1.png')"></div>
+          <div class="proj-arrow">↗</div>
+          <div class="proj-num">01 · Java · 2024</div>
+          <h3 class="proj-name">MT-Congés<br/>Architecture</h3>
+          <p class="proj-desc">Gestion des congés entreprise — auth sécurisée, RBAC, audit logs, MVC/DAO.</p>
+          <div class="proj-tags">
+            <span class="proj-tag">Java 17</span>
+            <span class="proj-tag">MySQL</span>
+            <span class="proj-tag">MVC</span>
+          </div>
+        </a>
+        <a href="/portfolio_bpa/gymnova" class="proj-half">
+          <div class="proj-half-bg" style="background-image:url('/portfolio_bpa/footage/photo-2.png')"></div>
+          <div class="proj-arrow">↗</div>
+          <div class="proj-num">02 · React · 2024</div>
+          <h3 class="proj-name">Gymnova<br/>E-Commerce</h3>
+          <p class="proj-desc">Site e-commerce complet — 50 produits, panier, Stripe, back-office admin.</p>
+          <div class="proj-tags">
+            <span class="proj-tag">React 18</span>
+            <span class="proj-tag">Stripe</span>
+            <span class="proj-tag">JWT</span>
+          </div>
+        </a>
+      </div>
+    </section>
 
-  <!-- ══ PROJECTS ══════════════════════════════════════════════════════════ -->
-  <section id="projects">
-    <div class="projects-header reveal">
-      <p class="section-num" style="margin-bottom:0">02 / Projets</p>
-      <h2 class="section-title">Work.</h2>
-    </div>
-
-    <div class="project-grid">
-      <a href="/portfolio_bpa/mt-conges" class="project-card card-featured reveal">
-        <span class="card-num">Projet 01 · 2024</span>
-        <div class="card-arrow">↗</div>
-        <h3 class="card-title">MT-Congés<br/>Architecture Java</h3>
-        <p class="card-desc">Application de gestion des congés entreprise. Authentification sécurisée, rôles RBAC, audit logs et architecture MVC rigoureuse.</p>
-        <div class="card-tags">
-          <span class="card-tag">Java 17</span>
-          <span class="card-tag">Swing</span>
-          <span class="card-tag">MySQL</span>
-          <span class="card-tag">MVC/DAO</span>
-          <span class="card-tag">RBAC</span>
-        </div>
-      </a>
-
-      <a href="/portfolio_bpa/gymnova" class="project-card reveal" style="transition-delay:0.1s">
-        <span class="card-num">Projet 02 · 2024</span>
-        <div class="card-arrow">↗</div>
-        <h3 class="card-title">Gymnova<br/>E-Commerce</h3>
-        <p class="card-desc">Site e-commerce complet — catalogue 50 produits, panier, paiement Stripe et back-office admin.</p>
-        <div class="card-tags">
-          <span class="card-tag">React 18</span>
-          <span class="card-tag">Node.js</span>
-          <span class="card-tag">Stripe</span>
-          <span class="card-tag">JWT</span>
-        </div>
-      </a>
-
-      <a href="/portfolio_bpa/after-effects-workflow" class="project-card reveal" style="transition-delay:0.2s">
-        <span class="card-num">Projet 03 · Motion</span>
-        <div class="card-arrow">↗</div>
-        <h3 class="card-title">VFX Lab<br/>Motion Design</h3>
-        <p class="card-desc">Créations visuelles, effets spéciaux et motion design avec Adobe After Effects, Element 3D et Trapcode Suite.</p>
-        <div class="card-tags">
-          <span class="card-tag">After Effects</span>
-          <span class="card-tag">Element 3D</span>
-          <span class="card-tag">Trapcode</span>
-        </div>
-      </a>
-
-      <div class="project-card reveal" style="transition-delay:0.3s; cursor:default;">
-        <span class="card-num">Projet 04 · En cours</span>
-        <h3 class="card-title">Portfolio<br/>3D Island</h3>
-        <p class="card-desc">Expérience portfolio immersive — île privée explorable, React Three Fiber, caméra cinématique et architecture luxe.</p>
-        <div class="card-tags">
-          <span class="card-tag">R3F</span>
-          <span class="card-tag">Three.js</span>
-          <span class="card-tag">GSAP</span>
-          <span class="card-tag">Theatre.js</span>
+    <!-- ═══ SCENE 6 — STACK ═══════════════════════════════════════════ -->
+    <section class="scene" id="s6" data-vid="6">
+      <div class="scene-inner scene-content" style="width:100%;max-width:100%;padding:0 7vw">
+        <div class="scene-tag">Stack Technique</div>
+        <h2 class="scene-title" style="font-size:clamp(3rem,6vw,6rem)">
+          Mes <em>outils.</em>
+        </h2>
+        <div class="skills-row">
+          <div class="skill-col">
+            <div class="skill-col-title">Backend</div>
+            <div class="skill-item">Java 17</div>
+            <div class="skill-item">Spring Boot</div>
+            <div class="skill-item">Node.js / Express</div>
+            <div class="skill-item">MySQL</div>
+            <div class="skill-item">API REST / JWT</div>
+          </div>
+          <div class="skill-col">
+            <div class="skill-col-title">Frontend</div>
+            <div class="skill-item">React 18 / Next.js</div>
+            <div class="skill-item">Three.js / R3F</div>
+            <div class="skill-item">GSAP / Lenis</div>
+            <div class="skill-item">SCSS / TailwindCSS</div>
+            <div class="skill-item">TypeScript</div>
+          </div>
+          <div class="skill-col">
+            <div class="skill-col-title">Créatif</div>
+            <div class="skill-item">After Effects</div>
+            <div class="skill-item">Element 3D</div>
+            <div class="skill-item">Trapcode Suite</div>
+            <div class="skill-item">Motion Design</div>
+            <div class="skill-item">Figma</div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <div class="h-line" style="position:relative;z-index:10;"></div>
-
-  <!-- ══ SKILLS ══════════════════════════════════════════════════════════ -->
-  <section id="skills">
-    <div class="projects-header reveal">
-      <p class="section-num" style="margin-bottom:0">03 / Stack</p>
-      <h2 class="section-title">Skills.</h2>
-    </div>
-
-    <div class="skills-grid">
-      <div class="skill-block reveal">
-        <div class="skill-category">Backend & Architecture</div>
-        <ul class="skill-list">
-          <li>Java 17 / Spring Boot</li>
-          <li>Architecture MVC / DAO</li>
-          <li>MySQL / SQL</li>
-          <li>Node.js / Express</li>
-          <li>JWT / bcryptjs</li>
-          <li>API REST</li>
-        </ul>
+    <!-- ═══ SCENE 7 — MOTION & VFX ════════════════════════════════════ -->
+    <section class="scene" id="s7" data-vid="7">
+      <div class="scene-inner scene-content" style="width:100%;max-width:100%;text-align:center;padding:0 5vw">
+        <div class="scene-tag" style="justify-content:center">
+          Motion Design · VFX · After Effects
+        </div>
+        <h2 class="scene-title">
+          Créations<br/><em>visuelles.</em>
+        </h2>
+        <div class="vfx-grid">
+          <div class="vfx-item">
+            <img src="/portfolio_bpa/footage/photo-5.png" alt="VFX création 1" loading="lazy" />
+          </div>
+          <div class="vfx-item">
+            <img src="/portfolio_bpa/footage/photo-6.png" alt="VFX création 2" loading="lazy" />
+          </div>
+          <div class="vfx-item">
+            <img src="/portfolio_bpa/footage/photo-7.png" alt="VFX création 3" loading="lazy" />
+          </div>
+          <div class="vfx-item">
+            <img src="/portfolio_bpa/footage/photo-8.png" alt="VFX création 4" loading="lazy" />
+          </div>
+        </div>
       </div>
-      <div class="skill-block reveal" style="transition-delay:0.1s">
-        <div class="skill-category">Frontend & Web</div>
-        <ul class="skill-list">
-          <li>React 18 / Next.js</li>
-          <li>Three.js / R3F</li>
-          <li>GSAP / Lenis</li>
-          <li>Astro</li>
-          <li>HTML / CSS / SCSS</li>
-          <li>TypeScript</li>
-        </ul>
+    </section>
+
+    <!-- ═══ SCENE 8 — CONTACT ═════════════════════════════════════════ -->
+    <section class="scene" id="s8" data-vid="8">
+      <div class="scene-inner scene-content">
+        <div class="scene-tag" style="justify-content:center">Fin de parcours · Début d'une collaboration</div>
+        <h2 class="scene-title" style="text-align:center;font-size:clamp(3rem,7vw,7rem)">
+          Travaillons<br/><em>ensemble.</em>
+        </h2>
+        <p class="scene-body" style="text-align:center;margin:1.5rem auto 0">
+          Disponible pour des projets freelance, stages ou collaborations créatives.
+        </p>
+        <div style="text-align:center">
+          <a href="mailto:zebi6073@gmail.com" class="contact-email">zebi6073@gmail.com</a>
+        </div>
+        <div class="contact-links">
+          <a href="https://github.com/Polochon06" target="_blank" rel="noopener" class="contact-link">GitHub</a>
+          <a href="#" class="contact-link">LinkedIn</a>
+          <a href="#" class="contact-link">Instagram</a>
+        </div>
       </div>
-      <div class="skill-block reveal" style="transition-delay:0.2s">
-        <div class="skill-category">Creative & Outils</div>
-        <ul class="skill-list">
-          <li>Adobe After Effects</li>
-          <li>Element 3D / Trapcode</li>
-          <li>Motion Design</li>
-          <li>VFX / Compositing</li>
-          <li>Git / GitHub</li>
-          <li>Figma</li>
-        </ul>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <div class="h-line" style="position:relative;z-index:10;"></div>
+  </div><!-- #scroll-container -->
 
-  <!-- ══ CONTACT ══════════════════════════════════════════════════════════ -->
-  <section id="contact">
-    <p class="contact-tag reveal">04 / Contact</p>
-    <h2 class="contact-title reveal">Travaillons<br/>Ensemble.</h2>
-    <p class="contact-sub reveal">Disponible pour des projets freelance, des stages ou des collaborations créatives. N'hésite pas à me contacter.</p>
-    <a href="mailto:zebi6073@gmail.com" class="contact-email reveal">zebi6073@gmail.com</a>
-    <div class="socials reveal">
-      <a href="https://github.com/Polochon06" target="_blank" rel="noopener" class="social-link">GitHub</a>
-      <a href="#" class="social-link">LinkedIn</a>
-      <a href="#" class="social-link">Instagram</a>
-    </div>
-  </section>
-
-  <!-- Footer -->
   <footer>
-    <span class="footer-copy">© 2025 Paul Blanc — Tous droits réservés</span>
-    <a href="#hero" class="footer-back">Retour en haut ↑</a>
+    <span class="foot-copy">© 2025 Paul Blanc</span>
+    <span class="foot-copy">Développeur Créatif · BTS SIO SLAM</span>
   </footer>
 
   <script>
-    // Nav scroll effect
-    const nav = document.getElementById('nav')
-    window.addEventListener('scroll', () => {
-      nav?.classList.toggle('scrolled', window.scrollY > 60)
-    }, { passive: true })
+    import Lenis from 'lenis'
+    import { gsap } from 'gsap'
+    import { ScrollTrigger } from 'gsap/ScrollTrigger'
+    gsap.registerPlugin(ScrollTrigger)
 
-    // Reveal on scroll
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible')
-          observer.unobserve(e.target)
-        }
+    // ── LENIS ─────────────────────────────────────────────────────────
+    const lenis = new Lenis({
+      duration: 2.2,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      touchMultiplier: 1.8,
+    })
+    lenis.on('scroll', ScrollTrigger.update)
+    gsap.ticker.add((time: number) => lenis.raf(time * 1000))
+    gsap.ticker.lagSmoothing(0)
+
+    // ── VIDEO MANAGEMENT ──────────────────────────────────────────────
+    const videos = Array.from(document.querySelectorAll('.bg-vid')) as HTMLVideoElement[]
+    let currentVid = 0
+
+    function activateVideo(index: number) {
+      if (index === currentVid) return
+      const next = videos[index]
+      if (!next) return
+      // Lazy load
+      if (next.preload === 'none') {
+        next.preload = 'auto'
+        next.load()
+      }
+      const prev = videos[currentVid]
+      next.classList.add('active')
+      prev.classList.remove('active')
+      currentVid = index
+      next.play().catch(() => {})
+    }
+
+    // Preload next video
+    function preloadNext(i: number) {
+      const next = videos[i + 1]
+      if (next && next.preload === 'none') {
+        next.preload = 'auto'
+        next.load()
+      }
+    }
+
+    // ── SCENE SCROLL TRIGGERS ─────────────────────────────────────────
+    const scenes = Array.from(document.querySelectorAll('.scene')) as HTMLElement[]
+    const navDots = Array.from(document.querySelectorAll('.nav-dot')) as HTMLElement[]
+    const progressBar = document.getElementById('progress-bar') as HTMLElement
+
+    // Update progress bar
+    lenis.on('scroll', ({ progress }: { progress: number }) => {
+      progressBar.style.width = `${progress * 100}%`
+    })
+
+    scenes.forEach((scene, i) => {
+      const vidIndex = parseInt(scene.dataset.vid || '1') - 1
+
+      ScrollTrigger.create({
+        trigger: scene,
+        start: 'top 55%',
+        end: 'bottom 45%',
+        onEnter: () => {
+          activateVideo(vidIndex)
+          preloadNext(vidIndex)
+          navDots.forEach((d, j) => d.classList.toggle('active', j === i))
+        },
+        onEnterBack: () => {
+          activateVideo(vidIndex)
+          navDots.forEach((d, j) => d.classList.toggle('active', j === i))
+        },
       })
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' })
 
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el))
+      // Cinematic parallax on scene content
+      const content = scene.querySelector('.scene-content')
+      if (content) {
+        gsap.fromTo(content,
+          { opacity: 0, y: 35 },
+          {
+            opacity: 1, y: 0,
+            duration: 1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: scene,
+              start: 'top 65%',
+              toggleActions: 'play none none reverse',
+            }
+          }
+        )
+      }
+
+      // Zoom effect on background video
+      const vid = videos[vidIndex]
+      if (vid) {
+        gsap.fromTo(vid,
+          { scale: 1.08 },
+          {
+            scale: 1.0,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: scene,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 2.5,
+            }
+          }
+        )
+      }
+    })
+
+    // ── NAV DOTS CLICK ────────────────────────────────────────────────
+    navDots.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        const sceneIndex = parseInt(dot.dataset.scene || '0')
+        lenis.scrollTo(scenes[sceneIndex], { duration: 2.5, easing: (t: number) => 1 - Math.pow(1 - t, 4) })
+      })
+    })
+
+    // ── LETTERBOX REMOVE ON SCROLL ────────────────────────────────────
+    ScrollTrigger.create({
+      trigger: scenes[1],
+      start: 'top 80%',
+      onEnter: () => document.body.classList.remove('cinematic'),
+      onLeaveBack: () => document.body.classList.add('cinematic'),
+    })
   </script>
+
 </body>
 </html>
