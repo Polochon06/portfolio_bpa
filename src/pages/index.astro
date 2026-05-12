@@ -33,7 +33,7 @@
     }
     ::selection { background: rgba(201,168,76,0.22); }
 
-    /* ── CINEMATIC BG (GSAP owns all transforms) ──────────────────────── */
+    /* ── CINEMATIC BG ─────────────────────────────────────────────────── */
     #cinematic-bg {
       position: fixed; inset: 0; z-index: 0;
       overflow: hidden;
@@ -45,9 +45,12 @@
       object-fit: cover;
       opacity: 0;
       pointer-events: none;
-      will-change: opacity, transform, filter;
+      /* GPU layer — no filter (degrades quality) */
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      will-change: opacity;
     }
-    .bg-vid.active { opacity: 1; }
+    /* Pas de .bg-vid.active — GSAP contrôle l'opacité */
     /* Vignette */
     #cinematic-bg::after {
       content: '';
@@ -151,9 +154,15 @@
       overflow: hidden;
       line-height: 0.95;
     }
+    /* Hidden by default — GSAP reveals them */
     .ti {
       display: block;
-      /* Initial state set by GSAP: translateY(105%) */
+      transform: translateY(110%);
+    }
+    /* Fade items also hidden by default */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(16px);
     }
 
     /* ── SCENE TEXT ───────────────────────────────────────────────────── */
@@ -618,22 +627,17 @@
     import { gsap } from 'gsap'
 
     // ── ELEMENTS ────────────────────────────────────────────────────────
-    const scenes   = Array.from(document.querySelectorAll<HTMLElement>('.scene'))
-    const navDots  = Array.from(document.querySelectorAll<HTMLElement>('.nav-dot'))
-    const videos   = Array.from(document.querySelectorAll<HTMLVideoElement>('.bg-vid'))
-    const barStatus = document.getElementById('bar-status')!
+    const scenes      = Array.from(document.querySelectorAll<HTMLElement>('.scene'))
+    const navDots     = Array.from(document.querySelectorAll<HTMLElement>('.nav-dot'))
+    const videos      = Array.from(document.querySelectorAll<HTMLVideoElement>('.bg-vid'))
+    const barStatus   = document.getElementById('bar-status')!
     const progressBar = document.getElementById('progress-bar')!
 
-    // ── SCENE DATA ──────────────────────────────────────────────────────
     type SceneInfo = {
-      el: HTMLElement
-      vidIndex: number
-      lines: HTMLElement[]   // .ti elements — slide from bottom
-      fades: HTMLElement[]   // .fade-in elements
-      status: string
+      el: HTMLElement; vidIndex: number
+      lines: HTMLElement[]; fades: HTMLElement[]; status: string
     }
-
-    const sceneData: SceneInfo[] = scenes.map(el => ({
+    const SD: SceneInfo[] = scenes.map(el => ({
       el,
       vidIndex: parseInt(el.dataset.vid ?? '1') - 1,
       lines: Array.from(el.querySelectorAll<HTMLElement>('.ti')),
@@ -641,196 +645,145 @@
       status: el.dataset.status ?? '',
     }))
 
-    // ── VIDEO SETUP ─────────────────────────────────────────────────────
-    let currentVid = 0
-    let kenTween: gsap.core.Tween | null = null
-    const vidDurations = new Array<number>(videos.length).fill(5.5)
-
-    // GSAP controls all transforms (no CSS transform on .bg-vid)
-    gsap.set(videos, { scale: 1.0 })
-
-    videos.forEach((vid, i) => {
-      if (vid.readyState >= 1) vidDurations[i] = vid.duration || 5.5
-      vid.addEventListener('loadedmetadata', () => { vidDurations[i] = vid.duration })
+    // ── VIDEO ───────────────────────────────────────────────────────────
+    // GSAP controls opacity only — NO scale, NO blur (kills quality)
+    let curVid = 0
+    const vidDur = new Array<number>(videos.length).fill(5.5)
+    videos.forEach((v, i) => {
+      if (v.readyState >= 1) vidDur[i] = v.duration || 5.5
+      v.addEventListener('loadedmetadata', () => { vidDur[i] = v.duration })
     })
+    // First video visible at start
+    gsap.set(videos[0], { opacity: 1 })
 
-    function switchVideo(index: number) {
-      if (index === currentVid) return
-      const next = videos[index]
-      const prev = videos[currentVid]
-
+    function crossfade(to: number) {
+      if (to === curVid) return
+      const next = videos[to], prev = videos[curVid]
       // Lazy load
       if (next.preload === 'none') { next.preload = 'auto'; next.load() }
-      const after = videos[index + 1]
+      const after = videos[to + 1]
       if (after?.preload === 'none') { after.preload = 'metadata'; after.load() }
-
-      // 3D entrance — zoom from depth + defocus
-      gsap.killTweensOf(next)
-      gsap.set(next, { scale: 1.18, filter: 'blur(14px)' })
-      gsap.to(next, {
-        scale: 1.06, filter: 'blur(0px)',
-        duration: 1.6, ease: 'expo.out',
-      })
-
-      // Crossfade
-      next.classList.add('active')
-      setTimeout(() => {
-        prev.classList.remove('active')
-        gsap.to(prev, { scale: 1.0, filter: 'blur(0px)', duration: 0.3 })
-        setTimeout(() => prev.pause(), 400)
-      }, 300)
-
-      // Ken Burns — slow zoom out while video plays
-      kenTween?.kill()
+      // Seamless crossfade — pur opacity, pas de scale/blur
+      gsap.to(prev, { opacity: 0, duration: 0.55, ease: 'linear',
+        onComplete: () => prev.pause() })
+      gsap.fromTo(next, { opacity: 0 },
+        { opacity: 1, duration: 0.65, ease: 'linear', delay: 0.15 })
       next.currentTime = 0
       next.play().catch(() => {})
-      const dur = vidDurations[index] || 5.5
-      kenTween = gsap.to(next, { scale: 1.0, duration: dur, ease: 'none' })
-
-      currentVid = index
+      curVid = to
     }
 
     // ── LETTERBOX ───────────────────────────────────────────────────────
-    const lboxT = document.querySelector<HTMLElement>('.lbox-t')!
-    const lboxB = document.querySelector<HTMLElement>('.lbox-b')!
-    gsap.to([lboxT, lboxB], {
-      translateY: 0, duration: 1, ease: 'power3.out', delay: 0.2,
-    })
+    gsap.to(['.lbox-t', '.lbox-b'], { y: 0, duration: 1.1, ease: 'power3.out', delay: 0.1 })
 
-    // ── SCENE TRANSITION ────────────────────────────────────────────────
+    // ── SCENE TEXT ──────────────────────────────────────────────────────
+    function hideText(s: SceneInfo) {
+      gsap.killTweensOf([...s.lines, ...s.fades])
+      gsap.to(s.lines, { y: '-110%', duration: 0.3, stagger: 0.03, ease: 'power2.in', overwrite: true })
+      gsap.to(s.fades, { opacity: 0, duration: 0.22, ease: 'power1.in', overwrite: true })
+    }
+
+    function showText(s: SceneInfo) {
+      // Lines slide up from below the clip
+      gsap.fromTo(s.lines,
+        { y: '110%' },
+        { y: '0%', duration: 0.9, stagger: 0.1, ease: 'power3.out' }
+      )
+      // Fade items appear after titles
+      gsap.fromTo(s.fades,
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.7, stagger: 0.09, ease: 'power2.out', delay: 0.35 }
+      )
+    }
+
+    // ── NAVIGATION ──────────────────────────────────────────────────────
     let active = 0
     let busy = false
 
-    function hideScene(info: SceneInfo) {
-      gsap.killTweensOf([...info.lines, ...info.fades])
-      gsap.to(info.lines, { yPercent: -110, duration: 0.35, stagger: 0.04, ease: 'power2.in' })
-      gsap.to(info.fades, { opacity: 0, y: -12, duration: 0.3, stagger: 0.03, ease: 'power2.in' })
-    }
-
-    function showScene(info: SceneInfo) {
-      // Lines: slide from bottom
-      gsap.set(info.lines, { yPercent: 110 })
-      gsap.to(info.lines, {
-        yPercent: 0,
-        duration: 0.85, stagger: 0.09, ease: 'power3.out',
-      })
-      // Fades: opacity + slight Y
-      gsap.set(info.fades, { opacity: 0, y: 18 })
-      gsap.to(info.fades, {
-        opacity: 1, y: 0,
-        duration: 0.7, stagger: 0.08, ease: 'power2.out',
-        delay: 0.3,
-      })
-    }
-
-    function goTo(index: number, instant = false) {
-      if (busy || index === active || index < 0 || index >= scenes.length) return
+    function goTo(idx: number) {
+      if (busy || idx === active || idx < 0 || idx >= scenes.length) return
       busy = true
 
-      const from = sceneData[active]
-      const to   = sceneData[index]
+      const from = SD[active]
+      const to   = SD[idx]
 
-      // Hide current scene text
-      hideScene(from)
+      hideText(from)
+      crossfade(to.vidIndex)
 
-      // Switch video
-      switchVideo(to.vidIndex)
-
-      // Update nav + status
-      navDots.forEach((d, j) => d.classList.toggle('active', j === index))
+      navDots.forEach((d, j) => d.classList.toggle('active', j === idx))
       barStatus.textContent = to.status
-      progressBar.style.width = `${(index / (scenes.length - 1)) * 100}%`
+      progressBar.style.width = `${(idx / (scenes.length - 1)) * 100}%`
 
-      const delay = instant ? 0 : 0.18
-
-      // Scene visibility swap
-      gsap.delayedCall(delay, () => {
+      // Swap scenes after text exit
+      gsap.delayedCall(0.28, () => {
         from.el.classList.remove('active')
         to.el.classList.add('active')
+        busy = false
 
-        // Wait for video to end — THEN show text (the "pause" behavior)
+        // Text appears ONLY when the video naturally ends
         const vid = videos[to.vidIndex]
-        vid.addEventListener('ended', () => {
-          if (active !== index) return
+        function onEnded() {
+          if (active !== idx) return
           vid.pause()
-          kenTween?.pause()
-          showScene(to)
-        }, { once: true })
-
-        // Allow next navigation after transition
-        gsap.delayedCall(0.6, () => { busy = false })
+          showText(to)
+        }
+        vid.addEventListener('ended', onEnded, { once: true })
       })
 
-      active = index
+      active = idx
     }
 
-    // ── S1: Intro animation on page load ────────────────────────────────
+    // ── S1 INTRO ────────────────────────────────────────────────────────
     ;(() => {
-      const s1 = sceneData[0]
-      gsap.set(s1.lines, { yPercent: 110 })
-      // Eyebrow + sub
+      const s1 = SD[0]
       const eyebrow = document.querySelector<HTMLElement>('.hero-eyebrow')!
       const sub     = document.querySelector<HTMLElement>('.hero-sub')!
       const hint    = document.querySelector<HTMLElement>('.scroll-hint')!
+
+      // All hero elements start hidden (CSS handles .ti, manual set for others)
       gsap.set([eyebrow, sub, hint], { opacity: 0 })
 
-      const tl = gsap.timeline({ delay: 0.4 })
-      tl.to(eyebrow, { opacity: 1, duration: 0.8, ease: 'power2.out' })
-      tl.to(s1.lines, { yPercent: 0, duration: 1.0, stagger: 0.12, ease: 'power3.out' }, '-=0.4')
+      const tl = gsap.timeline({ delay: 0.6 })
+      tl.to(eyebrow, { opacity: 1, duration: 0.7, ease: 'power2.out' })
+      tl.fromTo(s1.lines,
+        { y: '110%' },
+        { y: '0%', duration: 1.0, stagger: 0.13, ease: 'power3.out' }, '-=0.3')
       tl.to(sub,  { opacity: 1, duration: 0.7, ease: 'power2.out' }, '-=0.5')
-      tl.to(hint, { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3')
+      tl.to(hint, { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.4')
 
-      // Start video
       videos[0].play().catch(() => {})
-      const dur = vidDurations[0] || 5.5
-      kenTween = gsap.to(videos[0], { scale: 1.0, duration: dur, ease: 'none' })
-      gsap.set(videos[0], { scale: 1.06 })
-
-      // S1 video ends → animate hint more prominently (no text to reveal)
       videos[0].addEventListener('ended', () => {
         if (active !== 0) return
         videos[0].pause()
-        kenTween?.pause()
-        // Pulse hint to invite interaction
-        gsap.to(hint, { opacity: 0.9, y: -4, yoyo: true, repeat: -1, duration: 1.2, ease: 'sine.inOut' })
+        gsap.to(hint, { opacity: 0.85, y: -5, repeat: -1, yoyo: true, duration: 1.1, ease: 'sine.inOut' })
       })
     })()
 
-    // ── WHEEL ───────────────────────────────────────────────────────────
-    let wheelAcc = 0
-    let wheelTimer: ReturnType<typeof setTimeout> | null = null
-
+    // ── INPUT ───────────────────────────────────────────────────────────
+    let wAcc = 0, wTimer: ReturnType<typeof setTimeout> | null = null
     window.addEventListener('wheel', (e) => {
-      wheelAcc += e.deltaY
-      if (wheelTimer) clearTimeout(wheelTimer)
-      wheelTimer = setTimeout(() => {
-        if (Math.abs(wheelAcc) > 20) goTo(active + (wheelAcc > 0 ? 1 : -1))
-        wheelAcc = 0
-      }, 60)
+      wAcc += e.deltaY
+      if (wTimer) clearTimeout(wTimer)
+      wTimer = setTimeout(() => {
+        if (Math.abs(wAcc) > 15) goTo(active + (wAcc > 0 ? 1 : -1))
+        wAcc = 0
+      }, 55)
     }, { passive: true })
 
-    // ── TOUCH ───────────────────────────────────────────────────────────
-    let touchY0 = 0
-    document.addEventListener('touchstart', (e) => { touchY0 = e.touches[0].clientY }, { passive: true })
-    document.addEventListener('touchend', (e) => {
-      const dy = touchY0 - e.changedTouches[0].clientY
-      if (Math.abs(dy) > 50) goTo(active + (dy > 0 ? 1 : -1))
+    let ty0 = 0
+    document.addEventListener('touchstart', (e) => { ty0 = e.touches[0].clientY }, { passive: true })
+    document.addEventListener('touchend',   (e) => {
+      const d = ty0 - e.changedTouches[0].clientY
+      if (Math.abs(d) > 45) goTo(active + (d > 0 ? 1 : -1))
     }, { passive: true })
 
-    // ── KEYBOARD ────────────────────────────────────────────────────────
     document.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowDown' || e.key === 'PageDown') goTo(active + 1)
       if (e.key === 'ArrowUp'   || e.key === 'PageUp')   goTo(active - 1)
     })
 
-    // ── NAV DOTS ────────────────────────────────────────────────────────
-    navDots.forEach((dot) => {
-      dot.addEventListener('click', () => {
-        goTo(parseInt(dot.dataset.scene ?? '0'))
-      })
-    })
-
-    // ── LOGO → S1 ───────────────────────────────────────────────────────
+    navDots.forEach(d => d.addEventListener('click', () =>
+      goTo(parseInt(d.dataset.scene ?? '0'))))
     document.getElementById('logo-btn')?.addEventListener('click', () => goTo(0))
   </script>
 
