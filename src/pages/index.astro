@@ -352,6 +352,16 @@
     }
     .contact-link:hover { color: var(--gold); border-color: var(--gold); }
 
+    /* ── CINEMATIC OVERLAY ───────────────────────────────────────────── */
+    #scene-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 150;
+      background: var(--dark);
+      opacity: 0;
+      pointer-events: none;
+    }
+
     /* ── RESPONSIVE ───────────────────────────────────────────────────── */
     @media (max-width: 768px) {
       #scene-nav { display: none; }
@@ -417,6 +427,7 @@
   </nav>
 
   <div id="progress-bar"></div>
+  <div id="scene-overlay" aria-hidden="true"></div>
 
   <!-- ══════════════════════════════════════════════════════════════════ -->
   <!--  SCENES (fixed, stacked)                                           -->
@@ -632,6 +643,7 @@
     const videos      = Array.from(document.querySelectorAll<HTMLVideoElement>('.bg-vid'))
     const barStatus   = document.getElementById('bar-status')!
     const progressBar = document.getElementById('progress-bar')!
+    const overlay     = document.getElementById('scene-overlay')!
 
     type SceneInfo = {
       el: HTMLElement; vidIndex: number
@@ -646,88 +658,79 @@
     }))
 
     // ── VIDEO ───────────────────────────────────────────────────────────
-    // GSAP controls opacity only — NO scale, NO blur (kills quality)
     let curVid = 0
-    const vidDur = new Array<number>(videos.length).fill(5.5)
-    videos.forEach((v, i) => {
-      if (v.readyState >= 1) vidDur[i] = v.duration || 5.5
-      v.addEventListener('loadedmetadata', () => { vidDur[i] = v.duration })
-    })
-    // First video visible at start
     gsap.set(videos[0], { opacity: 1 })
 
     function crossfade(to: number) {
       if (to === curVid) return
       const next = videos[to], prev = videos[curVid]
-      // Lazy load
       if (next.preload === 'none') { next.preload = 'auto'; next.load() }
       const after = videos[to + 1]
       if (after?.preload === 'none') { after.preload = 'metadata'; after.load() }
-      // Seamless crossfade — pur opacity, pas de scale/blur
-      gsap.to(prev, { opacity: 0, duration: 0.55, ease: 'linear',
-        onComplete: () => prev.pause() })
-      gsap.fromTo(next, { opacity: 0 },
-        { opacity: 1, duration: 0.65, ease: 'linear', delay: 0.15 })
+      // Hidden behind overlay so crossfade happens in the dark — seamless
+      gsap.to(prev, { opacity: 0, duration: 0.6, ease: 'power1.out', onComplete: () => prev.pause() })
+      gsap.fromTo(next, { opacity: 0 }, { opacity: 1, duration: 0.9, ease: 'power1.out' })
       next.currentTime = 0
       next.play().catch(() => {})
       curVid = to
     }
 
     // ── LETTERBOX ───────────────────────────────────────────────────────
-    gsap.to(['.lbox-t', '.lbox-b'], { y: 0, duration: 1.1, ease: 'power3.out', delay: 0.1 })
+    gsap.to(['.lbox-t', '.lbox-b'], { y: 0, duration: 1.4, ease: 'power3.out', delay: 0.2 })
 
-    // ── SCENE TEXT ──────────────────────────────────────────────────────
+    // ── TEXT ────────────────────────────────────────────────────────────
     function hideText(s: SceneInfo) {
       gsap.killTweensOf([...s.lines, ...s.fades])
-      gsap.to(s.lines, { y: '-110%', duration: 0.3, stagger: 0.03, ease: 'power2.in', overwrite: true })
-      gsap.to(s.fades, { opacity: 0, duration: 0.22, ease: 'power1.in', overwrite: true })
+      gsap.to(s.lines, { y: '-110%', duration: 0.4, stagger: 0.04, ease: 'power2.in', overwrite: true })
+      gsap.to(s.fades, { opacity: 0, y: -6,  duration: 0.28, ease: 'power1.in', overwrite: true })
     }
 
     function showText(s: SceneInfo) {
-      // Lines slide up from below the clip
       gsap.fromTo(s.lines,
         { y: '110%' },
-        { y: '0%', duration: 0.9, stagger: 0.1, ease: 'power3.out' }
-      )
-      // Fade items appear after titles
+        { y: '0%', duration: 1.1, stagger: 0.12, ease: 'power3.out' })
       gsap.fromTo(s.fades,
-        { opacity: 0, y: 14 },
-        { opacity: 1, y: 0, duration: 0.7, stagger: 0.09, ease: 'power2.out', delay: 0.35 }
-      )
+        { opacity: 0, y: 18 },
+        { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power2.out', delay: 0.45 })
     }
 
     // ── NAVIGATION ──────────────────────────────────────────────────────
-    let active = 0
-    let busy = false
+    let active  = 0
+    let lastNav = 0
+    const NAV_COOLDOWN = 950  // ms — matches overlay + crossfade duration
 
     function goTo(idx: number) {
-      if (busy || idx === active || idx < 0 || idx >= scenes.length) return
-      busy = true
+      if (Date.now() - lastNav < NAV_COOLDOWN) return
+      if (idx === active || idx < 0 || idx >= scenes.length) return
+      lastNav = Date.now()
 
       const from = SD[active]
       const to   = SD[idx]
 
       hideText(from)
-      crossfade(to.vidIndex)
-
       navDots.forEach((d, j) => d.classList.toggle('active', j === idx))
       barStatus.textContent = to.status
       progressBar.style.width = `${(idx / (scenes.length - 1)) * 100}%`
 
-      // Swap scenes after text exit
-      gsap.delayedCall(0.28, () => {
-        from.el.classList.remove('active')
-        to.el.classList.add('active')
-        busy = false
-
-        // Text appears ONLY when the video naturally ends
-        const vid = videos[to.vidIndex]
-        function onEnded() {
-          if (active !== idx) return
-          vid.pause()
-          showText(to)
+      // Cinematic transition — fade to dark, swap, emerge
+      gsap.to(overlay, {
+        opacity: 1, duration: 0.32, ease: 'power2.inOut',
+        onComplete() {
+          from.el.classList.remove('active')
+          to.el.classList.add('active')
+          crossfade(to.vidIndex)
+          gsap.to(overlay, {
+            opacity: 0, duration: 0.65, ease: 'power2.out', delay: 0.06,
+            onComplete() {
+              const vid = videos[to.vidIndex]
+              vid.addEventListener('ended', () => {
+                if (active !== idx) return
+                vid.pause()
+                showText(to)
+              }, { once: true })
+            }
+          })
         }
-        vid.addEventListener('ended', onEnded, { once: true })
       })
 
       active = idx
@@ -735,49 +738,64 @@
 
     // ── S1 INTRO ────────────────────────────────────────────────────────
     ;(() => {
-      const s1 = SD[0]
+      const s1      = SD[0]
       const eyebrow = document.querySelector<HTMLElement>('.hero-eyebrow')!
       const sub     = document.querySelector<HTMLElement>('.hero-sub')!
       const hint    = document.querySelector<HTMLElement>('.scroll-hint')!
 
-      // All hero elements start hidden (CSS handles .ti, manual set for others)
       gsap.set([eyebrow, sub, hint], { opacity: 0 })
 
-      const tl = gsap.timeline({ delay: 0.6 })
-      tl.to(eyebrow, { opacity: 1, duration: 0.7, ease: 'power2.out' })
+      const tl = gsap.timeline({ delay: 0.85 })
+      tl.to(eyebrow, { opacity: 1, duration: 0.8, ease: 'power2.out' })
       tl.fromTo(s1.lines,
         { y: '110%' },
-        { y: '0%', duration: 1.0, stagger: 0.13, ease: 'power3.out' }, '-=0.3')
-      tl.to(sub,  { opacity: 1, duration: 0.7, ease: 'power2.out' }, '-=0.5')
-      tl.to(hint, { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.4')
+        { y: '0%', duration: 1.1, stagger: 0.15, ease: 'power3.out' }, '-=0.35')
+      tl.to(sub,  { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.55')
+      tl.to(hint, { opacity: 1, duration: 0.7, ease: 'power2.out' }, '-=0.45')
 
       videos[0].play().catch(() => {})
       videos[0].addEventListener('ended', () => {
         if (active !== 0) return
         videos[0].pause()
-        gsap.to(hint, { opacity: 0.85, y: -5, repeat: -1, yoyo: true, duration: 1.1, ease: 'sine.inOut' })
+        gsap.to(hint, { opacity: 0.85, y: -5, repeat: -1, yoyo: true, duration: 1.2, ease: 'sine.inOut' })
       })
     })()
 
-    // ── INPUT ───────────────────────────────────────────────────────────
-    let wAcc = 0, wTimer: ReturnType<typeof setTimeout> | null = null
-    window.addEventListener('wheel', (e) => {
-      wAcc += e.deltaY
-      if (wTimer) clearTimeout(wTimer)
-      wTimer = setTimeout(() => {
-        if (Math.abs(wAcc) > 15) goTo(active + (wAcc > 0 ? 1 : -1))
-        wAcc = 0
-      }, 55)
+    // ── WHEEL — velocity-based accumulator (pas de debounce lag) ────────
+    let wVel = 0
+    let wRaf = 0
+
+    function wheelTick() {
+      if (Math.abs(wVel) > 8) {
+        goTo(active + (wVel > 0 ? 1 : -1))
+        wVel = 0
+        wRaf = 0
+        return
+      }
+      wVel *= 0.80
+      if (Math.abs(wVel) > 0.4) {
+        wRaf = requestAnimationFrame(wheelTick)
+      } else {
+        wVel = 0
+        wRaf = 0
+      }
+    }
+
+    window.addEventListener('wheel', e => {
+      wVel += e.deltaY * 0.45
+      if (!wRaf) wRaf = requestAnimationFrame(wheelTick)
     }, { passive: true })
 
+    // ── TOUCH ───────────────────────────────────────────────────────────
     let ty0 = 0
-    document.addEventListener('touchstart', (e) => { ty0 = e.touches[0].clientY }, { passive: true })
-    document.addEventListener('touchend',   (e) => {
+    document.addEventListener('touchstart', e => { ty0 = e.touches[0].clientY }, { passive: true })
+    document.addEventListener('touchend',   e => {
       const d = ty0 - e.changedTouches[0].clientY
-      if (Math.abs(d) > 45) goTo(active + (d > 0 ? 1 : -1))
+      if (Math.abs(d) > 40) goTo(active + (d > 0 ? 1 : -1))
     }, { passive: true })
 
-    document.addEventListener('keydown', (e) => {
+    // ── KEYBOARD ────────────────────────────────────────────────────────
+    document.addEventListener('keydown', e => {
       if (e.key === 'ArrowDown' || e.key === 'PageDown') goTo(active + 1)
       if (e.key === 'ArrowUp'   || e.key === 'PageUp')   goTo(active - 1)
     })
