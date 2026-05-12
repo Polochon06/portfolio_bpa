@@ -659,7 +659,8 @@
       const k = KB[idx % KB.length]
       gsap.fromTo(photo,
         { scale: 1.0, x: k.xs, y: k.ys },
-        { scale: 1.07, x: k.xe, y: k.ye, duration: 8, ease: 'power1.inOut' })
+        { scale: 1.07, x: k.xe, y: k.ye, duration: 8, ease: 'power1.inOut',
+          yoyo: true, repeat: -1 })
     }
 
     function kenBurnsStop(photo: HTMLImageElement) {
@@ -759,11 +760,10 @@
         { y: '110%' },
         { y: '0%', duration: 1.1, stagger: 0.15, ease: 'power3.out' }, '-=0.35')
       tl.to(sub,  { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.55')
-      tl.to(hint, { opacity: 1, duration: 0.7, ease: 'power2.out' }, '-=0.45',
-        () => {
-          // After hero intro, pulse hint
-          gsap.to(hint, { opacity: 0.85, y: -5, repeat: -1, yoyo: true, duration: 1.2, ease: 'sine.inOut', delay: 2 })
-        })
+      tl.to(hint, {
+        opacity: 1, duration: 0.7, ease: 'power2.out',
+        onComplete: () => gsap.to(hint, { opacity: 0.85, y: -5, repeat: -1, yoyo: true, duration: 1.2, ease: 'sine.inOut', delay: 2 })
+      }, '-=0.45')
     })()
 
     // ── WHEEL — velocity-based (pas de debounce lag) ─────────────────────
