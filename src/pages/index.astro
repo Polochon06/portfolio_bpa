@@ -541,114 +541,100 @@ import '../styles/global.scss'
   </script>
 
   <script>
-    // ── Luxury background canvas — particles + grid ──────────────────────
-    const luxCanvas = document.querySelector('.js-luxury-canvas') as HTMLCanvasElement
-    if (luxCanvas) {
-      const lctx = luxCanvas.getContext('2d')!
+    import * as THREE from 'three'
 
-      function luxResize() {
-        luxCanvas.width  = window.innerWidth
-        luxCanvas.height = window.innerHeight
+    // ── Luxury background — Three.js particle field ──────────────────────
+    const luxCv = document.querySelector('.js-luxury-canvas') as HTMLCanvasElement | null
+    if (luxCv) {
+      const lW = window.innerWidth
+      const lH = window.innerHeight
+
+      const lRenderer = new THREE.WebGLRenderer({ canvas: luxCv, alpha: true, antialias: false })
+      lRenderer.setSize(lW, lH)
+      lRenderer.setPixelRatio(Math.min(devicePixelRatio, 1.5))
+      lRenderer.setClearColor(0x000000, 0)
+
+      const lScene = new THREE.Scene()
+      const lCam   = new THREE.PerspectiveCamera(65, lW / lH, 0.1, 200)
+      lCam.position.z = 9
+
+      // ── Fine particle dust ─────────────────────────────────────────────
+      const N1  = 1400
+      const p1  = new Float32Array(N1 * 3)
+      const c1  = new Float32Array(N1 * 3)
+      const palette = [
+        new THREE.Color(0xc9a84c), // or doux
+        new THREE.Color(0xa855f7), // violet
+        new THREE.Color(0x818cf8), // indigo
+        new THREE.Color(0xe8d5b7), // crème
+        new THREE.Color(0xffffff), // blanc
+      ]
+      for (let i = 0; i < N1; i++) {
+        p1[i*3]   = (Math.random() - 0.5) * 50
+        p1[i*3+1] = (Math.random() - 0.5) * 28
+        p1[i*3+2] = (Math.random() - 0.5) * 22 - 4
+        const c = palette[Math.floor(Math.random() * palette.length)]
+        c1[i*3] = c.r; c1[i*3+1] = c.g; c1[i*3+2] = c.b
       }
-      luxResize()
-      window.addEventListener('resize', luxResize, { passive: true })
+      const geo1 = new THREE.BufferGeometry()
+      geo1.setAttribute('position', new THREE.BufferAttribute(p1, 3))
+      geo1.setAttribute('color',    new THREE.BufferAttribute(c1, 3))
+      lScene.add(new THREE.Points(geo1, new THREE.PointsMaterial({
+        size: 0.042, vertexColors: true, transparent: true, opacity: 0.7, sizeAttenuation: true,
+      })))
 
-      const GOLD   = { r: 201, g: 168, b: 76  }
-      const SILVER = { r: 190, g: 200, b: 215 }
-      const VIOLET = { r: 192, g: 38,  b: 211 }
-
-      interface LuxParticle {
-        x: number; y: number; r: number
-        vx: number; vy: number; a: number
-        color: { r: number; g: number; b: number }
+      // ── Large gold bokeh ───────────────────────────────────────────────
+      const N2  = 90
+      const p2  = new Float32Array(N2 * 3)
+      for (let i = 0; i < N2; i++) {
+        p2[i*3]   = (Math.random() - 0.5) * 55
+        p2[i*3+1] = (Math.random() - 0.5) * 32
+        p2[i*3+2] = (Math.random() - 0.5) * 12
       }
+      const geo2 = new THREE.BufferGeometry()
+      geo2.setAttribute('position', new THREE.BufferAttribute(p2, 3))
+      lScene.add(new THREE.Points(geo2, new THREE.PointsMaterial({
+        size: 0.22, color: 0xc9a84c, transparent: true, opacity: 0.18, sizeAttenuation: true,
+      })))
 
-      const COUNT = 110
-      const pts: LuxParticle[] = []
-
-      function mkParticle(): LuxParticle {
-        const roll = Math.random()
-        const color = roll < 0.45 ? GOLD : roll < 0.75 ? SILVER : VIOLET
-        return {
-          x: Math.random() * luxCanvas.width,
-          y: Math.random() * luxCanvas.height,
-          r: 0.3 + Math.random() * 1.1,
-          vx: (Math.random() - 0.5) * 0.12,
-          vy: (Math.random() - 0.5) * 0.12,
-          a: 0.15 + Math.random() * 0.45,
-          color,
-        }
-      }
-      for (let i = 0; i < COUNT; i++) pts.push(mkParticle())
-
-      // Mouse parallax on glows
-      let mx = 0, my = 0
-      window.addEventListener('mousemove', (e) => {
-        mx = e.clientX / window.innerWidth  - 0.5
-        my = e.clientY / window.innerHeight - 0.5
+      // ── Mouse parallax ─────────────────────────────────────────────────
+      let lmx = 0, lmy = 0
+      window.addEventListener('mousemove', (e: MouseEvent) => {
+        lmx = e.clientX / window.innerWidth  - 0.5
+        lmy = e.clientY / window.innerHeight - 0.5
       }, { passive: true })
 
-      const goldEl    = document.querySelector('.bg-luxury__glow--gold')    as HTMLElement
-      const sapphEl   = document.querySelector('.bg-luxury__glow--sapphire') as HTMLElement
-      const violetEl  = document.querySelector('.bg-luxury__glow--violet')   as HTMLElement
+      const goldEl   = document.querySelector('.bg-luxury__glow--gold')     as HTMLElement | null
+      const sapphEl  = document.querySelector('.bg-luxury__glow--sapphire') as HTMLElement | null
+      const violetEl = document.querySelector('.bg-luxury__glow--violet')   as HTMLElement | null
 
-      let ogx = 0, ogy = 0
+      let lox = 0, loy = 0, lgx = 0, lgy = 0
 
-      function luxTick() {
-        requestAnimationFrame(luxTick)
+      function lTick() {
+        requestAnimationFrame(lTick)
+        const t = performance.now() * 0.00006
 
-        lctx.clearRect(0, 0, luxCanvas.width, luxCanvas.height)
+        lox += (lmx * 0.28 - lox) * 0.03
+        loy += (lmy * 0.22 - loy) * 0.03
 
-        // Subtle grid
-        const gap = 90
-        lctx.beginPath()
-        lctx.strokeStyle = 'rgba(255,255,255,0.016)'
-        lctx.lineWidth = 0.5
-        for (let x = 0; x <= luxCanvas.width; x += gap) {
-          lctx.moveTo(x, 0); lctx.lineTo(x, luxCanvas.height)
-        }
-        for (let y = 0; y <= luxCanvas.height; y += gap) {
-          lctx.moveTo(0, y); lctx.lineTo(luxCanvas.width, y)
-        }
-        lctx.stroke()
+        lScene.rotation.y = t + lox
+        lScene.rotation.x = -loy * 0.5
 
-        // Particles
-        pts.forEach((p) => {
-          p.x += p.vx; p.y += p.vy
-          if (p.x < -5 || p.x > luxCanvas.width + 5 || p.y < -5 || p.y > luxCanvas.height + 5) {
-            Object.assign(p, mkParticle(), { x: Math.random() * luxCanvas.width, y: Math.random() * luxCanvas.height })
-          }
-          lctx.beginPath()
-          lctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-          lctx.fillStyle = `rgba(${p.color.r},${p.color.g},${p.color.b},${p.a})`
-          lctx.fill()
-        })
+        lgx += (lmx * 44 - lgx) * 0.04
+        lgy += (lmy * 32 - lgy) * 0.04
+        if (goldEl)   goldEl.style.transform   = `translate(${lgx}px, ${lgy}px)`
+        if (sapphEl)  sapphEl.style.transform  = `translate(${-lgx * 0.65}px, ${-lgy * 0.5}px)`
+        if (violetEl) violetEl.style.transform = `translate(${lgx * 0.4}px, ${lgy * 0.75}px)`
 
-        // Connections
-        for (let i = 0; i < pts.length; i++) {
-          for (let j = i + 1; j < pts.length; j++) {
-            const dx = pts[i].x - pts[j].x
-            const dy = pts[i].y - pts[j].y
-            const d  = Math.sqrt(dx * dx + dy * dy)
-            if (d < 130) {
-              lctx.beginPath()
-              lctx.moveTo(pts[i].x, pts[i].y)
-              lctx.lineTo(pts[j].x, pts[j].y)
-              lctx.strokeStyle = `rgba(201,168,76,${0.045 * (1 - d / 130)})`
-              lctx.lineWidth = 0.4
-              lctx.stroke()
-            }
-          }
-        }
-
-        // Glow parallax (slow lerp)
-        ogx += (mx - ogx) * 0.04
-        ogy += (my - ogy) * 0.04
-        if (goldEl)   goldEl.style.transform   = `translate(${ogx * 40}px, ${ogy * 30}px)`
-        if (sapphEl)  sapphEl.style.transform  = `translate(${ogx * -30}px, ${ogy * -20}px)`
-        if (violetEl) violetEl.style.transform = `translate(${ogx * 20}px, ${ogy * 40}px)`
+        lRenderer.render(lScene, lCam)
       }
-      luxTick()
+      lTick()
+
+      window.addEventListener('resize', () => {
+        lRenderer.setSize(window.innerWidth, window.innerHeight)
+        lCam.aspect = window.innerWidth / window.innerHeight
+        lCam.updateProjectionMatrix()
+      }, { passive: true })
     }
   </script>
 
@@ -1099,28 +1085,28 @@ import '../styles/global.scss'
       pointer-events: none;
     }
 
-    // ── Transparence sections — laisse le bg luxury respirer ───────────
+    // ── Sections opaques — contenu lisible, bg visible dans les marges ──
     :global(.s-work) {
-      background: rgba(8, 4, 14, 0.55) !important;
+      background: rgba(6, 3, 11, 0.94) !important;
     }
     :global(.s-work .s__inner) {
-      background: rgba(6, 3, 10, 0.60) !important;
+      background: rgba(5, 2, 9, 0.96) !important;
     }
     :global(.s-work .s__mask__path-outer),
     :global(.s-work .s__mask__path-inner) {
-      fill: rgba(10, 5, 16, 0.65) !important;
+      fill: rgba(6, 3, 11, 0.95) !important;
     }
     :global(.s-about .s__award) {
-      background: rgba(12, 6, 20, 0.50) !important;
+      background: rgba(10, 5, 18, 0.92) !important;
     }
     :global(.s-about .s__award__mask) {
-      background: rgba(4, 2, 8, 0.72) !important;
+      background: rgba(3, 1, 6, 0.96) !important;
     }
     :global(.s-about .s__award__mask::before) {
-      background: rgba(140, 30, 180, 0.65) !important;
+      background: rgba(162, 28, 175, 0.90) !important;
     }
     :global(.s-about .s__title) {
-      background: rgba(4, 2, 8, 0.70) !important;
+      background: rgba(3, 1, 6, 0.94) !important;
     }
     :global(.s-cta) {
       background: transparent !important;
