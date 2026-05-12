@@ -110,15 +110,13 @@ import '../styles/global.scss'
   </head>
 
   <body data-page="home">
-    <iframe
-      class="bg-spline"
-      src="https://my.spline.design/3dpathslines1copy-lcS33gFjrhz50Qs8U35s5Ng4/"
-      frameborder="0"
-      allowfullscreen
-      aria-hidden="true"
-      tabindex="-1"
-    ></iframe>
-    <div class="bg-overlay" aria-hidden="true"></div>
+    <div class="bg-luxury" aria-hidden="true">
+      <canvas class="bg-luxury__canvas js-luxury-canvas"></canvas>
+      <div class="bg-luxury__noise"></div>
+      <div class="bg-luxury__glow bg-luxury__glow--gold"></div>
+      <div class="bg-luxury__glow bg-luxury__glow--sapphire"></div>
+      <div class="bg-luxury__glow bg-luxury__glow--violet"></div>
+    </div>
     <div class="site-wrapper js-site-wrapper" style="opacity: 0;">
       <SiteHead />
 
@@ -543,6 +541,118 @@ import '../styles/global.scss'
   </script>
 
   <script>
+    // ── Luxury background canvas — particles + grid ──────────────────────
+    const luxCanvas = document.querySelector('.js-luxury-canvas') as HTMLCanvasElement
+    if (luxCanvas) {
+      const lctx = luxCanvas.getContext('2d')!
+
+      function luxResize() {
+        luxCanvas.width  = window.innerWidth
+        luxCanvas.height = window.innerHeight
+      }
+      luxResize()
+      window.addEventListener('resize', luxResize, { passive: true })
+
+      const GOLD   = { r: 201, g: 168, b: 76  }
+      const SILVER = { r: 190, g: 200, b: 215 }
+      const VIOLET = { r: 192, g: 38,  b: 211 }
+
+      interface LuxParticle {
+        x: number; y: number; r: number
+        vx: number; vy: number; a: number
+        color: { r: number; g: number; b: number }
+      }
+
+      const COUNT = 110
+      const pts: LuxParticle[] = []
+
+      function mkParticle(): LuxParticle {
+        const roll = Math.random()
+        const color = roll < 0.45 ? GOLD : roll < 0.75 ? SILVER : VIOLET
+        return {
+          x: Math.random() * luxCanvas.width,
+          y: Math.random() * luxCanvas.height,
+          r: 0.3 + Math.random() * 1.1,
+          vx: (Math.random() - 0.5) * 0.12,
+          vy: (Math.random() - 0.5) * 0.12,
+          a: 0.15 + Math.random() * 0.45,
+          color,
+        }
+      }
+      for (let i = 0; i < COUNT; i++) pts.push(mkParticle())
+
+      // Mouse parallax on glows
+      let mx = 0, my = 0
+      window.addEventListener('mousemove', (e) => {
+        mx = e.clientX / window.innerWidth  - 0.5
+        my = e.clientY / window.innerHeight - 0.5
+      }, { passive: true })
+
+      const goldEl    = document.querySelector('.bg-luxury__glow--gold')    as HTMLElement
+      const sapphEl   = document.querySelector('.bg-luxury__glow--sapphire') as HTMLElement
+      const violetEl  = document.querySelector('.bg-luxury__glow--violet')   as HTMLElement
+
+      let ogx = 0, ogy = 0
+
+      function luxTick() {
+        requestAnimationFrame(luxTick)
+
+        lctx.clearRect(0, 0, luxCanvas.width, luxCanvas.height)
+
+        // Subtle grid
+        const gap = 90
+        lctx.beginPath()
+        lctx.strokeStyle = 'rgba(255,255,255,0.016)'
+        lctx.lineWidth = 0.5
+        for (let x = 0; x <= luxCanvas.width; x += gap) {
+          lctx.moveTo(x, 0); lctx.lineTo(x, luxCanvas.height)
+        }
+        for (let y = 0; y <= luxCanvas.height; y += gap) {
+          lctx.moveTo(0, y); lctx.lineTo(luxCanvas.width, y)
+        }
+        lctx.stroke()
+
+        // Particles
+        pts.forEach((p) => {
+          p.x += p.vx; p.y += p.vy
+          if (p.x < -5 || p.x > luxCanvas.width + 5 || p.y < -5 || p.y > luxCanvas.height + 5) {
+            Object.assign(p, mkParticle(), { x: Math.random() * luxCanvas.width, y: Math.random() * luxCanvas.height })
+          }
+          lctx.beginPath()
+          lctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+          lctx.fillStyle = `rgba(${p.color.r},${p.color.g},${p.color.b},${p.a})`
+          lctx.fill()
+        })
+
+        // Connections
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i + 1; j < pts.length; j++) {
+            const dx = pts[i].x - pts[j].x
+            const dy = pts[i].y - pts[j].y
+            const d  = Math.sqrt(dx * dx + dy * dy)
+            if (d < 130) {
+              lctx.beginPath()
+              lctx.moveTo(pts[i].x, pts[i].y)
+              lctx.lineTo(pts[j].x, pts[j].y)
+              lctx.strokeStyle = `rgba(201,168,76,${0.045 * (1 - d / 130)})`
+              lctx.lineWidth = 0.4
+              lctx.stroke()
+            }
+          }
+        }
+
+        // Glow parallax (slow lerp)
+        ogx += (mx - ogx) * 0.04
+        ogy += (my - ogy) * 0.04
+        if (goldEl)   goldEl.style.transform   = `translate(${ogx * 40}px, ${ogy * 30}px)`
+        if (sapphEl)  sapphEl.style.transform  = `translate(${ogx * -30}px, ${ogy * -20}px)`
+        if (violetEl) violetEl.style.transform = `translate(${ogx * 20}px, ${ogy * 40}px)`
+      }
+      luxTick()
+    }
+  </script>
+
+  <script>
     import * as THREE from 'three'
 
     const canvas = document.querySelector('.js-intro-canvas')
@@ -668,28 +778,87 @@ import '../styles/global.scss'
   </script>
 
   <style lang="scss">
-    // html fallback derrière le Spline
     :global(html) {
-      background-color: #0a000f;
+      background-color: #060409;
     }
 
-    .bg-spline {
+    // ── Luxury background ────────────────────────────────────────────────
+    .bg-luxury {
       position: fixed;
       inset: 0;
       z-index: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
+      background: radial-gradient(ellipse 130% 90% at 60% 10%, #130820 0%, #08040e 45%, #040208 100%);
       pointer-events: none;
+
+      &__canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      // Film-grain noise
+      &__noise {
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 160px 160px;
+        opacity: 0.038;
+        pointer-events: none;
+      }
+
+      // Ambient glows
+      &__glow {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        will-change: transform;
+      }
+
+      &__glow--gold {
+        width: 70vw;
+        height: 70vw;
+        top: -25%;
+        left: 5%;
+        background: radial-gradient(circle, rgba(201, 168, 76, 0.10) 0%, rgba(201, 148, 50, 0.04) 45%, transparent 70%);
+        filter: blur(60px);
+        animation: glowDrift1 22s ease-in-out infinite;
+      }
+
+      &__glow--sapphire {
+        width: 50vw;
+        height: 50vw;
+        bottom: 10%;
+        right: -10%;
+        background: radial-gradient(circle, rgba(30, 58, 138, 0.12) 0%, rgba(37, 99, 235, 0.04) 50%, transparent 70%);
+        filter: blur(70px);
+        animation: glowDrift2 28s ease-in-out infinite;
+      }
+
+      &__glow--violet {
+        width: 40vw;
+        height: 40vw;
+        bottom: 30%;
+        left: 35%;
+        background: radial-gradient(circle, rgba(139, 30, 180, 0.09) 0%, transparent 65%);
+        filter: blur(55px);
+        animation: glowDrift3 18s ease-in-out infinite;
+      }
     }
 
-    // Overlay fuchsia-rose entre Spline (z:0) et contenu (z:2)
-    .bg-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      background: rgba(180, 15, 195, 0.18);
-      pointer-events: none;
+    @keyframes glowDrift1 {
+      0%,  100% { transform: translate(0, 0)    scale(1);    }
+      33%        { transform: translate(4%, 7%)  scale(1.06); }
+      66%        { transform: translate(-3%, 3%) scale(0.97); }
+    }
+    @keyframes glowDrift2 {
+      0%,  100% { transform: translate(0, 0)     scale(1);    }
+      40%        { transform: translate(-5%, -4%) scale(1.04); }
+      70%        { transform: translate(3%, 5%)   scale(0.98); }
+    }
+    @keyframes glowDrift3 {
+      0%,  100% { transform: translate(0, 0)    scale(1);    }
+      50%        { transform: translate(6%, -5%) scale(1.08); }
     }
 
     body {
@@ -930,28 +1099,28 @@ import '../styles/global.scss'
       pointer-events: none;
     }
 
-    // ── Transparence sections — laisse le Spline respirer ───────────────
+    // ── Transparence sections — laisse le bg luxury respirer ───────────
     :global(.s-work) {
-      background: rgba(160, 20, 175, 0.10) !important;
+      background: rgba(8, 4, 14, 0.55) !important;
     }
     :global(.s-work .s__inner) {
-      background: rgba(4, 0, 8, 0.18) !important;
+      background: rgba(6, 3, 10, 0.60) !important;
     }
     :global(.s-work .s__mask__path-outer),
     :global(.s-work .s__mask__path-inner) {
-      fill: rgba(150, 18, 165, 0.22) !important;
+      fill: rgba(10, 5, 16, 0.65) !important;
     }
     :global(.s-about .s__award) {
-      background: rgba(160, 20, 175, 0.28) !important;
+      background: rgba(12, 6, 20, 0.50) !important;
     }
     :global(.s-about .s__award__mask) {
-      background: rgba(0, 0, 0, 0.42) !important;
+      background: rgba(4, 2, 8, 0.72) !important;
     }
     :global(.s-about .s__award__mask::before) {
-      background: rgba(160, 20, 175, 0.55) !important;
+      background: rgba(140, 30, 180, 0.65) !important;
     }
     :global(.s-about .s__title) {
-      background: rgba(0, 0, 0, 0.45) !important;
+      background: rgba(4, 2, 8, 0.70) !important;
     }
     :global(.s-cta) {
       background: transparent !important;
