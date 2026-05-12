@@ -1,1115 +1,247 @@
 ---
-import SiteHead from '../components/SiteHead.astro'
-import SiteFoot from '../components/SiteFoot.astro'
-import SiteScrollbar from '../components/SiteScrollbar.astro'
-import SiteTutorial from '../components/SiteTutorial.astro'
-import SHero from '../components/SHero.astro'
-import SAbout from '../components/SAbout.astro'
-import SWork from '../components/SWork.astro'
-import SMyWay from '../components/SMyWay.astro'
-import SCTA from '../components/SCTA.astro'
-import ASeparator from '../components/ASeparator.astro'
-import SiteCursor from '../components/SiteCursor.astro'
-import '../styles/global.scss'
 ---
 
-<html lang="en" class="is-scroll-blocked theme-contrasted">
-  <head>
-    <meta charset="utf-8" />
-
-    <title>Paul Blanc Portfolio</title>
-
-    <meta
-      name="description"
-      content="Portfolio of Paul Blanc, Creative Developer."
-    />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-
-    <meta name="robots" content="noindex, nofollow" />
-    <link rel="canonical" href="https://portfolio-paul-blanc.netlify.app/" />
-
-    <link
-      rel="icon"
-      type="image/png"
-      href="/icons/favicon-48x48.png"
-      sizes="48x48"
-    />
-    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
-    <link rel="shortcut icon" href="/icons/favicon.ico" />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="/icons/apple-touch-icon.png"
-    />
-    <meta name="apple-mobile-web-app-title" content="Paul Blanc Portfolio" />
-
-    <meta name="theme-color" content="#160000" />
-    <meta name="msapplication-navbutton-color" content="#160000" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="#160000" />
-
-    <meta property="og:locale" content="en_GB" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Paul Blanc Portfolio" />
-    <meta
-      property="og:description"
-      content="Portfolio of Paul Blanc, Creative Developer."
-    />
-    <meta
-      property="og:url"
-      content="https://portfolio-paul-blanc.netlify.app/"
-    />
-    <meta property="og:site_name" content="Paul Blanc Portfolio" />
-    <meta
-      property="og:image"
-      content="https://portfolio-paul-blanc.netlify.app/images/og-image.png"
-    />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="675" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta
-      name="twitter:image"
-      content="https://portfolio-paul-blanc.netlify.app/images/og-image.png"
-    />
-
-    <link
-      rel="preload"
-      href="/fonts/PPEditorialNew-Regular.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/fonts/PPEditorialNew-Ultralight.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/fonts/PPFraktionMono-Regular.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/fonts/PPFraktionMono-Bold.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/fonts/Bigger-Display.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-  </head>
-
-  <body data-page="home">
-    <div class="bg-luxury" aria-hidden="true">
-      <canvas class="bg-luxury__canvas js-luxury-canvas"></canvas>
-      <div class="bg-luxury__noise"></div>
-      <div class="bg-luxury__glow bg-luxury__glow--gold"></div>
-      <div class="bg-luxury__glow bg-luxury__glow--sapphire"></div>
-      <div class="bg-luxury__glow bg-luxury__glow--violet"></div>
-    </div>
-    <div class="site-wrapper js-site-wrapper" style="opacity: 0;">
-      <SiteHead />
-
-      <SHero />
-
-      <SAbout />
-
-      <ASeparator style="secondary" />
-
-      <SWork />
-
-      <ASeparator style="secondary" />
-
-      <SMyWay />
-
-      <SCTA />
-
-      <SiteFoot />
-    </div><!-- .site-wrapper -->
-
-    <div class="site-intro js-intro">
-      <canvas class="intro-canvas js-intro-canvas" aria-hidden="true"></canvas>
-      <div class="intro-glow"></div>
-      <div class="intro-inner">
-        <div class="intro-line js-line"></div>
-        <h1 class="intro-name" aria-label="Paul Blanc">
-          <span class="intro-char js-char"><span class="js-char-inner">P</span></span>
-          <span class="intro-char js-char"><span class="js-char-inner">A</span></span>
-          <span class="intro-char js-char"><span class="js-char-inner">U</span></span>
-          <span class="intro-char js-char"><span class="js-char-inner">L</span></span>
-          <span class="intro-char intro-char--space">&thinsp;&thinsp;</span>
-          <span class="intro-char js-char"><span class="js-char-inner">B</span></span>
-          <span class="intro-char js-char"><span class="js-char-inner">L</span></span>
-          <span class="intro-char js-char"><span class="js-char-inner">A</span></span>
-          <span class="intro-char js-char"><span class="js-char-inner">N</span></span>
-          <span class="intro-char js-char"><span class="js-char-inner">C</span></span>
-        </h1>
-        <p class="intro-sub js-sub">Développeur &middot; Motion Design</p>
-      </div><!-- .intro-inner -->
-      <div class="intro-corners">
-        <span class="intro-corner js-corner"></span>
-        <span class="intro-corner js-corner"></span>
-        <span class="intro-corner js-corner"></span>
-        <span class="intro-corner js-corner"></span>
-      </div>
-      <div class="intro-loader">
-        <span class="js-loader-num">00</span>%
-      </div>
-    </div><!-- .site-intro -->
-
-    <div class="site-mount js-mount"></div>
-    <div class="site-contrast-mask js-contrast-mask"></div>
-
-    <SiteScrollbar />
-    <SiteTutorial />
-    <SiteCursor />
-  </body>
-
-  <script>
-    import Emitter from '../utils/Emitter'
-    import Ticker from '../utils/Ticker'
-
-    import Lenis from 'lenis'
-
-    import { gsap } from 'gsap'
-    import { ScrollTrigger } from 'gsap/ScrollTrigger'
-    gsap.registerPlugin(ScrollTrigger)
-
-
-    declare global {
-      interface Window {
-        safeWidth: number
-        safeHeight: number
-        maxScrollTop: number
-        scrollProgress: number
-        lenis: any
-      }
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Paul Blanc — Bientôt disponible</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+  <link rel="preload" href="/fonts/Bigger-Display.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+  <link rel="preload" href="/fonts/PPFraktionMono-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+  <style>
+    @font-face {
+      font-family: 'Bigger';
+      src: url('/fonts/Bigger-Display.woff2') format('woff2');
+      font-weight: 400;
+      font-display: block;
+    }
+    @font-face {
+      font-family: 'Fraktion';
+      src: url('/fonts/PPFraktionMono-Regular.woff2') format('woff2');
+      font-weight: 400;
+      font-display: block;
     }
 
-    class Site {
-      timeouts: any = {
-        resizeThrottle: null,
-      }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-      windowWidth: number
-      windowHeight: number
-      clientWidth: number
-      clientHeight: number
-
-      isScrolling: boolean = false
-
-      lenis: any
-
-      /**
-       * Constructor
-       */
-      constructor() {
-        // OS class
-        let os = 'unknown'
-        if (navigator.userAgent.indexOf('Win') !== -1) {
-          os = 'windows'
-        } else if (navigator.userAgent.indexOf('Android') !== -1) {
-          os = 'android'
-        } else if (navigator.userAgent.indexOf('Mac') !== -1) {
-          os = 'mac'
-        } else if (navigator.userAgent.indexOf('Linux') !== -1) {
-          os = 'linux'
-        }
-        document.documentElement.classList.add(`is-${os}`)
-
-        // Browser class
-        let browser = 'unknown'
-        if (navigator.userAgent.indexOf('Firefox') !== -1) {
-          browser = 'firefox'
-        } else if (navigator.userAgent.indexOf('Chrome') !== -1) {
-          browser = 'chrome'
-        } else if (navigator.userAgent.indexOf('Safari') !== -1) {
-          browser = 'safari'
-        }
-        document.documentElement.classList.add(`is-${browser}`)
-
-        this.bindEvents()
-      }
-
-      /**
-       * Initialization
-       */
-      init() {
-        this.initLenis()
-
-        Ticker.init()
-
-        this.onResize()
-        Ticker.nextTick(this.intro, this)
-      }
-
-      /**
-       * Bind events
-       */
-      bindEvents() {
-        window.addEventListener('resize', this.resizeThrottle.bind(this))
-        window.addEventListener('scroll', this.onScroll.bind(this), {
-          passive: true,
-        })
-        window.addEventListener('mousemove', this.onMouseMove.bind(this), {
-          passive: true,
-        })
-
-        Emitter.on('updateViewport', this.onResize, this, true)
-
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              entry.target.dispatchEvent(
-                new CustomEvent('intersect', {
-                  detail: { isIntersecting: entry.isIntersecting },
-                }),
-              )
-
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-in-view')
-                entry.target.classList.remove(
-                  'is-out-of-view',
-                  'is-out-of-view-top',
-                  'is-out-of-view-bottom',
-                )
-              } else {
-                entry.target.classList.remove('is-in-view')
-                entry.target.classList.add('is-out-of-view')
-
-                entry.target.classList.toggle(
-                  'is-out-of-view-top',
-                  entry.boundingClientRect.top < 0,
-                )
-                entry.target.classList.toggle(
-                  'is-out-of-view-bottom',
-                  entry.boundingClientRect.top > 0,
-                )
-              }
-            })
-          },
-          {
-            threshold: 0,
-          },
-        )
-
-        document.querySelectorAll('[data-intersect]').forEach((el) => {
-          observer.observe(el)
-        })
-
-        // Site loaded event
-        if (document.readyState === 'complete') {
-          this.siteLoaded()
-        } else {
-          window.addEventListener('load', this.siteLoaded, { once: true })
-        }
-
-        this.onScroll()
-      }
-
-      /**
-       * Init lenis
-       */
-      initLenis() {
-        const lenis = new Lenis()
-
-        lenis.on('scroll', ScrollTrigger.update)
-
-        gsap.ticker.add((time) => {
-          lenis.raf(time * 1000)
-        })
-
-        gsap.ticker.lagSmoothing(0)
-
-        window.lenis = lenis
-        this.lenis = lenis
-      }
-
-      /**
-       * Set loaded class
-       */
-      siteLoaded() {
-        document.documentElement.classList.add('is-loaded')
-
-        Emitter.emit('siteLoaded')
-      }
-
-      /**
-       * Resize throttle
-       */
-      resizeThrottle() {
-        clearTimeout(this.timeouts.resizeThrottle)
-
-        this.timeouts.resizeThrottle = setTimeout(() => {
-          Ticker.nextTick(this.onResize, this)
-        }, 200)
-      }
-
-      /**
-       * Resize handler
-       */
-      onResize() {
-        const newWidth = window.innerWidth
-        let widthChanged = false
-        if (this.windowWidth !== newWidth) {
-          if (this.windowWidth !== undefined) {
-            widthChanged = true
-          }
-
-          this.windowWidth = newWidth
-          this.clientWidth = document.body.clientWidth
-        }
-
-        const newHeight = window.innerHeight
-        let heightChanged = false
-        if (this.windowHeight !== newHeight) {
-          if (this.windowHeight !== undefined) {
-            heightChanged = true
-          }
-
-          this.windowHeight = newHeight
-          this.clientHeight = document.body.clientHeight
-        }
-
-        window.safeWidth = newWidth
-        window.safeHeight = newHeight
-
-        window.maxScrollTop = document.body.scrollHeight - window.safeHeight
-
-        this.setScrollProgress()
-
-        Emitter.emit('resize', widthChanged, heightChanged)
-      }
-
-      /**
-       * Scroll handler
-       */
-      onScroll() {
-        this.setScrollProgress()
-
-        Ticker.nextTick(() => {
-          Emitter.emit('scroll', window.scrollY)
-        })
-      }
-
-      /**
-       * Set scroll progress
-       */
-      setScrollProgress() {
-        window.scrollProgress = window.scrollY / window.maxScrollTop
-      }
-
-      /**
-       * Mouse move handler
-       */
-      onMouseMove(e) {
-        Emitter.emit('mousemove', e.clientX, e.clientY)
-      }
-
-      /**
-       * Intro — cinematic motion design reveal (pure CSS + GSAP)
-       */
-      intro() {
-        const wrapper  = document.querySelector('.js-site-wrapper') as HTMLElement
-        const introEl  = document.querySelector('.js-intro')        as HTMLElement
-        const mount    = document.querySelector('.js-mount')        as HTMLElement
-
-        wrapper.style.opacity = ''
-
-        const chars      = introEl.querySelectorAll<HTMLElement>('.js-char-inner')
-        const sub        = introEl.querySelector<HTMLElement>('.js-sub')!
-        const line       = introEl.querySelector<HTMLElement>('.js-line')!
-        const corners    = introEl.querySelectorAll<HTMLElement>('.js-corner')
-        const loaderNum  = introEl.querySelector<HTMLElement>('.js-loader-num')!
-        const glow       = introEl.querySelector<HTMLElement>('.intro-glow')!
-
-        const cleanup = () => {
-          if (!introEl.parentNode) return
-          introEl.remove()
-          document.documentElement.classList.remove('is-scroll-blocked')
-          Ticker.nextTick(() => { Emitter.emit('updateViewport') })
-        }
-
-        const counter = { val: 0 }
-
-        const tl = gsap.timeline({ onComplete: cleanup })
-
-        tl
-          // ── Initial states ─────────────────────────────────────────
-          .set(chars,   { yPercent: 115 })
-          .set(sub,     { opacity: 0, letterSpacing: '-0.06em' })
-          .set(line,    { scaleX: 0, transformOrigin: 'center center' })
-          .set(corners, { opacity: 0, scale: 0.7 })
-          .set(glow,    { opacity: 0, scale: 0.6 })
-
-          // ── Ambient glow blooms in ──────────────────────────────────
-          .to(glow, { opacity: 1, scale: 1, duration: 1.6, ease: 'power2.out' }, 0)
-
-          // ── Corner brackets appear ─────────────────────────────────
-          .to(corners, {
-            opacity: 1, scale: 1,
-            duration: 0.55, ease: 'power3.out',
-            stagger: { amount: 0.15, from: 'random' },
-          }, 0.1)
-
-          // ── Loading counter (00 → 100) ─────────────────────────────
-          .to(counter, {
-            val: 100,
-            duration: 2.2,
-            ease: 'power1.inOut',
-            onUpdate: () => {
-              loaderNum.textContent = String(Math.round(counter.val)).padStart(2, '0')
-            },
-          }, 0.1)
-
-          // ── Line draws in from center ──────────────────────────────
-          .to(line, { scaleX: 1, duration: 0.7, ease: 'power3.inOut' }, 0.25)
-
-          // ── Letters slide up from clip masks ───────────────────────
-          .to(chars, {
-            yPercent: 0,
-            duration: 0.85,
-            ease: 'power3.out',
-            stagger: 0.045,
-          }, 0.5)
-
-          // ── Subtitle letter-spacing expands ────────────────────────
-          .to(sub, {
-            opacity: 1,
-            letterSpacing: '0.32em',
-            duration: 1.1,
-            ease: 'power2.out',
-          }, 0.95)
-
-          // ── Hold ───────────────────────────────────────────────────
-
-          // ── Glow pulses brighter before exit ──────────────────────
-          .to(glow, { opacity: 0.5, scale: 1.15, duration: 0.4, ease: 'power2.in' }, 2.25)
-
-          // ── Letters exit upward ────────────────────────────────────
-          .to(chars, {
-            yPercent: -115,
-            duration: 0.55,
-            ease: 'power3.in',
-            stagger: 0.028,
-          }, 2.45)
-          .to(sub,  { opacity: 0, y: -6, duration: 0.38, ease: 'power2.in' }, 2.45)
-          .to(line, { scaleX: 0,         duration: 0.42, ease: 'power3.in' }, 2.55)
-
-          // ── Corners & loader fade out ──────────────────────────────
-          .to(corners, {
-            opacity: 0, scale: 0.8,
-            duration: 0.3, ease: 'power2.in',
-            stagger: 0.04,
-          }, 2.5)
-          .to('.intro-loader', { opacity: 0, duration: 0.3, ease: 'power2.in' }, 2.5)
-          .to(glow,   { opacity: 0, scale: 0.5, duration: 0.5, ease: 'power2.in' }, 2.6)
-          .call(() => { document.dispatchEvent(new CustomEvent('intro-3d-destroy')) }, [], 2.65)
-
-          // ── Show border frame ──────────────────────────────────────
-          .call(() => { mount.style.opacity = '1' }, [], 2.85)
-
-          // ── Curtain: intro slides up revealing portfolio ───────────
-          .to(introEl, { yPercent: -100, duration: 0.78, ease: 'power3.inOut' }, 2.9)
-
-          // ── Fire intro event at mid-curtain ────────────────────────
-          .call(() => { document.dispatchEvent(new CustomEvent('intro')) }, [], 3.3)
-
-        // Safety fallback
-        setTimeout(cleanup, 8000)
-      }
+    html, body {
+      width: 100%; height: 100%;
+      background: #060409;
+      color: #fff;
+      overflow: hidden;
     }
 
-    const site = new Site()
-
-    // Site init on DOM ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', site.init, { once: true })
-    } else {
-      site.init()
-    }
-  </script>
-
-  <script>
-    import * as THREE from 'three'
-
-    // ── Luxury background — Three.js particle field ──────────────────────
-    const luxCv = document.querySelector('.js-luxury-canvas') as HTMLCanvasElement | null
-    if (luxCv) {
-      const lW = window.innerWidth
-      const lH = window.innerHeight
-
-      const lRenderer = new THREE.WebGLRenderer({ canvas: luxCv, alpha: true, antialias: false })
-      lRenderer.setSize(lW, lH)
-      lRenderer.setPixelRatio(Math.min(devicePixelRatio, 1.5))
-      lRenderer.setClearColor(0x000000, 0)
-
-      const lScene = new THREE.Scene()
-      const lCam   = new THREE.PerspectiveCamera(65, lW / lH, 0.1, 200)
-      lCam.position.z = 9
-
-      // ── Fine particle dust ─────────────────────────────────────────────
-      const N1  = 1400
-      const p1  = new Float32Array(N1 * 3)
-      const c1  = new Float32Array(N1 * 3)
-      const palette = [
-        new THREE.Color(0xc9a84c), // or doux
-        new THREE.Color(0xa855f7), // violet
-        new THREE.Color(0x818cf8), // indigo
-        new THREE.Color(0xe8d5b7), // crème
-        new THREE.Color(0xffffff), // blanc
-      ]
-      for (let i = 0; i < N1; i++) {
-        p1[i*3]   = (Math.random() - 0.5) * 50
-        p1[i*3+1] = (Math.random() - 0.5) * 28
-        p1[i*3+2] = (Math.random() - 0.5) * 22 - 4
-        const c = palette[Math.floor(Math.random() * palette.length)]
-        c1[i*3] = c.r; c1[i*3+1] = c.g; c1[i*3+2] = c.b
-      }
-      const geo1 = new THREE.BufferGeometry()
-      geo1.setAttribute('position', new THREE.BufferAttribute(p1, 3))
-      geo1.setAttribute('color',    new THREE.BufferAttribute(c1, 3))
-      lScene.add(new THREE.Points(geo1, new THREE.PointsMaterial({
-        size: 0.042, vertexColors: true, transparent: true, opacity: 0.7, sizeAttenuation: true,
-      })))
-
-      // ── Large gold bokeh ───────────────────────────────────────────────
-      const N2  = 90
-      const p2  = new Float32Array(N2 * 3)
-      for (let i = 0; i < N2; i++) {
-        p2[i*3]   = (Math.random() - 0.5) * 55
-        p2[i*3+1] = (Math.random() - 0.5) * 32
-        p2[i*3+2] = (Math.random() - 0.5) * 12
-      }
-      const geo2 = new THREE.BufferGeometry()
-      geo2.setAttribute('position', new THREE.BufferAttribute(p2, 3))
-      lScene.add(new THREE.Points(geo2, new THREE.PointsMaterial({
-        size: 0.22, color: 0xc9a84c, transparent: true, opacity: 0.18, sizeAttenuation: true,
-      })))
-
-      // ── Mouse parallax ─────────────────────────────────────────────────
-      let lmx = 0, lmy = 0
-      window.addEventListener('mousemove', (e: MouseEvent) => {
-        lmx = e.clientX / window.innerWidth  - 0.5
-        lmy = e.clientY / window.innerHeight - 0.5
-      }, { passive: true })
-
-      const goldEl   = document.querySelector('.bg-luxury__glow--gold')     as HTMLElement | null
-      const sapphEl  = document.querySelector('.bg-luxury__glow--sapphire') as HTMLElement | null
-      const violetEl = document.querySelector('.bg-luxury__glow--violet')   as HTMLElement | null
-
-      let lox = 0, loy = 0, lgx = 0, lgy = 0
-
-      function lTick() {
-        requestAnimationFrame(lTick)
-        const t = performance.now() * 0.00006
-
-        lox += (lmx * 0.28 - lox) * 0.03
-        loy += (lmy * 0.22 - loy) * 0.03
-
-        lScene.rotation.y = t + lox
-        lScene.rotation.x = -loy * 0.5
-
-        lgx += (lmx * 44 - lgx) * 0.04
-        lgy += (lmy * 32 - lgy) * 0.04
-        if (goldEl)   goldEl.style.transform   = `translate(${lgx}px, ${lgy}px)`
-        if (sapphEl)  sapphEl.style.transform  = `translate(${-lgx * 0.65}px, ${-lgy * 0.5}px)`
-        if (violetEl) violetEl.style.transform = `translate(${lgx * 0.4}px, ${lgy * 0.75}px)`
-
-        lRenderer.render(lScene, lCam)
-      }
-      lTick()
-
-      window.addEventListener('resize', () => {
-        lRenderer.setSize(window.innerWidth, window.innerHeight)
-        lCam.aspect = window.innerWidth / window.innerHeight
-        lCam.updateProjectionMatrix()
-      }, { passive: true })
-    }
-  </script>
-
-  <script>
-    import * as THREE from 'three'
-
-    const canvas = document.querySelector('.js-intro-canvas')
-    if (!canvas) throw new Error('intro canvas not found')
-
-    const W = window.innerWidth
-    const H = window.innerHeight
-
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
-    renderer.setSize(W, H)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
-
-    const scene  = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 100)
-    camera.position.z = 5.5
-
-    // ── Outer wireframe geodesic sphere ────────────────────────────────
-    const geoOuter = new THREE.IcosahedronGeometry(3.2, 5)
-    const matOuter = new THREE.MeshBasicMaterial({
-      color: 0x7c3aed,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.13,
-    })
-    const meshOuter = new THREE.Mesh(geoOuter, matOuter)
-    scene.add(meshOuter)
-
-    // ── Inner geodesic sphere ───────────────────────────────────────────
-    const geoInner = new THREE.IcosahedronGeometry(2.0, 3)
-    const matInner = new THREE.MeshBasicMaterial({
-      color: 0xc4b5fd,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.09,
-    })
-    const meshInner = new THREE.Mesh(geoInner, matInner)
-    scene.add(meshInner)
-
-    // ── Equatorial ring ─────────────────────────────────────────────────
-    const geoRing = new THREE.TorusGeometry(3.8, 0.004, 2, 180)
-    const matRing = new THREE.MeshBasicMaterial({
-      color: 0xa78bfa,
-      transparent: true,
-      opacity: 0.35,
-    })
-    const ring = new THREE.Mesh(geoRing, matRing)
-    ring.rotation.x = Math.PI / 2.6
-    scene.add(ring)
-
-    // ── Particle field ──────────────────────────────────────────────────
-    const COUNT = 700
-    const pPos  = new Float32Array(COUNT * 3)
-    const pCol  = new Float32Array(COUNT * 3)
-    const colors = [
-      new THREE.Color(0xa78bfa),
-      new THREE.Color(0x8b5cf6),
-      new THREE.Color(0xc4b5fd),
-      new THREE.Color(0xffffff),
-    ]
-    for (let i = 0; i < COUNT; i++) {
-      const r     = 4.5 + Math.random() * 12
-      const theta = Math.random() * Math.PI * 2
-      const phi   = Math.acos(2 * Math.random() - 1)
-      pPos[i*3]   = r * Math.sin(phi) * Math.cos(theta)
-      pPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta)
-      pPos[i*3+2] = (Math.random() - 0.5) * 14
-      const c = colors[Math.floor(Math.random() * colors.length)]
-      pCol[i*3]   = c.r
-      pCol[i*3+1] = c.g
-      pCol[i*3+2] = c.b
-    }
-    const pGeo = new THREE.BufferGeometry()
-    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3))
-    pGeo.setAttribute('color',    new THREE.BufferAttribute(pCol, 3))
-    const pMat = new THREE.PointsMaterial({
-      size: 0.028,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.5,
-      sizeAttenuation: true,
-    })
-    scene.add(new THREE.Points(pGeo, pMat))
-
-    // ── Mouse parallax ──────────────────────────────────────────────────
-    let tX = 0, tY = 0, oX = 0, oY = 0
-    const onMouse = (e) => {
-      tX = (e.clientX / window.innerWidth  - 0.5) * 0.55
-      tY = (e.clientY / window.innerHeight - 0.5) * 0.35
-    }
-    window.addEventListener('mousemove', onMouse, { passive: true })
-
-    // ── Render loop ─────────────────────────────────────────────────────
-    let raf
-    const animate = () => {
-      raf = requestAnimationFrame(animate)
-      const t = performance.now() * 0.001
-
-      meshOuter.rotation.y  = t * 0.09
-      meshOuter.rotation.x  = t * 0.04
-      meshInner.rotation.y  = -t * 0.14
-      meshInner.rotation.z  = t * 0.06
-      ring.rotation.z       = t * 0.07
-
-      oX += (tX - oX) * 0.035
-      oY += (tY - oY) * 0.035
-      scene.rotation.y = oX
-      scene.rotation.x = -oY
-
-      renderer.render(scene, camera)
-    }
-    animate()
-
-    // ── Cleanup ──────────────────────────────────────────────────────────
-    document.addEventListener('intro-3d-destroy', () => {
-      cancelAnimationFrame(raf)
-      window.removeEventListener('mousemove', onMouse)
-      renderer.dispose()
-      geoOuter.dispose(); matOuter.dispose()
-      geoInner.dispose(); matInner.dispose()
-      geoRing.dispose();  matRing.dispose()
-      pGeo.dispose();     pMat.dispose()
-    }, { once: true })
-  </script>
-
-  <style lang="scss">
-    :global(html) {
-      background-color: #060409;
-    }
-
-    // ── Luxury background ────────────────────────────────────────────────
-    .bg-luxury {
+    canvas#bg {
       position: fixed;
       inset: 0;
       z-index: 0;
-      background: radial-gradient(ellipse 130% 90% at 60% 10%, #130820 0%, #08040e 45%, #040208 100%);
-      pointer-events: none;
-
-      &__canvas {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-      }
-
-      // Film-grain noise
-      &__noise {
-        position: absolute;
-        inset: 0;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-        background-size: 160px 160px;
-        opacity: 0.038;
-        pointer-events: none;
-      }
-
-      // Ambient glows
-      &__glow {
-        position: absolute;
-        border-radius: 50%;
-        pointer-events: none;
-        will-change: transform;
-      }
-
-      &__glow--gold {
-        width: 70vw;
-        height: 70vw;
-        top: -25%;
-        left: 5%;
-        background: radial-gradient(circle, rgba(201, 168, 76, 0.10) 0%, rgba(201, 148, 50, 0.04) 45%, transparent 70%);
-        filter: blur(60px);
-        animation: glowDrift1 22s ease-in-out infinite;
-      }
-
-      &__glow--sapphire {
-        width: 50vw;
-        height: 50vw;
-        bottom: 10%;
-        right: -10%;
-        background: radial-gradient(circle, rgba(30, 58, 138, 0.12) 0%, rgba(37, 99, 235, 0.04) 50%, transparent 70%);
-        filter: blur(70px);
-        animation: glowDrift2 28s ease-in-out infinite;
-      }
-
-      &__glow--violet {
-        width: 40vw;
-        height: 40vw;
-        bottom: 30%;
-        left: 35%;
-        background: radial-gradient(circle, rgba(139, 30, 180, 0.09) 0%, transparent 65%);
-        filter: blur(55px);
-        animation: glowDrift3 18s ease-in-out infinite;
-      }
     }
 
-    @keyframes glowDrift1 {
-      0%,  100% { transform: translate(0, 0)    scale(1);    }
-      33%        { transform: translate(4%, 7%)  scale(1.06); }
-      66%        { transform: translate(-3%, 3%) scale(0.97); }
-    }
-    @keyframes glowDrift2 {
-      0%,  100% { transform: translate(0, 0)     scale(1);    }
-      40%        { transform: translate(-5%, -4%) scale(1.04); }
-      70%        { transform: translate(3%, 5%)   scale(0.98); }
-    }
-    @keyframes glowDrift3 {
-      0%,  100% { transform: translate(0, 0)    scale(1);    }
-      50%        { transform: translate(6%, -5%) scale(1.08); }
-    }
-
-    body {
-      position: relative;
-      padding: 1rem;
-      min-height: 100vh;
-
-      @include mq(phone) {
-        padding: 0.5rem;
-      }
-    }
-
-    .site-contrast-mask {
+    .noise {
       position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 20;
-
-      width: 100%;
-      height: 100%;
-
-      background: map.get($theme-colors, 'default', 'primary');
-      border-color: map.get($theme-colors, 'default', 'secondary');
-      border-style: solid;
-      border-width: 0 1rem 0 0;
-      mix-blend-mode: darken;
-      transform: translate3d(-100%, 0, 0);
-
-      pointer-events: none;
-      will-change: transform;
-
-      @include mq(phone) {
-        border-right-width: 0.5rem;
-      }
-    }
-
-    .intro-canvas {
-      position: absolute;
       inset: 0;
-      z-index: 0;
-      width: 100%;
-      height: 100%;
+      z-index: 1;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 160px 160px;
+      opacity: 0.04;
       pointer-events: none;
     }
 
-    .site-intro {
+    .scene {
       position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 50;
-
+      inset: 0;
+      z-index: 2;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-
-      width: 100%;
-      height: 100%;
-
-      background: radial-gradient(ellipse 90% 80% at 50% 50%, #140028 0%, #07000f 55%, #000 100%);
-      overflow: hidden;
-
-      // Film-grain noise texture
-      &::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-        background-size: 140px 140px;
-        opacity: 0.045;
-        pointer-events: none;
-        z-index: 0;
-      }
+      gap: 0;
+      padding: 2rem;
     }
 
-    .intro-glow {
-      position: absolute;
-      width: clamp(320px, 55vw, 720px);
-      height: clamp(320px, 55vw, 720px);
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -55%);
-      background: radial-gradient(circle, rgba(139, 92, 246, 0.14) 0%, rgba(109, 40, 217, 0.05) 45%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-      will-change: transform, opacity;
-    }
-
-    .intro-inner {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      user-select: none;
-      pointer-events: none;
-    }
-
-    .intro-line {
-      width: clamp(60px, 10vw, 130px);
+    .line-top {
+      width: clamp(40px, 8vw, 100px);
       height: 1px;
-      margin: 0 auto 2.8rem;
-      background: linear-gradient(90deg, transparent, rgba(167, 139, 250, 0.7) 25%, rgba(200, 180, 255, 0.9) 50%, rgba(167, 139, 250, 0.7) 75%, transparent);
-      box-shadow: 0 0 10px rgba(167, 139, 250, 0.25);
-    }
-
-    .intro-name {
-      display: flex;
-      align-items: baseline;
-      justify-content: center;
-      margin: 0;
-      font-family: font-family(bigger);
-      font-size: clamp(2.6rem, 7.5vw, 6.5rem);
-      font-weight: 400;
-      color: #fff;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      line-height: 1;
-      text-shadow: 0 0 80px rgba(167, 139, 250, 0.18), 0 0 140px rgba(139, 92, 246, 0.1);
-    }
-
-    .intro-char {
-      display: inline-block;
-      overflow: hidden;
-      line-height: 1.08;
-
-      &--space {
-        width: 0.28em;
-      }
-    }
-
-    .js-char-inner {
-      display: inline-block;
-    }
-
-    .intro-sub {
-      margin: 2.4rem 0 0;
-      padding-right: 0.32em;
-      font-family: font-family(fraktion);
-      font-size: clamp(0.5rem, 1.1vw, 0.65rem);
-      text-transform: uppercase;
-      color: rgba(167, 139, 250, 0.55);
-      letter-spacing: -0.06em;
-    }
-
-    .intro-corners {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .intro-corner {
-      position: absolute;
-      width: 1.4rem;
-      height: 1.4rem;
-      border-color: rgba(167, 139, 250, 0.4);
-      border-style: solid;
-      border-width: 0;
-
-      &:nth-child(1) {
-        top: 2rem; left: 2rem;
-        border-top-width: 1px;
-        border-left-width: 1px;
-      }
-      &:nth-child(2) {
-        top: 2rem; right: 2rem;
-        border-top-width: 1px;
-        border-right-width: 1px;
-      }
-      &:nth-child(3) {
-        bottom: 2rem; left: 2rem;
-        border-bottom-width: 1px;
-        border-left-width: 1px;
-      }
-      &:nth-child(4) {
-        bottom: 2rem; right: 2rem;
-        border-bottom-width: 1px;
-        border-right-width: 1px;
-      }
-
-      @include mq(phone) {
-        &:nth-child(1), &:nth-child(2) { top: 1.25rem; }
-        &:nth-child(3), &:nth-child(4) { bottom: 1.25rem; }
-        &:nth-child(1), &:nth-child(3) { left: 1.25rem; }
-        &:nth-child(2), &:nth-child(4) { right: 1.25rem; }
-      }
-    }
-
-    .intro-loader {
-      position: absolute;
-      bottom: 2.5rem;
-      right: 2.5rem;
-      z-index: 1;
-
-      font-family: font-family(fraktion);
-      font-size: clamp(0.48rem, 0.85vw, 0.58rem);
-      color: rgba(167, 139, 250, 0.35);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      pointer-events: none;
-
-      @include mq(phone) {
-        bottom: 1.5rem;
-        right: 1.5rem;
-      }
-    }
-
-    .js-loader-num {
-      display: inline-block;
-      min-width: 1.5em;
-      text-align: right;
-    }
-
-    .site-wrapper {
-      position: relative;
-      z-index: 2;
-
-      background: transparent;
-      clip-path: inset(0 -1rem);
-
-      @include mq(phone) {
-        clip-path: inset(0 -0.5rem);
-      }
-    }
-
-    .site-mount {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
-
-      width: 100%;
-      height: 100%;
-
-      border: 1rem solid color(secondary);
-
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.7), transparent);
+      margin-bottom: 3rem;
       opacity: 0;
-      will-change: border-width;
-
-      pointer-events: none;
+      animation: fadeUp 1s 0.3s ease forwards;
     }
 
-    // ── Sections opaques — contenu lisible, bg visible dans les marges ──
-    :global(.s-work) {
-      background: rgba(6, 3, 11, 0.94) !important;
+    .label {
+      font-family: 'Fraktion', monospace;
+      font-size: clamp(0.45rem, 0.9vw, 0.6rem);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(201, 168, 76, 0.65);
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 1s 0.5s ease forwards;
     }
-    :global(.s-work .s__inner) {
-      background: rgba(5, 2, 9, 0.96) !important;
+
+    .name {
+      font-family: 'Bigger', sans-serif;
+      font-size: clamp(3rem, 10vw, 9rem);
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 0.9;
+      text-align: center;
+      color: #fff;
+      opacity: 0;
+      animation: fadeUp 1.2s 0.7s cubic-bezier(0.16,1,0.3,1) forwards;
     }
-    :global(.s-work .s__mask__path-outer),
-    :global(.s-work .s__mask__path-inner) {
-      fill: rgba(6, 3, 11, 0.95) !important;
+
+    .name span {
+      display: block;
+      background: linear-gradient(135deg, #fff 40%, rgba(201,168,76,0.55));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    :global(.s-about .s__award) {
-      background: rgba(10, 5, 18, 0.92) !important;
+
+    .divider {
+      width: 1px;
+      height: clamp(40px, 5vw, 60px);
+      background: linear-gradient(180deg, transparent, rgba(201,168,76,0.5), transparent);
+      margin: 2.5rem 0;
+      opacity: 0;
+      animation: fadeUp 1s 1.1s ease forwards;
     }
-    :global(.s-about .s__award__mask) {
-      background: rgba(3, 1, 6, 0.96) !important;
+
+    .status {
+      font-family: 'Fraktion', monospace;
+      font-size: clamp(0.5rem, 1vw, 0.65rem);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      opacity: 0;
+      animation: fadeUp 1s 1.3s ease forwards;
     }
-    :global(.s-about .s__award__mask::before) {
-      background: rgba(162, 28, 175, 0.90) !important;
+
+    .status strong {
+      color: rgba(201,168,76,0.8);
+      font-weight: 400;
     }
-    :global(.s-about .s__title) {
-      background: rgba(3, 1, 6, 0.94) !important;
+
+    .dot {
+      display: inline-block;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: rgba(201,168,76,0.9);
+      margin-right: 0.6em;
+      vertical-align: middle;
+      animation: pulse 2s ease-in-out infinite;
     }
-    :global(.s-cta) {
-      background: transparent !important;
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
   </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <div class="noise"></div>
+
+  <div class="scene">
+    <div class="line-top"></div>
+    <p class="label">Portfolio · Creative Developer</p>
+    <h1 class="name">
+      <span>Paul</span>
+      <span>Blanc</span>
+    </h1>
+    <div class="divider"></div>
+    <p class="status">
+      <span class="dot"></span>
+      Nouvelle version <strong>en cours</strong>
+    </p>
+  </div>
+
+  <script>
+    import * as THREE from 'three'
+
+    const cv = document.getElementById('bg') as HTMLCanvasElement
+
+    const renderer = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: false })
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5))
+    renderer.setClearColor(0x000000, 0)
+
+    const scene = new THREE.Scene()
+    const cam   = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 200)
+    cam.position.z = 9
+
+    // Fine particle dust
+    const N = 1600
+    const pos = new Float32Array(N * 3)
+    const col = new Float32Array(N * 3)
+    const palette = [
+      new THREE.Color(0xc9a84c),
+      new THREE.Color(0xa855f7),
+      new THREE.Color(0x818cf8),
+      new THREE.Color(0xe8d5b7),
+      new THREE.Color(0xffffff),
+    ]
+    for (let i = 0; i < N; i++) {
+      pos[i*3]   = (Math.random() - 0.5) * 55
+      pos[i*3+1] = (Math.random() - 0.5) * 30
+      pos[i*3+2] = (Math.random() - 0.5) * 24 - 4
+      const c = palette[Math.floor(Math.random() * palette.length)]
+      col[i*3] = c.r; col[i*3+1] = c.g; col[i*3+2] = c.b
+    }
+    const geo = new THREE.BufferGeometry()
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3))
+    geo.setAttribute('color',    new THREE.BufferAttribute(col, 3))
+    scene.add(new THREE.Points(geo, new THREE.PointsMaterial({
+      size: 0.045, vertexColors: true, transparent: true, opacity: 0.75, sizeAttenuation: true,
+    })))
+
+    // Gold bokeh
+    const NB = 100, bpos = new Float32Array(NB * 3)
+    for (let i = 0; i < NB; i++) {
+      bpos[i*3]   = (Math.random() - 0.5) * 60
+      bpos[i*3+1] = (Math.random() - 0.5) * 35
+      bpos[i*3+2] = (Math.random() - 0.5) * 14
+    }
+    const bgeo = new THREE.BufferGeometry()
+    bgeo.setAttribute('position', new THREE.BufferAttribute(bpos, 3))
+    scene.add(new THREE.Points(bgeo, new THREE.PointsMaterial({
+      size: 0.24, color: 0xc9a84c, transparent: true, opacity: 0.22, sizeAttenuation: true,
+    })))
+
+    let mx = 0, my = 0
+    window.addEventListener('mousemove', (e: MouseEvent) => {
+      mx = e.clientX / window.innerWidth  - 0.5
+      my = e.clientY / window.innerHeight - 0.5
+    }, { passive: true })
+
+    let ox = 0, oy = 0
+
+    function tick() {
+      requestAnimationFrame(tick)
+      const t = performance.now() * 0.00005
+      ox += (mx * 0.3 - ox) * 0.03
+      oy += (my * 0.2 - oy) * 0.03
+      scene.rotation.y = t + ox
+      scene.rotation.x = -oy * 0.5
+      renderer.render(scene, cam)
+    }
+    tick()
+
+    window.addEventListener('resize', () => {
+      renderer.setSize(window.innerWidth, window.innerHeight)
+      cam.aspect = window.innerWidth / window.innerHeight
+      cam.updateProjectionMatrix()
+    }, { passive: true })
+  </script>
+</body>
 </html>
