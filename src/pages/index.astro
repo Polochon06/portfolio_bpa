@@ -13,11 +13,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
   <link rel="preload" href="/portfolio_bpa/footage/video-1.mp4" as="video" type="video/mp4" />
   <style>
-    /* ── RESET ─────────────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --gold:    #c9a84c;
-      --gold-lo: rgba(201,168,76,0.15);
       --cream:   #f0ebe0;
       --muted:   rgba(240,235,224,0.5);
       --dark:    #06040a;
@@ -33,32 +31,32 @@
     }
     ::selection { background: rgba(201,168,76,0.22); }
 
-    /* ── CINEMATIC BG ────────────────────────────────────────────────── */
+    /* ── CINEMATIC BG ──────────────────────────────────────────────── */
     #cinematic-bg {
       position: fixed; inset: 0; z-index: 0;
       overflow: hidden;
     }
+    /* GSAP handles transform — no transform in CSS */
     .bg-vid {
       position: absolute;
       top: 50%; left: 50%;
-      transform: translate(-50%,-50%) scale(1.06);
       width: max(100vw, 177.78vh);
       height: max(56.25vw, 100vh);
       object-fit: cover;
       opacity: 0;
-      transition: opacity 1.4s cubic-bezier(0.4,0,0.2,1);
+      transition: opacity 1.2s cubic-bezier(0.4,0,0.2,1);
       pointer-events: none;
-      will-change: opacity, transform;
+      will-change: opacity, transform, filter;
     }
     .bg-vid.active { opacity: 1; }
 
-    /* Vignette */
+    /* Vignette — lighter so videos show through better */
     #cinematic-bg::after {
       content: '';
       position: absolute; inset: 0; z-index: 2;
       background:
-        radial-gradient(ellipse 80% 65% at 50% 50%, transparent 35%, rgba(6,4,10,0.7) 100%),
-        linear-gradient(180deg, rgba(6,4,10,0.55) 0%, transparent 18%, transparent 78%, rgba(6,4,10,0.75) 100%);
+        radial-gradient(ellipse 85% 70% at 50% 50%, transparent 30%, rgba(6,4,10,0.55) 100%),
+        linear-gradient(180deg, rgba(6,4,10,0.45) 0%, transparent 20%, transparent 75%, rgba(6,4,10,0.65) 100%);
       pointer-events: none;
     }
     /* Grain */
@@ -67,11 +65,11 @@
       position: absolute; inset: 0; z-index: 3;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 180px;
-      opacity: 0.028;
+      opacity: 0.03;
       pointer-events: none;
     }
 
-    /* ── LETTERBOX ───────────────────────────────────────────────────── */
+    /* ── LETTERBOX ──────────────────────────────────────────────────── */
     .letterbox-top, .letterbox-bot {
       position: fixed; left: 0; right: 0; z-index: 80;
       height: 0; background: #000;
@@ -83,7 +81,7 @@
     body.cinematic .letterbox-top,
     body.cinematic .letterbox-bot { height: 4.5vh; }
 
-    /* ── TOP BAR ─────────────────────────────────────────────────────── */
+    /* ── TOP BAR ────────────────────────────────────────────────────── */
     #top-bar {
       position: fixed; top: 0; left: 0; right: 0; z-index: 90;
       display: flex; justify-content: space-between; align-items: center;
@@ -91,65 +89,58 @@
       pointer-events: none;
     }
     .bar-logo {
-      font-family: 'Jost', sans-serif;
-      font-size: 0.56rem;
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-      color: var(--gold);
-      text-decoration: none;
-      pointer-events: all;
+      font-family: 'Jost', sans-serif; font-size: 0.56rem;
+      letter-spacing: 0.32em; text-transform: uppercase;
+      color: var(--gold); text-decoration: none; pointer-events: all;
     }
     .bar-status {
-      font-family: 'Jost', sans-serif;
-      font-size: 0.5rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--muted);
+      font-family: 'Jost', sans-serif; font-size: 0.48rem;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--muted); transition: opacity 0.4s;
     }
 
-    /* ── NAV DOTS ────────────────────────────────────────────────────── */
+    /* ── NAV DOTS ───────────────────────────────────────────────────── */
     #scene-nav {
       position: fixed; right: 2.2rem; top: 50%;
-      transform: translateY(-50%);
-      z-index: 90;
+      transform: translateY(-50%); z-index: 90;
       display: flex; flex-direction: column; gap: 1rem;
     }
     .nav-dot {
-      width: 5px; height: 5px;
-      border-radius: 50%;
+      width: 5px; height: 5px; border-radius: 50%;
       background: rgba(201,168,76,0.28);
-      cursor: pointer;
-      transition: all 0.35s;
-      position: relative;
+      cursor: pointer; transition: all 0.35s; position: relative;
     }
     .nav-dot::before {
       content: attr(data-label);
       position: absolute; right: 1.5rem; top: 50%;
       transform: translateY(-50%);
-      font-family: 'Jost', sans-serif;
-      font-size: 0.48rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(201,168,76,0.6);
-      white-space: nowrap;
-      opacity: 0; transition: opacity 0.2s;
-      pointer-events: none;
+      font-family: 'Jost', sans-serif; font-size: 0.46rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(201,168,76,0.6); white-space: nowrap;
+      opacity: 0; transition: opacity 0.2s; pointer-events: none;
     }
     .nav-dot:hover::before { opacity: 1; }
     .nav-dot.active { background: var(--gold); transform: scale(1.7); }
 
-    /* ── PROGRESS BAR ────────────────────────────────────────────────── */
+    /* ── PROGRESS BAR ───────────────────────────────────────────────── */
     #progress-bar {
       position: fixed; bottom: 0; left: 0; z-index: 90;
       height: 1.5px;
-      background: linear-gradient(90deg, var(--gold), rgba(201,168,76,0.25));
+      background: linear-gradient(90deg, var(--gold), rgba(201,168,76,0.2));
       width: 0%; pointer-events: none;
     }
 
-    /* ── SCROLL CONTAINER ────────────────────────────────────────────── */
+    /* ── VIDEO PLAY INDICATOR ───────────────────────────────────────── */
+    #vid-progress {
+      position: fixed; bottom: 1.5px; left: 0; z-index: 89;
+      height: 1.5px; background: rgba(201,168,76,0.15);
+      width: 0%; transition: none; pointer-events: none;
+    }
+
+    /* ── SCROLL CONTAINER ───────────────────────────────────────────── */
     #scroll-container { position: relative; z-index: 10; }
 
-    /* ── SCENE BASE ──────────────────────────────────────────────────── */
+    /* ── SCENE BASE ─────────────────────────────────────────────────── */
     .scene {
       position: relative;
       min-height: 100vh;
@@ -163,19 +154,23 @@
       max-width: 860px;
     }
 
-    /* ── TEXT ELEMENTS ───────────────────────────────────────────────── */
+    /* ── TEXT ELEMENTS (hidden by default, GSAP reveals) ─────────────── */
+    [data-reveal] {
+      opacity: 0;
+      transform: translateY(28px);
+      will-change: opacity, transform;
+    }
+    /* S1 hero elements animate in on load — override */
+    .hero-anim { opacity: 1 !important; transform: none !important; }
+
     .scene-tag {
-      font-family: 'Jost', sans-serif;
-      font-size: 0.5rem;
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 1.6rem;
+      font-family: 'Jost', sans-serif; font-size: 0.5rem;
+      letter-spacing: 0.32em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.6rem;
       display: flex; align-items: center; gap: 1rem;
     }
     .scene-tag::before {
-      content: '';
-      width: 28px; height: 1px;
+      content: ''; width: 28px; height: 1px;
       background: var(--gold); flex-shrink: 0;
     }
     .no-line::before { display: none; }
@@ -183,168 +178,118 @@
     .scene-title {
       font-family: 'Bodoni Moda', serif;
       font-size: clamp(3.5rem, 8vw, 8rem);
-      font-weight: 400;
-      line-height: 0.9;
-      letter-spacing: -0.01em;
-      margin-bottom: 2rem;
+      font-weight: 400; line-height: 0.9;
+      letter-spacing: -0.01em; margin-bottom: 2rem;
     }
     .scene-title em { font-style: italic; color: rgba(240,235,224,0.6); }
 
     .scene-body {
       font-size: clamp(0.88rem, 1.2vw, 1.05rem);
-      font-weight: 200;
-      line-height: 1.85;
-      color: var(--muted);
-      max-width: 460px;
+      font-weight: 200; line-height: 1.85;
+      color: var(--muted); max-width: 460px;
     }
     .scene-body strong { color: var(--cream); font-weight: 400; }
 
     .gold-line { width: 44px; height: 1px; background: var(--gold); margin-bottom: 2rem; }
 
-    /* ── DATA-REVEAL (set by JS, not CSS) ────────────────────────────── */
-    [data-reveal] { will-change: opacity, transform; }
-
-    /* ── S1 — HERO ───────────────────────────────────────────────────── */
+    /* ── S1 — HERO ──────────────────────────────────────────────────── */
     #s1 {
       justify-content: center; align-items: flex-end;
-      padding-bottom: 10vh; min-height: 100vh;
+      padding-bottom: 10vh;
     }
     #s1 .scene-inner { text-align: center; max-width: 720px; }
     .hero-tag {
-      font-family: 'Jost', sans-serif;
-      font-size: 0.5rem; letter-spacing: 0.32em;
-      text-transform: uppercase; color: var(--gold);
-      margin-bottom: 2rem;
-      animation: fadeUp 1s 0.2s cubic-bezier(0.16,1,0.3,1) both;
+      font-family: 'Jost', sans-serif; font-size: 0.5rem;
+      letter-spacing: 0.32em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 2rem;
     }
     .hero-title {
       font-family: 'Bodoni Moda', serif;
       font-size: clamp(5rem, 14vw, 14rem);
-      font-weight: 400;
-      line-height: 0.88;
-      letter-spacing: 0.04em;
-      margin-bottom: 2rem;
+      font-weight: 400; line-height: 0.88;
+      letter-spacing: 0.04em; margin-bottom: 2rem;
     }
-    .hero-word {
-      display: block;
-      animation: fadeUp 1.1s cubic-bezier(0.16,1,0.3,1) both;
-    }
-    .hero-word:nth-child(1) { animation-delay: 0.4s; }
-    .hero-word:nth-child(2) { animation-delay: 0.6s; font-style: italic; color: rgba(240,235,224,0.6); }
+    .hero-word { display: block; }
     .hero-sub {
       font-family: 'Jost', sans-serif;
       font-size: clamp(0.75rem, 1.2vw, 1rem);
-      font-weight: 200;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      color: var(--muted);
-      animation: fadeUp 1.1s 0.8s cubic-bezier(0.16,1,0.3,1) both;
+      font-weight: 200; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--muted);
     }
     .scroll-cue {
       position: absolute; bottom: 3rem; left: 50%;
       transform: translateX(-50%);
       display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.42rem; letter-spacing: 0.3em;
-      text-transform: uppercase; color: rgba(201,168,76,0.5);
-      animation: fadeUp 1s 1.2s cubic-bezier(0.16,1,0.3,1) both;
+      font-family: 'Jost', sans-serif; font-size: 0.42rem;
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: rgba(201,168,76,0.5); pointer-events: none;
     }
     .scroll-line { width: 1px; height: 44px; background: linear-gradient(180deg, var(--gold), transparent); }
 
-    /* ── S2 — PHILOSOPHIE ────────────────────────────────────────────── */
+    /* ── S2 ─────────────────────────────────────────────────────────── */
     #s2 { align-items: flex-end; padding-bottom: 13vh; }
 
-    /* ── S3 — À PROPOS ───────────────────────────────────────────────── */
-    #s3 {}
+    /* ── S3 ─────────────────────────────────────────────────────────── */
     .stat-row {
       display: flex; gap: 3.5rem;
-      margin-top: 2.5rem;
-      padding-top: 2rem;
+      margin-top: 2.5rem; padding-top: 2rem;
       border-top: 1px solid var(--line);
     }
     .stat-val {
       font-family: 'Bodoni Moda', serif;
-      font-size: 3.2rem; font-weight: 400;
-      line-height: 1; color: var(--gold);
+      font-size: 3.2rem; font-weight: 400; line-height: 1; color: var(--gold);
     }
     .stat-lbl {
       font-size: 0.45rem; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--muted);
-      margin-top: 0.4rem;
+      text-transform: uppercase; color: var(--muted); margin-top: 0.4rem;
     }
 
-    /* ── S4 / S5 — PROJETS ───────────────────────────────────────────── */
+    /* ── S4 / S5 — PROJETS ──────────────────────────────────────────── */
     #s4 { align-items: flex-end; padding-bottom: 10vh; }
-    #s5 { justify-content: flex-end; padding-right: 0; }
-    #s5 .scene-inner { padding-right: 7vw; }
-
     .proj-number {
       font-family: 'Bodoni Moda', serif;
-      font-size: clamp(5rem, 10vw, 10rem);
-      font-weight: 400; line-height: 1;
-      color: rgba(201,168,76,0.08);
-      margin-bottom: -1rem;
+      font-size: clamp(4rem, 9vw, 9rem); font-weight: 400; line-height: 1;
+      color: rgba(201,168,76,0.07); margin-bottom: -0.5rem;
     }
     .proj-meta {
-      font-family: 'Jost', sans-serif;
-      font-size: 0.5rem; letter-spacing: 0.3em;
-      text-transform: uppercase; color: var(--gold);
-      margin-bottom: 0.8rem;
+      font-family: 'Jost', sans-serif; font-size: 0.5rem;
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 0.8rem;
     }
-    .proj-title {
-      font-size: clamp(4.5rem, 9.5vw, 9.5rem) !important;
-      margin-bottom: 1.5rem !important;
-    }
-    .feat-list {
-      list-style: none;
-      margin: 1.4rem 0 1.8rem;
-    }
+    .proj-title { font-size: clamp(4.5rem, 9.5vw, 9.5rem) !important; margin-bottom: 1.5rem !important; }
+    .feat-list { list-style: none; margin: 1.4rem 0 1.6rem; }
     .feat-list li {
-      font-size: 0.82rem; font-weight: 200;
-      color: var(--muted); line-height: 1;
+      font-size: 0.82rem; font-weight: 200; color: var(--muted); line-height: 1;
       padding: 0.42rem 0 0.42rem 1.3rem;
       border-bottom: 1px solid rgba(201,168,76,0.07);
       position: relative;
     }
-    .feat-list li::before {
-      content: '—';
-      position: absolute; left: 0;
-      color: var(--gold); opacity: 0.7;
-    }
-    .proj-tags {
-      display: flex; flex-wrap: wrap; gap: 0.35rem;
-      margin-bottom: 1.5rem;
-    }
+    .feat-list li::before { content: '—'; position: absolute; left: 0; color: var(--gold); opacity: 0.7; }
+    .proj-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 1.5rem; }
     .proj-tag {
-      font-size: 0.4rem; letter-spacing: 0.14em;
-      text-transform: uppercase;
-      border: 1px solid var(--line);
-      padding: 0.22rem 0.55rem;
+      font-size: 0.4rem; letter-spacing: 0.14em; text-transform: uppercase;
+      border: 1px solid var(--line); padding: 0.22rem 0.55rem;
       color: rgba(201,168,76,0.65);
     }
     .scene-cta {
       display: inline-flex; align-items: center; gap: 0.5rem;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.5rem; letter-spacing: 0.25em;
-      text-transform: uppercase; color: var(--cream);
-      text-decoration: none;
-      border-bottom: 1px solid var(--line);
+      font-family: 'Jost', sans-serif; font-size: 0.5rem;
+      letter-spacing: 0.25em; text-transform: uppercase; color: var(--cream);
+      text-decoration: none; border-bottom: 1px solid var(--line);
       padding-bottom: 0.35rem;
       transition: color 0.2s, border-color 0.2s;
     }
     .scene-cta:hover { color: var(--gold); border-color: var(--gold); }
-    .scene-cta .arrow { transition: transform 0.2s; }
-    .scene-cta:hover .arrow { transform: translate(2px,-2px); }
+    .scene-cta .arr { transition: transform 0.2s; }
+    .scene-cta:hover .arr { transform: translate(2px,-2px); }
 
-    /* ── S6 — STACK ──────────────────────────────────────────────────── */
+    /* ── S6 — STACK ─────────────────────────────────────────────────── */
     #s6 { align-items: flex-end; padding-bottom: 8vh; }
     #s6 .scene-inner { max-width: 100%; width: 100%; padding: 0 7vw; }
     .skills-row {
       display: flex; gap: 0;
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-      padding: 2.2rem 0;
-      margin-top: 2rem;
+      border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+      padding: 2.2rem 0; margin-top: 2rem;
     }
     .skill-col {
       flex: 1; padding: 0 2.5rem;
@@ -353,109 +298,91 @@
     .skill-col:first-child { padding-left: 0; }
     .skill-col:last-child { border-right: none; }
     .skill-col-title {
-      font-family: 'Jost', sans-serif;
-      font-size: 0.46rem; letter-spacing: 0.25em;
-      text-transform: uppercase; color: var(--gold);
-      margin-bottom: 1.4rem;
+      font-family: 'Jost', sans-serif; font-size: 0.46rem;
+      letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.4rem;
     }
     .skill-item {
-      font-size: 0.88rem; font-weight: 200;
-      color: var(--muted); line-height: 1;
-      padding: 0.48rem 0;
+      font-size: 0.88rem; font-weight: 200; color: var(--muted);
+      line-height: 1; padding: 0.48rem 0;
       border-bottom: 1px solid rgba(201,168,76,0.07);
       display: flex; align-items: center; gap: 0.6rem;
     }
     .skill-item::before {
-      content: '';
-      width: 3px; height: 3px; border-radius: 50%;
+      content: ''; width: 3px; height: 3px; border-radius: 50%;
       background: var(--gold); opacity: 0.7; flex-shrink: 0;
     }
 
-    /* ── S7 — MOTION VFX ─────────────────────────────────────────────── */
-    #s7 { flex-direction: column; justify-content: center; align-items: center; padding: 8vh 7vw; }
+    /* ── S7 — MOTION VFX ────────────────────────────────────────────── */
+    #s7 {
+      flex-direction: column; justify-content: center;
+      align-items: center; padding: 8vh 7vw;
+    }
     #s7 .scene-inner { max-width: 100%; width: 100%; text-align: center; padding: 0; }
     .vfx-grid {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr 1fr 1.4fr;
-      gap: 3px;
-      margin-top: 2.5rem;
-      max-height: 52vh;
-      overflow: hidden;
+      display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.4fr;
+      gap: 3px; margin-top: 2.5rem; max-height: 52vh; overflow: hidden;
     }
-    .vfx-item {
-      position: relative; overflow: hidden;
-    }
+    .vfx-item { position: relative; overflow: hidden; }
     .vfx-item img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      opacity: 0.72;
+      width: 100%; height: 100%; object-fit: cover;
+      opacity: 0.72; aspect-ratio: 3/4;
       transition: opacity 0.45s, transform 0.9s cubic-bezier(0.4,0,0.2,1);
-      aspect-ratio: 3/4;
     }
     .vfx-item:hover img { opacity: 1; transform: scale(1.06); }
 
-    /* ── S8 — CONTACT ────────────────────────────────────────────────── */
+    /* ── S8 — CONTACT ───────────────────────────────────────────────── */
     #s8 { justify-content: center; align-items: center; text-align: center; }
     #s8 .scene-inner { max-width: 680px; }
     .contact-email {
       font-family: 'Bodoni Moda', serif;
-      font-size: clamp(1rem, 2vw, 1.5rem);
-      font-style: italic; color: var(--cream);
-      text-decoration: none;
-      border-bottom: 1px solid var(--line);
-      padding-bottom: 0.4rem;
-      display: inline-block;
-      margin-top: 2rem;
+      font-size: clamp(1rem, 2vw, 1.5rem); font-style: italic; color: var(--cream);
+      text-decoration: none; border-bottom: 1px solid var(--line);
+      padding-bottom: 0.4rem; display: inline-block; margin-top: 2rem;
       transition: border-color 0.3s, color 0.3s;
     }
     .contact-email:hover { border-color: var(--gold); color: var(--gold); }
     .contact-links {
-      display: flex; gap: 2.5rem;
-      justify-content: center;
-      margin-top: 2.5rem;
+      display: flex; gap: 2.5rem; justify-content: center; margin-top: 2.5rem;
     }
     .contact-link {
-      font-family: 'Jost', sans-serif;
-      font-size: 0.5rem; letter-spacing: 0.22em;
-      text-transform: uppercase; color: var(--muted);
-      text-decoration: none;
-      border-bottom: 1px solid transparent;
-      padding-bottom: 0.2rem;
-      transition: color 0.2s, border-color 0.2s;
+      font-family: 'Jost', sans-serif; font-size: 0.5rem;
+      letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted);
+      text-decoration: none; border-bottom: 1px solid transparent;
+      padding-bottom: 0.2rem; transition: color 0.2s, border-color 0.2s;
     }
     .contact-link:hover { color: var(--gold); border-color: var(--gold); }
 
-    /* ── FOOTER ──────────────────────────────────────────────────────── */
+    /* ── FOOTER ─────────────────────────────────────────────────────── */
     footer {
       position: relative; z-index: 10;
       display: flex; justify-content: space-between; align-items: center;
-      padding: 1.4rem 3rem;
-      border-top: 1px solid var(--line);
+      padding: 1.4rem 3rem; border-top: 1px solid var(--line);
     }
     .foot-copy {
       font-size: 0.43rem; letter-spacing: 0.15em;
       text-transform: uppercase; color: var(--muted);
     }
 
-    /* ── KEYFRAMES ───────────────────────────────────────────────────── */
+    /* ── HERO KEYFRAMES ─────────────────────────────────────────────── */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(22px); }
+      from { opacity: 0; transform: translateY(24px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    @keyframes scrollBounce {
-      0%,100% { opacity: 0.5; transform: translateX(-50%) translateY(0); }
-      50%      { opacity: 0.9; transform: translateX(-50%) translateY(6px); }
-    }
-    .scroll-cue { animation: fadeUp 1s 1.2s cubic-bezier(0.16,1,0.3,1) both, scrollBounce 3s 2.5s ease-in-out infinite; }
+    .hero-tag  { animation: fadeUp 1s  0.3s cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-word { animation: fadeUp 1.1s cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-word:nth-child(1) { animation-delay: 0.5s; }
+    .hero-word:nth-child(2) { animation-delay: 0.7s; font-style: italic; color: rgba(240,235,224,0.6); }
+    .hero-sub  { animation: fadeUp 1s  0.9s cubic-bezier(0.16,1,0.3,1) both; }
+    .scroll-cue { animation: fadeUp 1s 1.3s cubic-bezier(0.16,1,0.3,1) both; }
 
-    /* ── RESPONSIVE ──────────────────────────────────────────────────── */
+    /* ── RESPONSIVE ─────────────────────────────────────────────────── */
     @media (max-width: 768px) {
       #scene-nav { display: none; }
       #top-bar { padding: 1.2rem 1.5rem; }
       .scene-inner { padding: 0 6vw !important; }
-      #s5 { justify-content: flex-start; }
       .stat-row { gap: 2rem; }
-      .skills-row { flex-direction: column; gap: 0; }
+      .skills-row { flex-direction: column; }
       .skill-col { border-right: none; border-bottom: 1px solid var(--line); padding: 1.5rem 0; }
       .skill-col:last-child { border-bottom: none; }
       .vfx-grid { grid-template-columns: 1fr 1fr; max-height: none; }
@@ -470,7 +397,7 @@
 
   <!-- ── BACKGROUND VIDEOS ──────────────────────────────────────────── -->
   <div id="cinematic-bg">
-    <video class="bg-vid active" id="vid1" autoplay muted playsinline preload="auto">
+    <video class="bg-vid active" id="vid1" muted playsinline preload="auto">
       <source src="/portfolio_bpa/footage/video-1.mp4" type="video/mp4" />
     </video>
     <video class="bg-vid" id="vid2" muted playsinline preload="metadata">
@@ -504,25 +431,23 @@
 
   <!-- ── NAV DOTS ────────────────────────────────────────────────────── -->
   <nav id="scene-nav" aria-label="Navigation">
-    <div class="nav-dot active"   data-scene="0" data-label="Intro"></div>
-    <div class="nav-dot"          data-scene="1" data-label="Approche"></div>
-    <div class="nav-dot"          data-scene="2" data-label="À Propos"></div>
-    <div class="nav-dot"          data-scene="3" data-label="MT-Congés"></div>
-    <div class="nav-dot"          data-scene="4" data-label="Gymnova"></div>
-    <div class="nav-dot"          data-scene="5" data-label="Stack"></div>
-    <div class="nav-dot"          data-scene="6" data-label="Motion VFX"></div>
-    <div class="nav-dot"          data-scene="7" data-label="Contact"></div>
+    <div class="nav-dot active" data-scene="0" data-label="Intro"></div>
+    <div class="nav-dot"       data-scene="1" data-label="Approche"></div>
+    <div class="nav-dot"       data-scene="2" data-label="À Propos"></div>
+    <div class="nav-dot"       data-scene="3" data-label="MT-Congés"></div>
+    <div class="nav-dot"       data-scene="4" data-label="Gymnova"></div>
+    <div class="nav-dot"       data-scene="5" data-label="Stack"></div>
+    <div class="nav-dot"       data-scene="6" data-label="Motion VFX"></div>
+    <div class="nav-dot"       data-scene="7" data-label="Contact"></div>
   </nav>
 
-  <!-- ── PROGRESS BAR ────────────────────────────────────────────────── -->
   <div id="progress-bar"></div>
+  <div id="vid-progress"></div>
 
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <!--  SCROLL CONTAINER                                                  -->
   <!-- ══════════════════════════════════════════════════════════════════ -->
   <div id="scroll-container">
 
-    <!-- ═══ S1 · HERO ══════════════════════════════════════════════════ -->
+    <!-- S1 · INTRO ════════════════════════════════════════════════════ -->
     <section class="scene" id="s1" data-vid="1" data-status="Développeur Créatif">
       <div class="scene-inner">
         <p class="hero-tag">Normandie · France · 2025</p>
@@ -538,21 +463,21 @@
       </div>
     </section>
 
-    <!-- ═══ S2 · PHILOSOPHIE ═══════════════════════════════════════════ -->
+    <!-- S2 · PHILOSOPHIE ══════════════════════════════════════════════ -->
     <section class="scene" id="s2" data-vid="2" data-status="L'Approche">
       <div class="scene-inner">
-        <div class="scene-tag" data-reveal>L'Approche</div>
+        <div class="scene-tag"  data-reveal>L'Approche</div>
         <div class="gold-line"  data-reveal></div>
         <h2 class="scene-title" data-reveal>
           Chaque<br/>projet<br/><em>compte.</em>
         </h2>
-        <p class="scene-body" data-reveal>
-          Je construis des expériences numériques qui ont du sens. Du back-end sécurisé aux interfaces cinématiques — chaque décision technique est au service de l'expérience utilisateur.
+        <p class="scene-body"   data-reveal>
+          Je construis des expériences numériques qui ont du sens. Du back-end sécurisé aux interfaces cinématiques — chaque décision est au service de l'expérience utilisateur.
         </p>
       </div>
     </section>
 
-    <!-- ═══ S3 · À PROPOS ═══════════════════════════════════════════════ -->
+    <!-- S3 · À PROPOS ═════════════════════════════════════════════════ -->
     <section class="scene" id="s3" data-vid="3" data-status="À Propos">
       <div class="scene-inner">
         <div class="scene-tag" data-reveal>À Propos · BTS SIO SLAM · Promo 2025</div>
@@ -560,7 +485,7 @@
           Code<br/><em>&amp; Art.</em>
         </h2>
         <p class="scene-body" data-reveal>
-          Basé en <strong>Normandie</strong>, développeur depuis 2020. Je mélange rigueur technique et sensibilité artistique — de l'architecture Java aux interfaces React, jusqu'au motion design 3D.
+          Basé en <strong>Normandie</strong>, développeur depuis 2020. Je mélange rigueur technique et sensibilité artistique — Java, React, et motion design 3D.
         </p>
         <div class="stat-row" data-reveal>
           <div>
@@ -579,7 +504,7 @@
       </div>
     </section>
 
-    <!-- ═══ S4 · MT-CONGÉS ══════════════════════════════════════════════ -->
+    <!-- S4 · MT-CONGÉS ════════════════════════════════════════════════ -->
     <section class="scene" id="s4" data-vid="4" data-status="Projet 01 — MT-Congés">
       <div class="scene-inner">
         <div class="proj-number" data-reveal>01</div>
@@ -588,13 +513,13 @@
           MT-<br/><em>Congés</em>
         </h2>
         <p class="scene-body" data-reveal>
-          Système de gestion des congés d'entreprise — authentification RBAC, workflow de validation multi-niveaux, audit logs. Architecture MVC/DAO propre.
+          Système de gestion des congés d'entreprise — auth RBAC, workflow multi-niveaux, audit logs complets.
         </p>
         <ul class="feat-list" data-reveal>
-          <li>Auth JWT sécurisée, gestion des rôles admin / manager / employé</li>
-          <li>CRUD congés avec workflow de validation</li>
-          <li>Dashboard statistiques avec filtres</li>
-          <li>Audit trail complet — traçabilité totale</li>
+          <li>Auth JWT, rôles admin / manager / employé</li>
+          <li>CRUD congés + workflow de validation</li>
+          <li>Dashboard statistiques temps réel</li>
+          <li>Audit trail — traçabilité totale</li>
         </ul>
         <div class="proj-tags" data-reveal>
           <span class="proj-tag">Java 17</span>
@@ -604,12 +529,12 @@
           <span class="proj-tag">JWT</span>
         </div>
         <a href="/portfolio_bpa/mt-conges" class="scene-cta" data-reveal>
-          Voir le projet <span class="arrow">↗</span>
+          Voir le projet <span class="arr">↗</span>
         </a>
       </div>
     </section>
 
-    <!-- ═══ S5 · GYMNOVA ════════════════════════════════════════════════ -->
+    <!-- S5 · GYMNOVA ══════════════════════════════════════════════════ -->
     <section class="scene" id="s5" data-vid="5" data-status="Projet 02 — Gymnova">
       <div class="scene-inner">
         <div class="proj-number" data-reveal>02</div>
@@ -618,12 +543,12 @@
           Gym-<br/><em>nova</em>
         </h2>
         <p class="scene-body" data-reveal>
-          Plateforme e-commerce complète pour équipements de gym — 50+ produits, panier dynamique, paiement Stripe, back-office admin React + Node.js.
+          Plateforme e-commerce complète — 50+ produits, panier dynamique, paiement Stripe, back-office admin.
         </p>
         <ul class="feat-list" data-reveal>
-          <li>Catalogue 50+ produits avec filtres avancés et recherche</li>
-          <li>Panier temps réel, paiement Stripe intégré</li>
-          <li>Auth JWT — espace client, historique commandes</li>
+          <li>Catalogue 50+ produits avec filtres avancés</li>
+          <li>Panier temps réel + Stripe intégré</li>
+          <li>Auth JWT, espace client, historique commandes</li>
           <li>Back-office admin : stocks, commandes, analytics</li>
         </ul>
         <div class="proj-tags" data-reveal>
@@ -634,12 +559,12 @@
           <span class="proj-tag">MySQL</span>
         </div>
         <a href="/portfolio_bpa/gymnova" class="scene-cta" data-reveal>
-          Voir le projet <span class="arrow">↗</span>
+          Voir le projet <span class="arr">↗</span>
         </a>
       </div>
     </section>
 
-    <!-- ═══ S6 · STACK TECHNIQUE ════════════════════════════════════════ -->
+    <!-- S6 · STACK ════════════════════════════════════════════════════ -->
     <section class="scene" id="s6" data-vid="6" data-status="Stack Technique">
       <div class="scene-inner">
         <div class="scene-tag" data-reveal>Stack Technique</div>
@@ -675,7 +600,7 @@
       </div>
     </section>
 
-    <!-- ═══ S7 · MOTION & VFX ════════════════════════════════════════════ -->
+    <!-- S7 · MOTION VFX ═══════════════════════════════════════════════ -->
     <section class="scene" id="s7" data-vid="7" data-status="Motion Design · VFX">
       <div class="scene-inner">
         <div class="scene-tag no-line" style="justify-content:center" data-reveal>
@@ -685,26 +610,18 @@
           Créations<br/><em>visuelles.</em>
         </h2>
         <p class="scene-body" style="text-align:center;margin:1.2rem auto 0" data-reveal>
-          Motion design cinématique — typographies animées, effets particules 3D, compositing VFX avec Element 3D et Trapcode Suite.
+          Typographies animées, effets particules 3D, compositing VFX avec Element 3D et Trapcode Suite.
         </p>
         <div class="vfx-grid" data-reveal>
-          <div class="vfx-item">
-            <img src="/portfolio_bpa/footage/photo-5.png" alt="Création motion 1" loading="lazy" />
-          </div>
-          <div class="vfx-item">
-            <img src="/portfolio_bpa/footage/photo-6.png" alt="Création motion 2" loading="lazy" />
-          </div>
-          <div class="vfx-item">
-            <img src="/portfolio_bpa/footage/photo-7.png" alt="Création motion 3" loading="lazy" />
-          </div>
-          <div class="vfx-item">
-            <img src="/portfolio_bpa/footage/photo-8.png" alt="Création motion 4" loading="lazy" />
-          </div>
+          <div class="vfx-item"><img src="/portfolio_bpa/footage/photo-5.png" alt="Motion 1" loading="lazy" /></div>
+          <div class="vfx-item"><img src="/portfolio_bpa/footage/photo-6.png" alt="Motion 2" loading="lazy" /></div>
+          <div class="vfx-item"><img src="/portfolio_bpa/footage/photo-7.png" alt="Motion 3" loading="lazy" /></div>
+          <div class="vfx-item"><img src="/portfolio_bpa/footage/photo-8.png" alt="Motion 4" loading="lazy" /></div>
         </div>
       </div>
     </section>
 
-    <!-- ═══ S8 · CONTACT ════════════════════════════════════════════════ -->
+    <!-- S8 · CONTACT ══════════════════════════════════════════════════ -->
     <section class="scene" id="s8" data-vid="8" data-status="Contact">
       <div class="scene-inner">
         <div class="scene-tag no-line" style="justify-content:center" data-reveal>
@@ -714,7 +631,7 @@
           Travaillons<br/><em>ensemble.</em>
         </h2>
         <p class="scene-body" style="text-align:center;margin:1.5rem auto 0" data-reveal>
-          Disponible pour <strong>stages</strong>, <strong>alternances</strong>, projets freelance et collaborations créatives. Basé en Normandie — disponible à distance.
+          Disponible pour <strong>stages</strong>, <strong>alternances</strong>, freelance et collaborations créatives.
         </p>
         <div style="text-align:center" data-reveal>
           <a href="mailto:zebi6073@gmail.com" class="contact-email">zebi6073@gmail.com</a>
@@ -750,17 +667,20 @@
     gsap.ticker.add((time: number) => lenis.raf(time * 1000))
     gsap.ticker.lagSmoothing(0)
 
-    // ── VIDEOS ─────────────────────────────────────────────────────────
+    // ── VIDEOS — GSAP owns the transform ───────────────────────────────
     const videos = Array.from(document.querySelectorAll<HTMLVideoElement>('.bg-vid'))
     let currentVid = 0
-    let pauseTimers: ReturnType<typeof setTimeout>[] = []
+    let kenBurnsTween: gsap.core.Tween | null = null
+    let pauseTimer: ReturnType<typeof setTimeout> | null = null
 
-    // Loop each video on end
-    videos.forEach(vid => {
-      vid.addEventListener('ended', () => {
-        vid.currentTime = 0
-        vid.play().catch(() => {})
-      })
+    // Init: position via GSAP (no CSS transform on .bg-vid)
+    gsap.set(videos, { xPercent: -50, yPercent: -50, scale: 1.0 })
+
+    // Store durations when metadata loads
+    const vidDurations: number[] = new Array(videos.length).fill(5.5)
+    videos.forEach((vid, i) => {
+      if (vid.readyState >= 1) vidDurations[i] = vid.duration || 5.5
+      vid.addEventListener('loadedmetadata', () => { vidDurations[i] = vid.duration })
     })
 
     function activateVideo(index: number) {
@@ -769,111 +689,114 @@
       const prev = videos[currentVid]
       if (!next) return
 
-      // Clear any pending pause for prev
-      pauseTimers.forEach(t => clearTimeout(t))
-      pauseTimers = []
-
       // Lazy load
-      if (next.preload === 'none') {
-        next.preload = 'auto'
-        next.load()
-      }
-      // Preload the one after
+      if (next.preload === 'none') { next.preload = 'auto'; next.load() }
       const after = videos[index + 1]
-      if (after && after.preload === 'none') {
-        after.preload = 'metadata'
-        after.load()
-      }
+      if (after && after.preload === 'none') { after.preload = 'metadata'; after.load() }
 
-      // Reset + play next
-      next.currentTime = 0
-      next.play().catch(() => {})
+      // Clear pending pause
+      if (pauseTimer) clearTimeout(pauseTimer)
+
+      // 3D entrance: zoom from depth + de-blur
+      gsap.set(next, { scale: 1.18, filter: 'blur(12px)' })
+      gsap.to(next, {
+        scale: 1.06, filter: 'blur(0px)',
+        duration: 1.5, ease: 'expo.out',
+      })
+
+      // Crossfade opacity
       next.classList.add('active')
       prev.classList.remove('active')
 
-      // Pause prev after crossfade completes (1.4s)
-      pauseTimers.push(setTimeout(() => {
+      // Kill old Ken Burns, start new one
+      kenBurnsTween?.kill()
+      const dur = vidDurations[index] || 5.5
+      kenBurnsTween = gsap.to(next, { scale: 1.0, duration: dur, ease: 'none' })
+
+      // Play from start
+      next.currentTime = 0
+      next.play().catch(() => {})
+
+      // Pause prev after crossfade
+      pauseTimer = setTimeout(() => {
         if (!prev.classList.contains('active')) prev.pause()
-      }, 1500))
+      }, 1400)
 
       currentVid = index
     }
 
     // ── SCENES ─────────────────────────────────────────────────────────
-    const scenes   = Array.from(document.querySelectorAll<HTMLElement>('.scene'))
-    const navDots  = Array.from(document.querySelectorAll<HTMLElement>('.nav-dot'))
+    const scenes    = Array.from(document.querySelectorAll<HTMLElement>('.scene'))
+    const navDots   = Array.from(document.querySelectorAll<HTMLElement>('.nav-dot'))
     const barStatus = document.getElementById('bar-status')!
     const progressBar = document.getElementById('progress-bar')!
+    const vidProgress = document.getElementById('vid-progress')!
 
-    // Progress bar
+    // Page scroll → progress bar
     lenis.on('scroll', ({ progress }: { progress: number }) => {
       progressBar.style.width = `${progress * 100}%`
     })
 
     scenes.forEach((scene, i) => {
       const vidIndex = parseInt(scene.dataset.vid ?? '1') - 1
-      const status   = scene.dataset.status ?? ''
+      const vid      = videos[vidIndex]
+      const reveals  = Array.from(scene.querySelectorAll<HTMLElement>('[data-reveal]'))
 
-      // ── Activate video + nav dot when scene is centred ──
-      ScrollTrigger.create({
-        trigger: scene,
-        start: 'top 58%',
-        end:   'bottom 42%',
-        onEnter: () => {
-          activateVideo(vidIndex)
-          navDots.forEach((d, j) => d.classList.toggle('active', j === i))
-          if (barStatus) barStatus.textContent = status
-        },
-        onEnterBack: () => {
-          activateVideo(vidIndex)
-          navDots.forEach((d, j) => d.classList.toggle('active', j === i))
-          if (barStatus) barStatus.textContent = status
-        },
-      })
-
-      // ── Staggered text reveals ──
-      const reveals = Array.from(scene.querySelectorAll<HTMLElement>('[data-reveal]'))
-      if (reveals.length) {
-        gsap.set(reveals, { opacity: 0, y: 28 })
-        ScrollTrigger.create({
-          trigger: scene,
-          start: 'top 62%',
-          onEnter: () => {
-            gsap.to(reveals, {
-              opacity: 1, y: 0,
-              duration: 1.1,
-              stagger: 0.13,
-              ease: 'power3.out',
-            })
-          },
-          onLeaveBack: () => {
-            gsap.to(reveals, {
-              opacity: 0, y: 28,
-              duration: 0.6,
-              stagger: 0.06,
-              ease: 'power2.in',
-            })
-          },
-        })
+      // ── Video playback tracker (thin bar under progress bar) ──
+      const updateVidProgress = () => {
+        if (currentVid !== vidIndex) return
+        const pct = vid.duration ? (vid.currentTime / vid.duration) * 100 : 0
+        vidProgress.style.width = `${pct}%`
+        if (!vid.paused) requestAnimationFrame(updateVidProgress)
       }
 
-      // ── Subtle bg scale parallax ──
-      gsap.fromTo(videos[vidIndex],
-        { scale: 1.08 },
-        {
-          scale: 1.0,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: scene,
-            start: 'top bottom',
-            end:   'bottom top',
-            scrub: 2,
-          },
-        }
-      )
+      // ── Video ended → PAUSE on last frame → reveal text ──────────────
+      vid.addEventListener('ended', () => {
+        if (currentVid !== vidIndex) return
+        vid.pause()
+        kenBurnsTween?.pause() // freeze Ken Burns too
+        // Text slides in with stagger
+        gsap.to(reveals, {
+          opacity: 1, y: 0,
+          duration: 1.1,
+          stagger: 0.14,
+          ease: 'power3.out',
+          overwrite: true,
+        })
+      })
+
+      // ── Scene enters viewport → start video, hide text ───────────────
+      function enterScene() {
+        activateVideo(vidIndex)
+        // Hide text immediately
+        gsap.set(reveals, { opacity: 0, y: 28 })
+        // Update nav + status
+        navDots.forEach((d, j) => d.classList.toggle('active', j === i))
+        barStatus.textContent = scene.dataset.status ?? ''
+        // Start vid-progress tracking
+        requestAnimationFrame(updateVidProgress)
+        vid.addEventListener('play', () => requestAnimationFrame(updateVidProgress), { once: true })
+      }
+
+      ScrollTrigger.create({
+        trigger: scene,
+        start: 'top 55%',
+        end:   'bottom 45%',
+        onEnter:     enterScene,
+        onEnterBack: enterScene,
+      })
     })
 
-    // ── NAV DOTS ───────────────────────────────────────────────────────
+    // ── S1: play video on page load ─────────────────────────────────────
+    videos[0].play().catch(() => {})
+    gsap.to(videos[0], { scale: 1.0, duration: vidDurations[0] || 5.5, ease: 'none' })
+    videos[0].addEventListener('ended', () => {
+      if (currentVid !== 0) return
+      videos[0].pause()
+      kenBurnsTween?.pause()
+    })
+
+    // ── NAV DOTS ────────────────────────────────────────────────────────
     navDots.forEach(dot => {
       dot.addEventListener('click', () => {
         const idx = parseInt(dot.dataset.scene ?? '0')
@@ -884,7 +807,7 @@
       })
     })
 
-    // ── LETTERBOX — remove on S2 ───────────────────────────────────────
+    // ── LETTERBOX — remove on S2 ────────────────────────────────────────
     ScrollTrigger.create({
       trigger: scenes[1],
       start: 'top 80%',
@@ -892,13 +815,13 @@
       onLeaveBack: () => document.body.classList.add('cinematic'),
     })
 
-    // ── SCROLL CUE — fade out on scroll ───────────────────────────────
+    // ── SCROLL CUE — fade on scroll ─────────────────────────────────────
     gsap.to('.scroll-cue', {
       opacity: 0,
       scrollTrigger: {
         trigger: '#s1',
         start: 'top top',
-        end:   '+=180',
+        end: '+=150',
         scrub: true,
       },
     })
