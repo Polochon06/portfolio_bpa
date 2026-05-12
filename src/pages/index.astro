@@ -52,6 +52,17 @@
       will-change: opacity, transform;
     }
     /* GSAP contrôle opacity + Ken Burns */
+    .bg-vid {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      will-change: opacity;
+    }
     /* Vignette */
     #cinematic-bg::after {
       content: '';
@@ -382,8 +393,34 @@
   <div class="lbox lbox-t"></div>
   <div class="lbox lbox-b"></div>
 
-  <!-- ── BACKGROUND PHOTOS (Ken Burns) ────────────────────────────── -->
+  <!-- ── CINEMATIC BG : vidéos (ambiance) + photos (fin, Ken Burns) ─── -->
   <div id="cinematic-bg">
+    <!-- Vidéos — jouent en premier -->
+    <video class="bg-vid" id="vid1" muted playsinline preload="auto">
+      <source src="/portfolio_bpa/footage/video-1.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-vid" id="vid2" muted playsinline preload="metadata">
+      <source src="/portfolio_bpa/footage/video-2.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-vid" id="vid3" muted playsinline preload="metadata">
+      <source src="/portfolio_bpa/footage/video-3.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-vid" id="vid4" muted playsinline preload="none">
+      <source src="/portfolio_bpa/footage/video-4.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-vid" id="vid5" muted playsinline preload="none">
+      <source src="/portfolio_bpa/footage/video-5.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-vid" id="vid6" muted playsinline preload="none">
+      <source src="/portfolio_bpa/footage/video-6.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-vid" id="vid7" muted playsinline preload="none">
+      <source src="/portfolio_bpa/footage/video-7.mp4" type="video/mp4" />
+    </video>
+    <video class="bg-vid" id="vid8" muted playsinline preload="none">
+      <source src="/portfolio_bpa/footage/video-8.mp4" type="video/mp4" />
+    </video>
+    <!-- Photos — apparaissent à la fin de la vidéo (par-dessus) avec Ken Burns -->
     <img class="bg-photo" src="/portfolio_bpa/footage/photo-1.webp" alt="" aria-hidden="true" fetchpriority="high" />
     <img class="bg-photo" src="/portfolio_bpa/footage/photo-2.webp" alt="" aria-hidden="true" loading="lazy" />
     <img class="bg-photo" src="/portfolio_bpa/footage/photo-3.webp" alt="" aria-hidden="true" loading="lazy" />
@@ -625,25 +662,25 @@
     // ── ELEMENTS ────────────────────────────────────────────────────────
     const scenes      = Array.from(document.querySelectorAll<HTMLElement>('.scene'))
     const navDots     = Array.from(document.querySelectorAll<HTMLElement>('.nav-dot'))
+    const videos      = Array.from(document.querySelectorAll<HTMLVideoElement>('.bg-vid'))
     const photos      = Array.from(document.querySelectorAll<HTMLImageElement>('.bg-photo'))
     const barStatus   = document.getElementById('bar-status')!
     const progressBar = document.getElementById('progress-bar')!
     const overlay     = document.getElementById('scene-overlay')!
 
     type SceneInfo = {
-      el: HTMLElement; photoIdx: number
+      el: HTMLElement; idx: number
       lines: HTMLElement[]; fades: HTMLElement[]; status: string
     }
     const SD: SceneInfo[] = scenes.map(el => ({
       el,
-      photoIdx: parseInt(el.dataset.vid ?? '1') - 1,
+      idx: parseInt(el.dataset.vid ?? '1') - 1,
       lines: Array.from(el.querySelectorAll<HTMLElement>('.ti')),
       fades: Array.from(el.querySelectorAll<HTMLElement>('.fade-in')),
       status: el.dataset.status ?? '',
     }))
 
-    // ── KEN BURNS ───────────────────────────────────────────────────────
-    // Each scene: different direction for visual variety
+    // ── KEN BURNS — direction unique par scène ──────────────────────────
     const KB = [
       { xs: '0%',    ys: '0%',    xe: '-1.5%', ye: '-1%'  },
       { xs: '-1.5%', ys: '-1%',   xe: '0.5%',  ye: '0.5%' },
@@ -655,8 +692,8 @@
       { xs: '0%',    ys: '1%',    xe: '-1%',   ye: '-1%'  },
     ]
 
-    function kenBurnsStart(photo: HTMLImageElement, idx: number) {
-      const k = KB[idx % KB.length]
+    function kenBurnsStart(photo: HTMLImageElement, i: number) {
+      const k = KB[i % KB.length]
       gsap.fromTo(photo,
         { scale: 1.0, x: k.xs, y: k.ys },
         { scale: 1.07, x: k.xe, y: k.ye, duration: 8, ease: 'power1.inOut',
@@ -664,21 +701,55 @@
     }
 
     function kenBurnsStop(photo: HTMLImageElement) {
-      gsap.killTweensOf(photo, 'scale,x,y')
+      gsap.killTweensOf(photo)
+      gsap.set(photo, { scale: 1.0, x: '0%', y: '0%' })
     }
 
-    // ── PHOTO CROSSFADE ─────────────────────────────────────────────────
-    let curPhoto = 0
-    gsap.set(photos[0], { opacity: 1 })
-    kenBurnsStart(photos[0], 0)
+    // ── VIDEO CROSSFADE ─────────────────────────────────────────────────
+    let curVid = 0
+    gsap.set(videos[0], { opacity: 1 })
+    videos[0].play().catch(() => {})
 
     function crossfade(to: number) {
-      if (to === curPhoto) return
-      const next = photos[to], prev = photos[curPhoto]
-      gsap.to(prev,   { opacity: 0, duration: 0.6, ease: 'power1.out', onComplete: () => kenBurnsStop(prev) })
-      gsap.fromTo(next, { opacity: 0 }, { opacity: 1, duration: 0.9, ease: 'power1.out',
-        onComplete: () => kenBurnsStart(next, to) })
-      curPhoto = to
+      if (to === curVid) return
+      const prev = videos[curVid], next = videos[to]
+      const prevPhoto = photos[curVid]
+
+      // Arrêter Ken Burns + cacher photo de la scène précédente
+      kenBurnsStop(prevPhoto)
+      gsap.to(prevPhoto, { opacity: 0, duration: 0.4, ease: 'power1.out' })
+
+      // Lazy load
+      if (next.preload === 'none') { next.preload = 'auto'; next.load() }
+      const after = videos[to + 1]
+      if (after?.preload === 'none') { after.preload = 'metadata'; after.load() }
+
+      // Vidéo crossfade
+      gsap.to(prev, { opacity: 0, duration: 0.6, ease: 'power1.out',
+        onComplete: () => prev.pause() })
+      gsap.fromTo(next, { opacity: 0 }, { opacity: 1, duration: 0.9, ease: 'power1.out' })
+      next.currentTime = 0
+      next.play().catch(() => {})
+      curVid = to
+    }
+
+    // Quand la vidéo se termine → photo nette + Ken Burns + texte
+    function onVideoEnd(vidIdx: number, sceneIdx: number, s: SceneInfo) {
+      const vid   = videos[vidIdx]
+      const photo = photos[vidIdx]
+      vid.pause()
+
+      // Photo fade-in par-dessus la vidéo figée
+      gsap.fromTo(photo,
+        { opacity: 0 },
+        { opacity: 1, duration: 1.1, ease: 'power2.out',
+          onComplete: () => kenBurnsStart(photo, vidIdx) })
+
+      // Texte apparaît 0.4s après le début du fade-in de la photo
+      gsap.delayedCall(0.4, () => {
+        if (active !== sceneIdx) return
+        showText(s)
+      })
     }
 
     // ── LETTERBOX ───────────────────────────────────────────────────────
@@ -688,7 +759,7 @@
     function hideText(s: SceneInfo) {
       gsap.killTweensOf([...s.lines, ...s.fades])
       gsap.to(s.lines, { y: '-110%', duration: 0.4, stagger: 0.04, ease: 'power2.in', overwrite: true })
-      gsap.to(s.fades, { opacity: 0, y: -6,  duration: 0.28, ease: 'power1.in', overwrite: true })
+      gsap.to(s.fades, { opacity: 0, y: -6, duration: 0.28, ease: 'power1.in', overwrite: true })
     }
 
     function showText(s: SceneInfo) {
@@ -703,15 +774,12 @@
     // ── NAVIGATION ──────────────────────────────────────────────────────
     let active  = 0
     let lastNav = 0
-    let pendingReveal: gsap.core.Tween | null = null
     const NAV_COOLDOWN = 950
 
     function goTo(idx: number) {
       if (Date.now() - lastNav < NAV_COOLDOWN) return
       if (idx === active || idx < 0 || idx >= scenes.length) return
       lastNav = Date.now()
-
-      if (pendingReveal) { pendingReveal.kill(); pendingReveal = null }
 
       const from = SD[active]
       const to   = SD[idx]
@@ -721,22 +789,19 @@
       barStatus.textContent = to.status
       progressBar.style.width = `${(idx / (scenes.length - 1)) * 100}%`
 
-      // Cinematic overlay — fade to dark, swap photo, emerge
       gsap.to(overlay, {
         opacity: 1, duration: 0.32, ease: 'power2.inOut',
         onComplete() {
           from.el.classList.remove('active')
           to.el.classList.add('active')
-          crossfade(to.photoIdx)
+          crossfade(to.idx)
           gsap.to(overlay, {
             opacity: 0, duration: 0.65, ease: 'power2.out', delay: 0.06,
             onComplete() {
-              // Text reveals after Ken Burns has played ~5.5s
-              pendingReveal = gsap.delayedCall(5.5, () => {
-                if (active !== idx) return
-                showText(to)
-                pendingReveal = null
-              })
+              // Écouter la fin de la vidéo → photo + texte
+              videos[to.idx].addEventListener('ended', () => {
+                onVideoEnd(to.idx, idx, to)
+              }, { once: true })
             }
           })
         }
@@ -762,13 +827,18 @@
       tl.to(sub,  { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.55')
       tl.to(hint, {
         opacity: 1, duration: 0.7, ease: 'power2.out',
-        onComplete: () => gsap.to(hint, { opacity: 0.85, y: -5, repeat: -1, yoyo: true, duration: 1.2, ease: 'sine.inOut', delay: 2 })
+        onComplete: () => { gsap.to(hint, { opacity: 0.85, y: -5, repeat: -1, yoyo: true, duration: 1.2, ease: 'sine.inOut', delay: 2 }) }
       }, '-=0.45')
+
+      // Fin de la vidéo d'intro → photo + Ken Burns
+      videos[0].addEventListener('ended', () => {
+        if (active !== 0) return
+        onVideoEnd(0, 0, s1)
+      }, { once: true })
     })()
 
-    // ── WHEEL — velocity-based (pas de debounce lag) ─────────────────────
-    let wVel = 0
-    let wRaf = 0
+    // ── WHEEL ───────────────────────────────────────────────────────────
+    let wVel = 0, wRaf = 0
 
     function wheelTick() {
       if (Math.abs(wVel) > 8) {
