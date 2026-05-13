@@ -64,7 +64,7 @@
       position: absolute; inset: 0; z-index: 3;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 180px;
-      opacity: 0.028;
+      opacity: 0.042;
       pointer-events: none;
     }
 
@@ -73,8 +73,25 @@
       position: fixed; left: 0; right: 0; z-index: 80;
       background: #000; pointer-events: none;
     }
-    .lbox-t { top: 0;    height: 4.5vh; transform: translateY(-100%); }
-    .lbox-b { bottom: 0; height: 4.5vh; transform: translateY(100%); }
+    .lbox-t { top: 0;    height: 6vh; transform: translateY(-100%); }
+    .lbox-b { bottom: 0; height: 6vh; transform: translateY(100%); }
+
+    /* ── SCENE TINT ──────────────────────────────────────────────────── */
+    #scene-tint {
+      position: fixed; inset: 0; z-index: 1;
+      pointer-events: none; background: transparent;
+    }
+
+    /* ── SCENE FRACTION COUNTER ─────────────────────────────────────── */
+    #scene-fraction {
+      position: fixed; bottom: 2.4rem; right: 3rem; z-index: 90;
+      display: flex; align-items: center; gap: 0.55rem;
+      font-family: 'Jost', sans-serif; font-size: 0.4rem;
+      letter-spacing: 0.22em; color: rgba(201,168,76,0.28);
+      opacity: 0; pointer-events: none;
+    }
+    .sf-cur { color: var(--gold); font-size: 0.5rem; letter-spacing: 0.15em; }
+    .sf-dash { width: 16px; height: 1px; background: rgba(201,168,76,0.25); display: inline-block; vertical-align: middle; }
 
     /* ── FIXED UI ─────────────────────────────────────────────────────── */
     #top-bar {
@@ -418,6 +435,12 @@
 
   <div id="progress-bar"></div>
   <div id="scene-overlay" aria-hidden="true"></div>
+  <div id="scene-tint"    aria-hidden="true"></div>
+  <div id="scene-fraction" aria-hidden="true">
+    <span class="sf-cur" id="sf-cur">01</span>
+    <span class="sf-dash"></span>
+    <span>08</span>
+  </div>
 
   <!-- ══════════════════════════════════════════════════════════════════ -->
   <!--  SCENES (fixed, stacked)                                           -->
@@ -627,12 +650,14 @@
   <script>
     import { gsap } from 'gsap'
 
-    // ── ELEMENTS
     const scenes      = Array.from(document.querySelectorAll<HTMLElement>('.scene'))
     const navDots     = Array.from(document.querySelectorAll<HTMLElement>('.nav-dot'))
     const barStatus   = document.getElementById('bar-status')!
     const progressBar = document.getElementById('progress-bar')!
     const overlay     = document.getElementById('scene-overlay')!
+    const sceneTint   = document.getElementById('scene-tint')!
+    const sfCur       = document.getElementById('sf-cur')!
+    const fracEl      = document.getElementById('scene-fraction')!
 
     type SceneInfo = { el: HTMLElement; lines: HTMLElement[]; fades: HTMLElement[]; status: string }
     const SD: SceneInfo[] = scenes.map(el => ({
@@ -642,123 +667,198 @@
       status: el.dataset.status ?? '',
     }))
 
-    // Paires [intro, boucle] pour chaque scène (0-indexed)
     const VP = Array.from({ length: 8 }, (_, i) => [
       document.getElementById(`v${i + 1}i`) as HTMLVideoElement,
       document.getElementById(`v${i + 1}l`) as HTMLVideoElement,
     ] as const)
 
-    // ── LETTERBOX
+    const charMap = new Map<number, HTMLElement[]>()
+
+    const TINTS = [
+      'rgba(201,168,76,0.07)',
+      'rgba(180,110,30,0.11)',
+      'rgba(30,55,110,0.10)',
+      'rgba(15,35,90,0.13)',
+      'rgba(25,75,50,0.10)',
+      'rgba(55,15,95,0.10)',
+      'rgba(115,15,20,0.11)',
+      'rgba(201,168,76,0.06)',
+    ]
+
     gsap.to(['.lbox-t', '.lbox-b'], { y: 0, duration: 1.4, ease: 'power3.out', delay: 0.2 })
 
-    // ── TEXTE
-    function hideText(s: SceneInfo) {
-      gsap.killTweensOf([...s.lines, ...s.fades])
-      gsap.to(s.lines, { y: '-110%', duration: 0.4, stagger: 0.04, ease: 'power2.in', overwrite: true })
-      gsap.to(s.fades, { opacity: 0, y: -6, duration: 0.28, ease: 'power1.in', overwrite: true })
-    }
-    function showText(s: SceneInfo) {
-      gsap.fromTo(s.lines, { y: '110%' }, { y: '0%', duration: 1.1, stagger: 0.12, ease: 'power3.out' })
-      gsap.fromTo(s.fades, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power2.out', delay: 0.45 })
+    function buildChars(lines: HTMLElement[]): HTMLElement[] {
+      const all: HTMLElement[] = []
+      lines.forEach(li => {
+        const isEm = li.classList.contains('is-em')
+        const text = li.textContent ?? ''
+        gsap.set(li, { y: '0%' })
+        li.innerHTML = ''
+        for (const ch of text) {
+          const clip  = document.createElement('span')
+          clip.style.cssText = 'display:inline-block;overflow:hidden;vertical-align:bottom;line-height:inherit'
+          const inner = document.createElement('span')
+          inner.style.display = 'inline-block'
+          if (isEm) { inner.style.fontStyle = 'italic'; inner.style.color = 'rgba(240,235,224,0.6)' }
+          inner.textContent = ch === ' ' ? ' ' : ch
+          clip.appendChild(inner)
+          li.appendChild(clip)
+          all.push(inner)
+        }
+      })
+      return all
     }
 
-    // ── LOGIQUE VIDÉO PAR SCÈNE
+    function typeTag(el: HTMLElement, delay: number) {
+      if (!el.dataset.text) el.dataset.text = el.textContent ?? ''
+      el.textContent = ''
+      el.dataset.text.split('').forEach((ch, i) => {
+        const s = document.createElement('span')
+        s.style.cssText = 'display:inline-block;opacity:0'
+        s.textContent = ch === ' ' ? ' ' : ch
+        el.appendChild(s)
+        gsap.to(s, { opacity: 1, duration: 0.12, delay: delay + i * 0.038, ease: 'power1.out' })
+      })
+    }
+
+    function showText(s: SceneInfo, idx: number) {
+      const chars = buildChars(s.lines)
+      charMap.set(idx, chars)
+      gsap.fromTo(chars,
+        { y: '115%' },
+        { y: '0%', duration: 0.74, stagger: 0.028, ease: 'expo.out', delay: 0.22 })
+
+      if (idx === 0) {
+        gsap.fromTo(['.hero-eyebrow', '.hero-sub'],
+          { opacity: 0 },
+          { opacity: 1, duration: 0.7, stagger: 0.18, ease: 'power2.out', delay: 0.65 })
+        gsap.to('.scroll-hint', { opacity: 0.85, duration: 0.7, ease: 'power2.out', delay: 1.1 })
+        return
+      }
+
+      const goldLines = s.fades.filter(el => el.classList.contains('gold-line'))
+      const tags      = s.fades.filter(el => el.classList.contains('scene-tag'))
+      const rest      = s.fades.filter(el =>
+        !el.classList.contains('gold-line') && !el.classList.contains('scene-tag'))
+
+      goldLines.forEach(el => gsap.fromTo(el,
+        { scaleX: 0 },
+        { scaleX: 1, duration: 0.65, ease: 'power2.inOut', delay: 0 }))
+      tags.forEach(el => typeTag(el, 0.06))
+      rest.forEach((el, i) => gsap.fromTo(el,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.88, ease: 'power2.out', delay: 0.88 + i * 0.1 }))
+    }
+
+    function hideText(s: SceneInfo, idx: number) {
+      gsap.killTweensOf([...s.lines, ...s.fades, ...(charMap.get(idx) ?? [])])
+      s.lines.forEach(li => {
+        const txt = li.textContent ?? ''
+        gsap.set(li, { y: '110%' })
+        li.textContent = txt
+      })
+      charMap.delete(idx)
+      s.fades.forEach(el => {
+        if (el.classList.contains('gold-line'))  gsap.set(el, { scaleX: 0 })
+        else                                     gsap.set(el, { opacity: 0, y: 20 })
+        if (el.classList.contains('scene-tag') && el.dataset.text) el.textContent = el.dataset.text
+      })
+      if (idx === 0) gsap.set(['.hero-eyebrow', '.hero-sub', '.scroll-hint'], { opacity: 0 })
+    }
+
+    function setTint(idx: number) {
+      gsap.to(sceneTint, {
+        backgroundColor: TINTS[idx] ?? 'transparent',
+        duration: 1.4, ease: 'power2.out',
+      })
+    }
+
     let active = 0
+    let heroInitDone = false
 
     function enterScene(idx: number) {
       const [intro, loop] = VP[idx]
-      const s = SD[idx]
-
-      // Prépare les deux vidéos
       gsap.set([intro, loop], { opacity: 0 })
-      intro.currentTime = 0
-      loop.currentTime  = 0
-
-      // Précharge la boucle dès maintenant (elle sera nécessaire à la fin de l'intro)
+      intro.currentTime = 0; loop.currentTime = 0
       if (loop.preload === 'none') { loop.preload = 'auto'; loop.load() }
-
-      // Précharge l'intro de la scène suivante
       if (idx + 1 < VP.length) {
-        const nextIntro = VP[idx + 1][0]
-        if (nextIntro.preload === 'none') { nextIntro.preload = 'metadata'; nextIntro.load() }
+        const ni = VP[idx + 1][0]
+        if (ni.preload === 'none') { ni.preload = 'metadata'; ni.load() }
       }
-
-      // Lance l'intro
       gsap.to(intro, { opacity: 1, duration: 0.5, ease: 'power1.out' })
       intro.play().catch(() => {})
-
-      // À la fin de l'intro → bascule sur la boucle + révèle le texte
-      intro.addEventListener('ended', function handler() {
+      intro.addEventListener('ended', function () {
         if (active !== idx) return
-        gsap.to(intro, { opacity: 0, duration: 0.8, ease: 'power1.out' })
-        gsap.fromTo(loop, { opacity: 0 }, { opacity: 1, duration: 1.0, ease: 'power1.out' })
+        gsap.to(intro, { opacity: 0, duration: 0.9, ease: 'power1.out' })
+        gsap.fromTo(loop, { opacity: 0 }, { opacity: 1, duration: 1.1, ease: 'power1.out' })
         loop.play().catch(() => {})
-        if (idx !== 0) showText(s)   // S1 hero : texte déjà visible via timeline
+        if (idx === 0 && !heroInitDone) { heroInitDone = true; return }
+        showText(SD[idx], idx)
       }, { once: true })
     }
 
     function leaveScene(idx: number) {
       const [intro, loop] = VP[idx]
-      intro.pause()
-      loop.pause()
+      intro.pause(); loop.pause()
       gsap.set([intro, loop], { opacity: 0 })
     }
 
-    // ── NAVIGATION
     let lastNav = 0
-    const NAV_COOLDOWN = 950
+    const NAV_COOLDOWN = 900
 
     function goTo(toIdx: number) {
       if (Date.now() - lastNav < NAV_COOLDOWN) return
       if (toIdx === active || toIdx < 0 || toIdx >= scenes.length) return
       lastNav = Date.now()
-
-      const prevIdx = active
-      active = toIdx
+      const prevIdx = active; active = toIdx
       const from = SD[prevIdx], to = SD[toIdx]
-
-      hideText(from)
+      hideText(from, prevIdx)
       navDots.forEach((d, j) => d.classList.toggle('active', j === toIdx))
       barStatus.textContent = to.status
       progressBar.style.width = `${(toIdx / (scenes.length - 1)) * 100}%`
-
+      sfCur.textContent = String(toIdx + 1).padStart(2, '0')
+      setTint(toIdx)
       gsap.to(overlay, {
-        opacity: 1, duration: 0.32, ease: 'power2.inOut',
+        opacity: 1, duration: 0.3, ease: 'power2.inOut',
         onComplete() {
           from.el.classList.remove('active')
           to.el.classList.add('active')
           leaveScene(prevIdx)
           enterScene(toIdx)
-          gsap.to(overlay, { opacity: 0, duration: 0.65, ease: 'power2.out', delay: 0.06 })
+          gsap.to(overlay, { opacity: 0, duration: 0.7, ease: 'power2.out', delay: 0.05 })
         }
       })
     }
 
-    // ── S1 HERO : texte immédiat au chargement, intro démarre
     ;(() => {
       const s0      = SD[0]
       const eyebrow = document.querySelector<HTMLElement>('.hero-eyebrow')!
       const sub     = document.querySelector<HTMLElement>('.hero-sub')!
       const hint    = document.querySelector<HTMLElement>('.scroll-hint')!
-
       gsap.set([eyebrow, sub, hint], { opacity: 0 })
       enterScene(0)
-
-      const tl = gsap.timeline({ delay: 0.85 })
-      tl.to(eyebrow, { opacity: 1, duration: 0.8, ease: 'power2.out' })
-      tl.fromTo(s0.lines, { y: '110%' }, { y: '0%', duration: 1.1, stagger: 0.15, ease: 'power3.out' }, '-=0.35')
-      tl.to(sub,  { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.55')
+      setTint(0)
+      gsap.to(fracEl, { opacity: 1, duration: 1, delay: 2 })
+      const heroChars = buildChars(s0.lines)
+      charMap.set(0, heroChars)
+      const tl = gsap.timeline({ delay: 0.9 })
+      tl.to(eyebrow, { opacity: 1, duration: 0.85, ease: 'power2.out' })
+      tl.fromTo(heroChars,
+        { y: '115%' },
+        { y: '0%', duration: 0.78, stagger: 0.038, ease: 'expo.out' }, '-=0.42')
+      tl.to(sub,  { opacity: 1, duration: 0.85, ease: 'power2.out' }, '-=0.52')
       tl.to(hint, {
         opacity: 1, duration: 0.7, ease: 'power2.out',
-        onComplete: () => { gsap.to(hint, { opacity: 0.85, y: -5, repeat: -1, yoyo: true, duration: 1.2, ease: 'sine.inOut', delay: 2 }) }
-      }, '-=0.45')
+        onComplete: () => {
+          gsap.to(hint, { opacity: 0.85, y: -5, repeat: -1, yoyo: true, duration: 1.2, ease: 'sine.inOut', delay: 2 })
+        }
+      }, '-=0.48')
     })()
 
-    // ── WHEEL
     let wVel = 0, wRaf = 0
     function wheelTick() {
       if (Math.abs(wVel) > 8) { goTo(active + (wVel > 0 ? 1 : -1)); wVel = 0; wRaf = 0; return }
-      wVel *= 0.80
+      wVel *= 0.78
       if (Math.abs(wVel) > 0.4) wRaf = requestAnimationFrame(wheelTick)
       else { wVel = 0; wRaf = 0 }
     }
@@ -767,7 +867,6 @@
       if (!wRaf) wRaf = requestAnimationFrame(wheelTick)
     }, { passive: true })
 
-    // ── TOUCH
     let ty0 = 0
     document.addEventListener('touchstart', e => { ty0 = e.touches[0].clientY }, { passive: true })
     document.addEventListener('touchend',   e => {
@@ -775,7 +874,6 @@
       if (Math.abs(d) > 40) goTo(active + (d > 0 ? 1 : -1))
     }, { passive: true })
 
-    // ── KEYBOARD
     document.addEventListener('keydown', e => {
       if (e.key === 'ArrowDown' || e.key === 'PageDown') goTo(active + 1)
       if (e.key === 'ArrowUp'   || e.key === 'PageUp')   goTo(active - 1)
