@@ -379,33 +379,24 @@
   <div class="lbox lbox-t"></div>
   <div class="lbox lbox-b"></div>
 
-  <!-- ── CINEMATIC BG : vidéos (ambiance) + photos (fin, Ken Burns) ─── -->
+  <!-- ── CINEMATIC BG : intro (joue une fois) + boucle (tourne en fond) ─── -->
   <div id="cinematic-bg">
-    <!-- Vidéos — jouent en premier -->
-    <video class="bg-vid" id="vid1" muted playsinline preload="auto">
-      <source src="/portfolio_bpa/footage/video-1.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-vid" id="vid2" muted playsinline preload="metadata">
-      <source src="/portfolio_bpa/footage/video-2.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-vid" id="vid3" muted playsinline preload="metadata">
-      <source src="/portfolio_bpa/footage/video-3.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-vid" id="vid4" muted playsinline preload="none">
-      <source src="/portfolio_bpa/footage/video-4.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-vid" id="vid5" muted playsinline preload="none">
-      <source src="/portfolio_bpa/footage/video-5.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-vid" id="vid6" muted playsinline preload="none">
-      <source src="/portfolio_bpa/footage/video-6.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-vid" id="vid7" muted playsinline preload="none">
-      <source src="/portfolio_bpa/footage/video-7.mp4" type="video/mp4" />
-    </video>
-    <video class="bg-vid" id="vid8" muted playsinline preload="none">
-      <source src="/portfolio_bpa/footage/video-8.mp4" type="video/mp4" />
-    </video>
+    <!-- S1 --><video class="bg-vid" id="v1i" muted playsinline preload="auto"><source src="/portfolio_bpa/footage/video-1.mp4" type="video/mp4"/></video>
+    <video class="bg-vid" id="v1l" muted playsinline preload="metadata" loop><source src="/portfolio_bpa/footage/video-1-1.mp4" type="video/mp4"/></video>
+    <!-- S2 --><video class="bg-vid" id="v2i" muted playsinline preload="none"><source src="/portfolio_bpa/footage/video-2.mp4" type="video/mp4"/></video>
+    <video class="bg-vid" id="v2l" muted playsinline preload="none" loop><source src="/portfolio_bpa/footage/video-2-1.mp4" type="video/mp4"/></video>
+    <!-- S3 --><video class="bg-vid" id="v3i" muted playsinline preload="none"><source src="/portfolio_bpa/footage/video-3.mp4" type="video/mp4"/></video>
+    <video class="bg-vid" id="v3l" muted playsinline preload="none" loop><source src="/portfolio_bpa/footage/video-3-1.mp4" type="video/mp4"/></video>
+    <!-- S4 --><video class="bg-vid" id="v4i" muted playsinline preload="none"><source src="/portfolio_bpa/footage/video-4.mp4" type="video/mp4"/></video>
+    <video class="bg-vid" id="v4l" muted playsinline preload="none" loop><source src="/portfolio_bpa/footage/video-4-1.mp4" type="video/mp4"/></video>
+    <!-- S5 --><video class="bg-vid" id="v5i" muted playsinline preload="none"><source src="/portfolio_bpa/footage/video-5.mp4" type="video/mp4"/></video>
+    <video class="bg-vid" id="v5l" muted playsinline preload="none" loop><source src="/portfolio_bpa/footage/video-5-1.mp4" type="video/mp4"/></video>
+    <!-- S6 --><video class="bg-vid" id="v6i" muted playsinline preload="none"><source src="/portfolio_bpa/footage/video-6.mp4" type="video/mp4"/></video>
+    <video class="bg-vid" id="v6l" muted playsinline preload="none" loop><source src="/portfolio_bpa/footage/video-6-1.mp4" type="video/mp4"/></video>
+    <!-- S7 --><video class="bg-vid" id="v7i" muted playsinline preload="none"><source src="/portfolio_bpa/footage/video-7.mp4" type="video/mp4"/></video>
+    <video class="bg-vid" id="v7l" muted playsinline preload="none" loop><source src="/portfolio_bpa/footage/video-7-1.mp4" type="video/mp4"/></video>
+    <!-- S8 --><video class="bg-vid" id="v8i" muted playsinline preload="none"><source src="/portfolio_bpa/footage/video-8.mp4" type="video/mp4"/></video>
+    <video class="bg-vid" id="v8l" muted playsinline preload="none" loop><source src="/portfolio_bpa/footage/video-8-1.mp4" type="video/mp4"/></video>
   </div>
 
   <!-- ── FIXED UI ──────────────────────────────────────────────────── -->
@@ -636,140 +627,126 @@
   <script>
     import { gsap } from 'gsap'
 
-    // ── ELEMENTS ────────────────────────────────────────────────────────
+    // ── ELEMENTS
     const scenes      = Array.from(document.querySelectorAll<HTMLElement>('.scene'))
     const navDots     = Array.from(document.querySelectorAll<HTMLElement>('.nav-dot'))
-    const videos      = Array.from(document.querySelectorAll<HTMLVideoElement>('.bg-vid'))
     const barStatus   = document.getElementById('bar-status')!
     const progressBar = document.getElementById('progress-bar')!
     const overlay     = document.getElementById('scene-overlay')!
 
-    type SceneInfo = {
-      el: HTMLElement; idx: number
-      lines: HTMLElement[]; fades: HTMLElement[]; status: string
-    }
+    type SceneInfo = { el: HTMLElement; lines: HTMLElement[]; fades: HTMLElement[]; status: string }
     const SD: SceneInfo[] = scenes.map(el => ({
       el,
-      idx: parseInt(el.dataset.vid ?? '1') - 1,
       lines: Array.from(el.querySelectorAll<HTMLElement>('.ti')),
       fades: Array.from(el.querySelectorAll<HTMLElement>('.fade-in')),
       status: el.dataset.status ?? '',
     }))
 
-    // Suivi par scène : le texte a-t-il déjà été révélé ce passage ?
-    const textShown = new Array(scenes.length).fill(false)
+    // Paires [intro, boucle] pour chaque scène (0-indexed)
+    const VP = Array.from({ length: 8 }, (_, i) => [
+      document.getElementById(`v${i + 1}i`) as HTMLVideoElement,
+      document.getElementById(`v${i + 1}l`) as HTMLVideoElement,
+    ] as const)
 
-    // ── VIDEO CROSSFADE ─────────────────────────────────────────────────
-    let curVid = 0
-    gsap.set(videos[0], { opacity: 1 })
-    videos[0].play().catch(() => {})
-
-    function crossfade(to: number) {
-      if (to === curVid) return
-      const prev = videos[curVid]
-      const next = videos[to]
-
-      // Lazy load de la prochaine vidéo
-      if (next.preload === 'none') { next.preload = 'auto'; next.load() }
-      const after = videos[to + 1]
-      if (after?.preload === 'none') { after.preload = 'metadata'; after.load() }
-
-      gsap.to(prev, { opacity: 0, duration: 0.6, ease: 'power1.out',
-        onComplete: () => prev.pause() })
-      gsap.fromTo(next, { opacity: 0 }, { opacity: 1, duration: 0.9, ease: 'power1.out' })
-      next.currentTime = 0
-      next.play().catch(() => {})
-      curVid = to
-    }
-
-    // ── BOUCLE VIDÉO + RÉVÉLATION TEXTE ─────────────────────────────────
-    // Écoute "ended" pour chaque vidéo une seule fois à l'init
-    videos.forEach((vid, vidIdx) => {
-      vid.addEventListener('ended', () => {
-        // Boucle : on repart au début
-        vid.currentTime = 0
-        vid.play().catch(() => {})
-
-        // La scène hero (idx 0) gère son texte via la timeline d'intro
-        if (vidIdx === 0) return
-
-        const sceneIdx = SD.findIndex(s => s.idx === vidIdx)
-        if (sceneIdx === -1) return
-
-        // Révèle le texte uniquement à la fin du premier passage
-        if (!textShown[sceneIdx] && active === sceneIdx) {
-          textShown[sceneIdx] = true
-          showText(SD[sceneIdx])
-        }
-      })
-    })
-
-    // ── LETTERBOX ───────────────────────────────────────────────────────
+    // ── LETTERBOX
     gsap.to(['.lbox-t', '.lbox-b'], { y: 0, duration: 1.4, ease: 'power3.out', delay: 0.2 })
 
-    // ── TEXT ────────────────────────────────────────────────────────────
+    // ── TEXTE
     function hideText(s: SceneInfo) {
       gsap.killTweensOf([...s.lines, ...s.fades])
       gsap.to(s.lines, { y: '-110%', duration: 0.4, stagger: 0.04, ease: 'power2.in', overwrite: true })
       gsap.to(s.fades, { opacity: 0, y: -6, duration: 0.28, ease: 'power1.in', overwrite: true })
     }
-
     function showText(s: SceneInfo) {
-      gsap.fromTo(s.lines,
-        { y: '110%' },
-        { y: '0%', duration: 1.1, stagger: 0.12, ease: 'power3.out' })
-      gsap.fromTo(s.fades,
-        { opacity: 0, y: 18 },
-        { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power2.out', delay: 0.45 })
+      gsap.fromTo(s.lines, { y: '110%' }, { y: '0%', duration: 1.1, stagger: 0.12, ease: 'power3.out' })
+      gsap.fromTo(s.fades, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power2.out', delay: 0.45 })
     }
 
-    // ── NAVIGATION ──────────────────────────────────────────────────────
-    let active  = 0
+    // ── LOGIQUE VIDÉO PAR SCÈNE
+    let active = 0
+
+    function enterScene(idx: number) {
+      const [intro, loop] = VP[idx]
+      const s = SD[idx]
+
+      // Prépare les deux vidéos
+      gsap.set([intro, loop], { opacity: 0 })
+      intro.currentTime = 0
+      loop.currentTime  = 0
+
+      // Précharge la boucle dès maintenant (elle sera nécessaire à la fin de l'intro)
+      if (loop.preload === 'none') { loop.preload = 'auto'; loop.load() }
+
+      // Précharge l'intro de la scène suivante
+      if (idx + 1 < VP.length) {
+        const nextIntro = VP[idx + 1][0]
+        if (nextIntro.preload === 'none') { nextIntro.preload = 'metadata'; nextIntro.load() }
+      }
+
+      // Lance l'intro
+      gsap.to(intro, { opacity: 1, duration: 0.5, ease: 'power1.out' })
+      intro.play().catch(() => {})
+
+      // À la fin de l'intro → bascule sur la boucle + révèle le texte
+      intro.addEventListener('ended', function handler() {
+        if (active !== idx) return
+        gsap.to(intro, { opacity: 0, duration: 0.8, ease: 'power1.out' })
+        gsap.fromTo(loop, { opacity: 0 }, { opacity: 1, duration: 1.0, ease: 'power1.out' })
+        loop.play().catch(() => {})
+        if (idx !== 0) showText(s)   // S1 hero : texte déjà visible via timeline
+      }, { once: true })
+    }
+
+    function leaveScene(idx: number) {
+      const [intro, loop] = VP[idx]
+      intro.pause()
+      loop.pause()
+      gsap.set([intro, loop], { opacity: 0 })
+    }
+
+    // ── NAVIGATION
     let lastNav = 0
     const NAV_COOLDOWN = 950
 
-    function goTo(idx: number) {
+    function goTo(toIdx: number) {
       if (Date.now() - lastNav < NAV_COOLDOWN) return
-      if (idx === active || idx < 0 || idx >= scenes.length) return
+      if (toIdx === active || toIdx < 0 || toIdx >= scenes.length) return
       lastNav = Date.now()
 
-      const from = SD[active]
-      const to   = SD[idx]
+      const prevIdx = active
+      active = toIdx
+      const from = SD[prevIdx], to = SD[toIdx]
 
-      // Réinitialise le flag texte de la scène qu'on quitte
-      textShown[active] = false
       hideText(from)
-      navDots.forEach((d, j) => d.classList.toggle('active', j === idx))
+      navDots.forEach((d, j) => d.classList.toggle('active', j === toIdx))
       barStatus.textContent = to.status
-      progressBar.style.width = `${(idx / (scenes.length - 1)) * 100}%`
+      progressBar.style.width = `${(toIdx / (scenes.length - 1)) * 100}%`
 
       gsap.to(overlay, {
         opacity: 1, duration: 0.32, ease: 'power2.inOut',
         onComplete() {
           from.el.classList.remove('active')
           to.el.classList.add('active')
-          crossfade(to.idx)
+          leaveScene(prevIdx)
+          enterScene(toIdx)
           gsap.to(overlay, { opacity: 0, duration: 0.65, ease: 'power2.out', delay: 0.06 })
         }
       })
-
-      active = idx
     }
 
-    // ── S1 INTRO ────────────────────────────────────────────────────────
+    // ── S1 HERO : texte immédiat au chargement, intro démarre
     ;(() => {
-      const s1      = SD[0]
+      const s0      = SD[0]
       const eyebrow = document.querySelector<HTMLElement>('.hero-eyebrow')!
       const sub     = document.querySelector<HTMLElement>('.hero-sub')!
       const hint    = document.querySelector<HTMLElement>('.scroll-hint')!
 
       gsap.set([eyebrow, sub, hint], { opacity: 0 })
+      enterScene(0)
 
       const tl = gsap.timeline({ delay: 0.85 })
       tl.to(eyebrow, { opacity: 1, duration: 0.8, ease: 'power2.out' })
-      tl.fromTo(s1.lines,
-        { y: '110%' },
-        { y: '0%', duration: 1.1, stagger: 0.15, ease: 'power3.out' }, '-=0.35')
+      tl.fromTo(s0.lines, { y: '110%' }, { y: '0%', duration: 1.1, stagger: 0.15, ease: 'power3.out' }, '-=0.35')
       tl.to(sub,  { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.55')
       tl.to(hint, {
         opacity: 1, duration: 0.7, ease: 'power2.out',
@@ -777,25 +754,20 @@
       }, '-=0.45')
     })()
 
-    // ── WHEEL ───────────────────────────────────────────────────────────
+    // ── WHEEL
     let wVel = 0, wRaf = 0
-
     function wheelTick() {
-      if (Math.abs(wVel) > 8) {
-        goTo(active + (wVel > 0 ? 1 : -1))
-        wVel = 0; wRaf = 0; return
-      }
+      if (Math.abs(wVel) > 8) { goTo(active + (wVel > 0 ? 1 : -1)); wVel = 0; wRaf = 0; return }
       wVel *= 0.80
-      if (Math.abs(wVel) > 0.4) { wRaf = requestAnimationFrame(wheelTick) }
+      if (Math.abs(wVel) > 0.4) wRaf = requestAnimationFrame(wheelTick)
       else { wVel = 0; wRaf = 0 }
     }
-
     window.addEventListener('wheel', e => {
       wVel += e.deltaY * 0.45
       if (!wRaf) wRaf = requestAnimationFrame(wheelTick)
     }, { passive: true })
 
-    // ── TOUCH ───────────────────────────────────────────────────────────
+    // ── TOUCH
     let ty0 = 0
     document.addEventListener('touchstart', e => { ty0 = e.touches[0].clientY }, { passive: true })
     document.addEventListener('touchend',   e => {
@@ -803,14 +775,13 @@
       if (Math.abs(d) > 40) goTo(active + (d > 0 ? 1 : -1))
     }, { passive: true })
 
-    // ── KEYBOARD ────────────────────────────────────────────────────────
+    // ── KEYBOARD
     document.addEventListener('keydown', e => {
       if (e.key === 'ArrowDown' || e.key === 'PageDown') goTo(active + 1)
       if (e.key === 'ArrowUp'   || e.key === 'PageUp')   goTo(active - 1)
     })
 
-    navDots.forEach(d => d.addEventListener('click', () =>
-      goTo(parseInt(d.dataset.scene ?? '0'))))
+    navDots.forEach(d => d.addEventListener('click', () => goTo(parseInt(d.dataset.scene ?? '0'))))
     document.getElementById('logo-btn')?.addEventListener('click', () => goTo(0))
   </script>
 
