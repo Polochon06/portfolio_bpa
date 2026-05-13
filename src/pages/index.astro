@@ -45,9 +45,8 @@
       object-fit: cover;
       opacity: 0;
       pointer-events: none;
-      transform: translateZ(0);
       backface-visibility: hidden;
-      will-change: opacity;
+      will-change: transform, opacity;
     }
     /* Vignette */
     #cinematic-bg::after {
@@ -779,6 +778,7 @@
     function enterScene(idx: number) {
       const [intro, loop] = VP[idx]
       gsap.set([intro, loop], { opacity: 0 })
+      gsap.set(loop, { scale: 1.08, x: 0, y: 0, force3D: true })
       intro.currentTime = 0; loop.currentTime = 0
       if (loop.preload === 'none') { loop.preload = 'auto'; loop.load() }
       if (idx + 1 < VP.length) {
@@ -800,7 +800,7 @@
     function leaveScene(idx: number) {
       const [intro, loop] = VP[idx]
       intro.pause(); loop.pause()
-      gsap.set([intro, loop], { opacity: 0 })
+      gsap.set([intro, loop], { opacity: 0, x: 0, y: 0 })
     }
 
     let lastNav = 0
@@ -881,6 +881,19 @@
 
     navDots.forEach(d => d.addEventListener('click', () => goTo(parseInt(d.dataset.scene ?? '0'))))
     document.getElementById('logo-btn')?.addEventListener('click', () => goTo(0))
+
+    const PARA_STR = 24
+    window.addEventListener('mousemove', e => {
+      const nx = (e.clientX / window.innerWidth  - 0.5) * 2
+      const ny = (e.clientY / window.innerHeight - 0.5) * 2
+      gsap.to(VP[active][1], {
+        x: nx * PARA_STR,
+        y: ny * PARA_STR,
+        duration: 1.8,
+        ease: 'power2.out',
+        overwrite: 'auto',
+      })
+    }, { passive: true })
   </script>
 
 </body>
