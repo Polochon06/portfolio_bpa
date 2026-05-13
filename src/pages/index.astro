@@ -30,6 +30,8 @@
       color: var(--cream);
       font-family: 'Jost', sans-serif;
       font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
     ::selection { background: rgba(201,168,76,0.22); }
 
@@ -48,32 +50,24 @@
       backface-visibility: hidden;
       will-change: transform, opacity;
     }
-    /* Vignette */
+    /* Vignette — bords sombres sans letterbox */
     #cinematic-bg::after {
       content: '';
       position: absolute; inset: 0; z-index: 2;
       background:
-        radial-gradient(ellipse 90% 75% at 50% 50%, transparent 30%, rgba(6,4,10,0.6) 100%),
-        linear-gradient(180deg, rgba(6,4,10,0.5) 0%, transparent 22%, transparent 72%, rgba(6,4,10,0.7) 100%);
+        radial-gradient(ellipse 80% 65% at 50% 50%, transparent 20%, rgba(6,4,10,0.72) 100%),
+        linear-gradient(180deg, rgba(6,4,10,0.62) 0%, transparent 18%, transparent 68%, rgba(6,4,10,0.82) 100%);
       pointer-events: none;
     }
-    /* Grain */
+    /* Grain pellicule */
     #cinematic-bg::before {
       content: '';
       position: absolute; inset: 0; z-index: 3;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 180px;
-      opacity: 0.042;
+      background-size: 160px;
+      opacity: 0.055;
       pointer-events: none;
     }
-
-    /* ── LETTERBOX ────────────────────────────────────────────────────── */
-    .lbox {
-      position: fixed; left: 0; right: 0; z-index: 80;
-      background: #000; pointer-events: none;
-    }
-    .lbox-t { top: 0;    height: 6vh; transform: translateY(-100%); }
-    .lbox-b { bottom: 0; height: 6vh; transform: translateY(100%); }
 
     /* ── SCENE TINT ──────────────────────────────────────────────────── */
     #scene-tint {
@@ -196,6 +190,7 @@
       font-family: 'Bodoni Moda', serif;
       font-size: clamp(3.5rem, 8vw, 8rem);
       font-weight: 400; margin-bottom: 2rem;
+      -webkit-font-smoothing: antialiased;
     }
     .ti em { font-style: italic; color: rgba(240,235,224,0.6); }
     .ti.is-em { font-style: italic; color: rgba(240,235,224,0.6); }
@@ -230,6 +225,7 @@
       font-size: clamp(5rem, 14vw, 14rem);
       font-weight: 400; line-height: 0.88;
       letter-spacing: 0.04em; margin-bottom: 2rem;
+      -webkit-font-smoothing: antialiased;
     }
     .hero-title .tl { line-height: 0.88; }
     .hero-sub {
@@ -391,10 +387,6 @@
 </head>
 
 <body>
-  <!-- Letterbox bars -->
-  <div class="lbox lbox-t"></div>
-  <div class="lbox lbox-b"></div>
-
   <!-- ── CINEMATIC BG : intro (joue une fois) + boucle (tourne en fond) ─── -->
   <div id="cinematic-bg">
     <!-- S1 --><video class="bg-vid" id="v1i" muted playsinline preload="auto"><source src="/portfolio_bpa/footage/video-1.mp4" type="video/mp4"/></video>
@@ -683,8 +675,6 @@
       'rgba(115,15,20,0.11)',
       'rgba(201,168,76,0.06)',
     ]
-
-    gsap.to(['.lbox-t', '.lbox-b'], { y: 0, duration: 1.4, ease: 'power3.out', delay: 0.2 })
 
     function buildChars(lines: HTMLElement[]): HTMLElement[] {
       const all: HTMLElement[] = []
