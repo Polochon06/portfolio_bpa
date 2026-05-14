@@ -28,11 +28,16 @@ const TINTS = [
   'rgba(201,168,76,0.06)',
 ]
 
-const NAV_LABELS  = ['Accueil', 'Approche', 'À Propos', 'MT-Congés', 'Gymnova', 'Stack', 'Motion', 'Contact']
+const NAV_LABELS  = ['Home', 'Vision', 'Profil', 'MT-Congés', 'Gymnova', 'Stack', 'Motion', 'Contact']
 const STATUSES    = [
-  'Développeur Créatif', "L'Approche", 'À Propos',
-  'Projet 01 — MT-Congés', 'Projet 02 — Gymnova',
-  'Stack Technique', 'Motion Design · VFX', 'Contact',
+  'Développeur Créatif',
+  'Vision',
+  'Profil',
+  'Projet 01 — MT-Congés',
+  'Projet 02 — Gymnova',
+  'Stack Technique',
+  'Motion Design · VFX',
+  'Contact',
 ]
 
 export function Portfolio() {
@@ -310,24 +315,24 @@ export function Portfolio() {
             <span className="tl"><span className="ti">Paul</span></span>
             <span className="tl"><span className="ti is-em">Blanc</span></span>
           </h1>
-          <p className="hero-sub">Développeur Créatif</p>
+          <p className="hero-sub">Développeur Créatif &amp; Motion Designer</p>
         </div>
         <div className="scroll-hint" aria-hidden="true">
-          <div className="scroll-hint-line" />Défiler
+          <div className="scroll-hint-line" />Découvrir
         </div>
       </section>
 
-      {/* S2 PHILOSOPHIE */}
+      {/* S2 VISION */}
       <section className="scene" id="s2">
         <div className="scene-inner">
-          <div className="scene-tag fade-in">L'Approche</div>
+          <div className="scene-tag fade-in">Vision</div>
           <div className="gold-line fade-in" />
           <h2 className="scene-title">
-            <span className="tl"><span className="ti">Chaque</span></span>
-            <span className="tl"><span className="ti">projet</span></span>
-            <span className="tl"><span className="ti is-em">compte.</span></span>
+            <span className="tl"><span className="ti">L'interface</span></span>
+            <span className="tl"><span className="ti">est une</span></span>
+            <span className="tl"><span className="ti is-em">émotion.</span></span>
           </h2>
-          <p className="scene-body fade-in">Je construis des expériences numériques qui ont du sens. Du back-end sécurisé aux interfaces cinématiques — chaque décision est au service de l'expérience utilisateur.</p>
+          <p className="scene-body fade-in">Je ne code pas des pages — je construis des <strong>expériences</strong>. Chaque animation, chaque transition, chaque micro-interaction est pensée pour créer un ressenti. Du back-end robuste à l'interface cinématique.</p>
         </div>
       </section>
 
@@ -335,15 +340,16 @@ export function Portfolio() {
       <section className="scene" id="s3">
         <SplineScene scene={SPLINE.about} className="spline-layer spline-right" />
         <div className="scene-inner">
-          <div className="scene-tag fade-in">À Propos · BTS SIO SLAM · Promo 2025</div>
+          <div className="scene-tag fade-in">BTS SIO SLAM · Promo 2025 · Normandie</div>
           <h2 className="scene-title">
-            <span className="tl"><span className="ti">Code</span></span>
-            <span className="tl"><span className="ti is-em">&amp; Art.</span></span>
+            <span className="tl"><span className="ti">Code.</span></span>
+            <span className="tl"><span className="ti">Image.</span></span>
+            <span className="tl"><span className="ti is-em">Mouvement.</span></span>
           </h2>
-          <p className="scene-body fade-in">Basé en <strong>Normandie</strong>, développeur depuis 2020. Je mélange rigueur technique et sensibilité artistique — Java, React, et motion design 3D.</p>
+          <p className="scene-body fade-in">Développeur full-stack passionné par l'intersection entre la technique et l'art. Java côté serveur, React côté client, After Effects côté créatif — je maîtrise toute la chaîne.</p>
           <div className="stat-row fade-in">
-            <div><div className="stat-val">2+</div><div className="stat-lbl">Années</div></div>
-            <div><div className="stat-val">4</div><div className="stat-lbl">Projets</div></div>
+            <div><div className="stat-val">5+</div><div className="stat-lbl">Projets</div></div>
+            <div><div className="stat-val">3</div><div className="stat-lbl">Langages</div></div>
             <div><div className="stat-val">∞</div><div className="stat-lbl">Curiosité</div></div>
           </div>
         </div>
@@ -353,20 +359,20 @@ export function Portfolio() {
       <section className="scene" id="s4">
         <div className="scene-inner">
           <div className="proj-num-bg fade-in">01</div>
-          <div className="proj-meta fade-in">Java · Architecture · 2024</div>
+          <div className="proj-meta fade-in">Java 17 · Architecture MVC · 2024</div>
           <h2 className="scene-title proj-title">
             <span className="tl"><span className="ti">MT-</span></span>
             <span className="tl"><span className="ti is-em">Congés</span></span>
           </h2>
-          <p className="scene-body fade-in">Gestion des congés d'entreprise — auth RBAC, workflow multi-niveaux, audit logs.</p>
+          <p className="scene-body fade-in">Application RH complète — système de rôles hiérarchiques, workflow de validation multi-niveaux et audit trail intégral.</p>
           <ul className="feat-list fade-in">
-            <li>Auth JWT, rôles admin / manager / employé</li>
-            <li>CRUD congés + workflow de validation</li>
-            <li>Dashboard statistiques temps réel</li>
-            <li>Audit trail — traçabilité totale</li>
+            <li>Auth JWT — rôles admin · manager · employé</li>
+            <li>Workflow de validation avec notifications</li>
+            <li>Dashboard statistiques &amp; exports</li>
+            <li>Audit trail — traçabilité complète des actions</li>
           </ul>
           <div className="proj-tags fade-in">
-            {['Java 17', 'MySQL', 'MVC / DAO', 'RBAC', 'JWT'].map(t => <span key={t} className="proj-tag">{t}</span>)}
+            {['Java 17', 'MySQL', 'MVC / DAO', 'RBAC', 'JWT', 'Servlet'].map(t => <span key={t} className="proj-tag">{t}</span>)}
           </div>
           <a href={`${BASE}/mt-conges`} className="scene-cta fade-in">Voir le projet <span className="arr">↗</span></a>
         </div>
@@ -376,20 +382,20 @@ export function Portfolio() {
       <section className="scene" id="s5">
         <div className="scene-inner">
           <div className="proj-num-bg fade-in">02</div>
-          <div className="proj-meta fade-in">React · E-Commerce · 2024</div>
+          <div className="proj-meta fade-in">React · Node.js · E-Commerce · 2024</div>
           <h2 className="scene-title proj-title">
             <span className="tl"><span className="ti">Gym-</span></span>
             <span className="tl"><span className="ti is-em">nova</span></span>
           </h2>
-          <p className="scene-body fade-in">Plateforme e-commerce complète — 50+ produits, panier, Stripe, back-office admin.</p>
+          <p className="scene-body fade-in">Plateforme e-commerce premium — catalogue 50+ articles, paiement Stripe, espace client et back-office admin complet.</p>
           <ul className="feat-list fade-in">
-            <li>Catalogue 50+ produits avec filtres avancés</li>
-            <li>Panier temps réel + Stripe intégré</li>
-            <li>Auth JWT, espace client, historique commandes</li>
-            <li>Back-office admin : stocks, commandes, analytics</li>
+            <li>Catalogue filtrable — 50+ produits</li>
+            <li>Panier temps réel · paiement Stripe sécurisé</li>
+            <li>Espace client · historique commandes</li>
+            <li>Back-office — stocks · analytics · gestion</li>
           </ul>
           <div className="proj-tags fade-in">
-            {['React 18', 'Node.js', 'Stripe', 'JWT', 'MySQL'].map(t => <span key={t} className="proj-tag">{t}</span>)}
+            {['React 18', 'Node.js', 'Express', 'Stripe', 'JWT', 'MySQL'].map(t => <span key={t} className="proj-tag">{t}</span>)}
           </div>
           <a href={`${BASE}/gymnova`} className="scene-cta fade-in">Voir le projet <span className="arr">↗</span></a>
         </div>
@@ -401,21 +407,21 @@ export function Portfolio() {
         <div className="scene-inner">
           <div className="scene-tag fade-in">Stack Technique</div>
           <h2 className="scene-title" style={{ fontSize: 'clamp(3rem,6vw,6.5rem)' }}>
-            <span className="tl"><span className="ti">Mes</span></span>
-            <span className="tl"><span className="ti is-em">outils.</span></span>
+            <span className="tl"><span className="ti">Maîtrise</span></span>
+            <span className="tl"><span className="ti is-em">totale.</span></span>
           </h2>
           <div className="skills-row">
             <div className="skill-col fade-in">
               <div className="skill-col-title">Backend</div>
-              {['Java 17', 'Spring Boot', 'Node.js · Express', 'MySQL · PostgreSQL', 'API REST · JWT'].map(s => <div key={s} className="skill-item">{s}</div>)}
+              {['Java 17 · Spring Boot', 'Node.js · Express', 'MySQL · PostgreSQL', 'API REST · JWT', 'Architecture MVC'].map(s => <div key={s} className="skill-item">{s}</div>)}
             </div>
             <div className="skill-col fade-in">
               <div className="skill-col-title">Frontend</div>
-              {['React 19 · Next.js', 'Three.js · R3F', 'GSAP · Remotion', 'SCSS · TailwindCSS', 'TypeScript'].map(s => <div key={s} className="skill-item">{s}</div>)}
+              {['React 19 · TypeScript', 'Three.js · R3F · Spline', 'GSAP · Remotion', 'TailwindCSS · SCSS', 'Next.js'].map(s => <div key={s} className="skill-item">{s}</div>)}
             </div>
             <div className="skill-col fade-in">
               <div className="skill-col-title">Créatif</div>
-              {['After Effects', 'Element 3D', 'Trapcode Suite', 'Motion Design', 'Figma · Spline'].map(s => <div key={s} className="skill-item">{s}</div>)}
+              {['After Effects · Premiere', 'Element 3D · Trapcode', 'Motion Design · VFX', 'Figma · Spline 3D', 'Compositing'].map(s => <div key={s} className="skill-item">{s}</div>)}
             </div>
           </div>
         </div>
@@ -426,10 +432,10 @@ export function Portfolio() {
         <div className="scene-inner">
           <div className="scene-tag no-line fade-in" style={{ justifyContent: 'center' }}>Motion Design · VFX · After Effects</div>
           <h2 className="scene-title" style={{ textAlign: 'center', fontSize: 'clamp(2.8rem,6vw,6rem)' }}>
-            <span className="tl"><span className="ti">Créations</span></span>
-            <span className="tl"><span className="ti is-em">visuelles.</span></span>
+            <span className="tl"><span className="ti">En mouvement</span></span>
+            <span className="tl"><span className="ti is-em">constant.</span></span>
           </h2>
-          <p className="scene-body fade-in" style={{ textAlign: 'center', margin: '1.2rem auto 0' }}>Typographies animées, effets particules 3D, compositing VFX.</p>
+          <p className="scene-body fade-in" style={{ textAlign: 'center', margin: '1.2rem auto 0' }}>Typographies cinétiques, particules 3D, compositing VFX — l'image animée comme langage.</p>
           <div className="vfx-grid fade-in">
             {[5, 6, 7, 8].map(n => (
               <div key={n} className="vfx-item">
@@ -445,13 +451,13 @@ export function Portfolio() {
       <section className="scene" id="s8">
         <SplineScene scene={SPLINE.contact} className="spline-layer spline-contact" interactive />
         <div className="scene-inner">
-          <div className="scene-tag no-line fade-in" style={{ justifyContent: 'center' }}>Fin de parcours · Début d'une collaboration</div>
+          <div className="scene-tag no-line fade-in" style={{ justifyContent: 'center' }}>Disponible · Stage · Alternance · Freelance</div>
           <h2 className="scene-title" style={{ textAlign: 'center', fontSize: 'clamp(3rem,7.5vw,7.5rem)' }}>
-            <span className="tl"><span className="ti">Travaillons</span></span>
-            <span className="tl"><span className="ti is-em">ensemble.</span></span>
+            <span className="tl"><span className="ti">On crée</span></span>
+            <span className="tl"><span className="ti is-em">quelque chose ?</span></span>
           </h2>
           <p className="scene-body fade-in" style={{ textAlign: 'center', margin: '1.5rem auto 0' }}>
-            Disponible pour <strong>stages</strong>, <strong>alternances</strong>, freelance et collaborations créatives.
+            Basé en <strong>Normandie</strong>, disponible immédiatement pour des projets ambitieux.
           </p>
           <div style={{ textAlign: 'center' }} className="fade-in">
             <a href="mailto:zebi6073@gmail.com" className="contact-email">zebi6073@gmail.com</a>
