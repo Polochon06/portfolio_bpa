@@ -28,7 +28,7 @@ const TINTS = [
   'rgba(201,168,76,0.06)',
 ]
 
-const NAV_LABELS  = ['Home', 'Vision', 'Profil', 'MT-Congés', 'Gymnova', 'Stack', 'Motion', 'Contact']
+const NAV_LABELS  = ['Home', 'Vision', 'Profil', 'MT-Congés', 'Gymnova', 'Stack', 'Taste', 'Contact']
 const STATUSES    = [
   'Développeur Créatif',
   'Vision',
@@ -36,7 +36,7 @@ const STATUSES    = [
   'Projet 01 — MT-Congés',
   'Projet 02 — Gymnova',
   'Stack Technique',
-  'Motion Design · VFX',
+  'Taste · Direction Artistique',
   'Contact',
 ]
 
@@ -423,27 +423,37 @@ export function Portfolio() {
               <div className="skill-col-title">Créatif</div>
               {['After Effects · Premiere', 'Element 3D · Trapcode', 'Motion Design · VFX', 'Figma · Spline 3D', 'Compositing'].map(s => <div key={s} className="skill-item">{s}</div>)}
             </div>
+            <div className="skill-col skill-col--taste fade-in">
+              <div className="skill-col-title">Taste</div>
+              {['Direction artistique', 'Typographie éditoriale', 'Composition · Cadrage', 'Palette · Couleur', 'Storytelling visuel'].map(s => <div key={s} className="skill-item">{s}</div>)}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* S7 MOTION VFX */}
+      {/* S7 TASTE */}
       <section className="scene" id="s7">
-        <div className="scene-inner">
-          <div className="scene-tag no-line fade-in" style={{ justifyContent: 'center' }}>Motion Design · VFX · After Effects</div>
-          <h2 className="scene-title" style={{ textAlign: 'center', fontSize: 'clamp(2.8rem,6vw,6rem)' }}>
-            <span className="tl"><span className="ti">En mouvement</span></span>
-            <span className="tl"><span className="ti is-em">constant.</span></span>
+        <div className="taste-grid fade-in">
+          {([
+            { n: 5, label: 'Motion Design' },
+            { n: 6, label: 'VFX' },
+            { n: 7, label: 'Compositing' },
+            { n: 8, label: 'Direction Art.' },
+            { n: 1, label: 'Identité' },
+          ] as { n: number; label: string }[]).map(({ n, label }) => (
+            <div key={n} className="taste-item">
+              <img src={`${BASE}/footage/photo-${n}.webp`} alt={label} loading="lazy"
+                   onError={e => { (e.target as HTMLImageElement).src = `${BASE}/footage/photo-${n}.png` }} />
+              <span className="taste-item-label">{label}</span>
+            </div>
+          ))}
+        </div>
+        <div className="taste-header">
+          <div className="scene-tag fade-in">Goût · Esthétique · Direction Artistique</div>
+          <h2 className="taste-title">
+            <span className="tl"><span className="ti">L'œil avant</span></span>
+            <span className="tl"><span className="ti is-em">la technique.</span></span>
           </h2>
-          <p className="scene-body fade-in" style={{ textAlign: 'center', margin: '1.2rem auto 0' }}>Typographies cinétiques, particules 3D, compositing VFX — l'image animée comme langage.</p>
-          <div className="vfx-grid fade-in">
-            {[5, 6, 7, 8].map(n => (
-              <div key={n} className="vfx-item">
-                <img src={`${BASE}/footage/photo-${n}.webp`} alt={`Motion ${n - 4}`} loading="lazy"
-                     onError={e => { (e.target as HTMLImageElement).src = `${BASE}/footage/photo-${n}.png` }} />
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
