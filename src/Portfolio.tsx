@@ -3,6 +3,7 @@ import { gsap } from 'gsap'
 import { Player } from '@remotion/player'
 import { CinematicFX } from '../remotion/compositions/CinematicFX'
 import { SplineScene } from './components/SplineScene'
+import { MjLayer, MjLayerHandle } from './components/MjLayer'
 
 const BASE = '/portfolio_bpa'
 const SCENE_COUNT = 8
@@ -48,6 +49,7 @@ export function Portfolio() {
   const wVelRef      = useRef(0)
   const wRafRef      = useRef(0)
   const abObj        = useRef({ val: 0 })
+  const mjLayerRef   = useRef<MjLayerHandle>(null)
 
   // Aberration value fed into Remotion Player
   const [aberration, setAberration] = useState(0)
@@ -288,15 +290,7 @@ export function Portfolio() {
       sfCur.textContent = String(toIdx + 1).padStart(2, '0')
       setTint(toIdx)
       triggerAbRef.current()  // ← Remotion aberration spike
-      // MJ atmospheric layer crossfade
-      const mjEl = document.getElementById('mj-bg') as HTMLImageElement | null
-      if (mjEl) gsap.to(mjEl, {
-        opacity: 0, duration: 0.35,
-        onComplete: () => {
-          mjEl.onload = () => gsap.to(mjEl, { opacity: 0.28, duration: 1.5 })
-          mjEl.src = `${BASE}/footage/mj-${toIdx + 1}.png`
-        },
-      })
+      mjLayerRef.current?.crossfadeTo(toIdx)
       gsap.to(overlay, {
         opacity: 1, duration: 0.3, ease: 'power2.inOut',
         onComplete() {
@@ -320,11 +314,8 @@ export function Portfolio() {
       enterScene(0); setTint(0)
       gsap.to(fracEl, { opacity: 1, duration: 1, delay: 0.6 })
 
-      const mjEl = document.getElementById('mj-bg') as HTMLImageElement | null
-      if (mjEl) {
-        mjEl.onload = () => gsap.to(mjEl, { opacity: 0.28, duration: 1.8, delay: 0.4 })
-        mjEl.src = `${BASE}/footage/mj-1.png`
-      }
+      mjLayerRef.current?.crossfadeTo(0)
+      mjLayerRef.current?.reveal()
 
       const heroChars = buildChars(SD[0].lines)
       charMap.current.set(0, heroChars)
@@ -435,8 +426,8 @@ export function Portfolio() {
       <div id="cursor-dot"  aria-hidden="true" />
       <div id="cursor-ring" aria-hidden="true" />
 
-      {/* MIDJOURNEY ATMOSPHERIC LAYER */}
-      <img id="mj-bg" src="" alt="" aria-hidden="true" />
+      {/* MIDJOURNEY ATMOSPHERIC LAYER — WebGL shader */}
+      <MjLayer ref={mjLayerRef} base={BASE} />
 
       <div id="cinematic-bg">
         {Array.from({ length: SCENE_COUNT }, (_, i) => <VideoGroup key={i} idx={i + 1} base={BASE} />)}
