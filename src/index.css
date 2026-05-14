@@ -44,14 +44,15 @@ html, body, #root {
   pointer-events: none;
   backface-visibility: hidden;
   will-change: transform, opacity;
+  image-rendering: high-quality;
 }
-/* Vignette forte — donne de la profondeur sans grain */
+/* Vignette légère — laisse respirer la footage */
 #cinematic-bg::after {
   content: '';
   position: absolute; inset: 0; z-index: 2;
   background:
-    radial-gradient(ellipse 70% 60% at 50% 50%, transparent 15%, rgba(6,4,10,0.78) 100%),
-    linear-gradient(180deg, rgba(6,4,10,0.70) 0%, transparent 22%, transparent 62%, rgba(6,4,10,0.88) 100%);
+    radial-gradient(ellipse 75% 65% at 50% 50%, transparent 25%, rgba(6,4,10,0.42) 100%),
+    linear-gradient(180deg, rgba(6,4,10,0.45) 0%, transparent 28%, transparent 60%, rgba(6,4,10,0.58) 100%);
   pointer-events: none;
 }
 
