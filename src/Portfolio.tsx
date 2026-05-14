@@ -88,63 +88,157 @@ export function Portfolio() {
       fades: Array.from(el.querySelectorAll<HTMLElement>('.fade-in')),
     }))
 
+    // ── Char split avec blur cinématique ───────────────────────────────────
     function buildChars(lines: HTMLElement[]): HTMLElement[] {
       const all: HTMLElement[] = []
       lines.forEach(li => {
         const isEm = li.classList.contains('is-em')
         const text = li.textContent ?? ''
-        gsap.set(li, { y: '0%' })
         li.innerHTML = ''
         for (const ch of text) {
           const clip  = document.createElement('span')
           clip.style.cssText = 'display:inline-block;overflow:hidden;vertical-align:bottom;line-height:inherit'
           const inner = document.createElement('span')
-          inner.style.display = 'inline-block'
-          if (isEm) { inner.style.fontStyle = 'italic'; inner.style.color = 'rgba(240,235,224,0.6)' }
-          inner.textContent = ch === ' ' ? ' ' : ch
+          inner.style.cssText = 'display:inline-block;filter:blur(14px);opacity:0'
+          if (isEm) inner.style.cssText += ';font-style:italic;color:rgba(240,235,224,0.45)'
+          inner.textContent = ch === ' ' ? ' ' : ch
           clip.appendChild(inner); li.appendChild(clip); all.push(inner)
         }
       })
       return all
     }
 
-    function typeTag(el: HTMLElement, delay: number) {
+    // ── Scramble text (remplace typeTag) ───────────────────────────────────
+    const SCRAMBLE = '!<>—_/[]{}=+*?@&%#$ABCDEFabcdef0123456789'
+    function scrambleText(el: HTMLElement, delay: number) {
       if (!el.dataset.text) el.dataset.text = el.textContent ?? ''
-      el.textContent = ''
-      el.dataset.text.split('').forEach((ch, i) => {
-        const s = document.createElement('span')
-        s.style.cssText = 'display:inline-block;opacity:0'
-        s.textContent = ch === ' ' ? ' ' : ch
-        el.appendChild(s)
-        gsap.to(s, { opacity: 1, duration: 0.12, delay: delay + i * 0.038, ease: 'power1.out' })
-      })
+      const target = el.dataset.text
+      let frame = 0
+      const SETTLE = 4
+      const tick = () => {
+        let out = ''
+        for (let i = 0; i < target.length; i++) {
+          if (target[i] === ' ' || target[i] === '·' || target[i] === '—') { out += target[i]; continue }
+          out += frame >= i * SETTLE + 10
+            ? target[i]
+            : SCRAMBLE[Math.floor(Math.random() * SCRAMBLE.length)]
+        }
+        el.textContent = out
+        if (frame++ < target.length * SETTLE + 16) requestAnimationFrame(tick)
+        else el.textContent = target
+      }
+      setTimeout(() => { el.textContent = ''; requestAnimationFrame(tick) }, delay * 1000)
     }
+
+    // ── Count-up pour les chiffres ──────────────────────────────────────────
+    function countUp(el: HTMLElement, delay: number) {
+      const raw = el.textContent ?? ''
+      if (!el.dataset.origText) el.dataset.origText = raw
+      const m   = raw.match(/(\d+)/)
+      if (!m) return
+      const target = parseInt(m[1])
+      const pre    = raw.slice(0, m.index!)
+      const suf    = raw.slice(m.index! + m[1].length)
+      setTimeout(() => {
+        const t0  = performance.now()
+        const dur = 1600
+        const tick = (now: number) => {
+          const p = Math.min((now - t0) / dur, 1)
+          const e = 1 - Math.pow(1 - p, 4)
+          el.textContent = pre + Math.round(e * target) + suf
+          if (p < 1) requestAnimationFrame(tick)
+        }
+        requestAnimationFrame(tick)
+      }, delay * 1000)
+    }
+
+    // ── Word reveal pour le body text ───────────────────────────────────────
+    function wordReveal(el: HTMLElement, delay: number): HTMLElement[] {
+      if (!el.dataset.origHtml) el.dataset.origHtml = el.innerHTML
+      const text = el.textContent ?? ''
+      el.innerHTML = ''
+      const spans: HTMLElement[] = []
+      text.split(' ').forEach((word, i, arr) => {
+        const clip  = document.createElement('span')
+        clip.style.cssText = 'display:inline-block;overflow:hidden;vertical-align:baseline'
+        const inner = document.createElement('span')
+        inner.style.cssText = 'display:inline-block;transform:translateY(105%)'
+        inner.textContent   = word + (i < arr.length - 1 ? ' ' : '')
+        clip.appendChild(inner); el.appendChild(clip); spans.push(inner)
+        gsap.to(inner, { y: '0%', duration: 0.6, delay: delay + i * 0.055, ease: 'power3.out' })
+      })
+      return spans
+    }
+
+    const wordMap = new Map<number, HTMLElement[]>()
 
     function showText(sd: SD, idx: number) {
       const chars = buildChars(sd.lines)
       charMap.current.set(idx, chars)
-      gsap.fromTo(chars, { y: '115%' }, { y: '0%', duration: 0.74, stagger: 0.028, ease: 'expo.out', delay: 0.22 })
+
+      // Chars : blur + slide vers le haut
+      gsap.fromTo(chars,
+        { y: '120%', filter: 'blur(14px)', opacity: 0 },
+        { y: '0%',   filter: 'blur(0px)',  opacity: 1,
+          duration: 0.88, stagger: 0.022, ease: 'expo.out', delay: 0.15 }
+      )
+
       if (idx === 0) {
         gsap.fromTo(['.hero-eyebrow', '.hero-sub'], { opacity: 0 }, { opacity: 1, duration: 0.7, stagger: 0.18, ease: 'power2.out', delay: 0.65 })
         gsap.to('.scroll-hint', { opacity: 0.85, duration: 0.7, ease: 'power2.out', delay: 1.1 })
         return
       }
+
+      // Ligne gold
       sd.fades.filter(el => el.classList.contains('gold-line'))
-        .forEach(el => gsap.fromTo(el, { scaleX: 0 }, { scaleX: 1, duration: 0.65, ease: 'power2.inOut' }))
+        .forEach(el => gsap.fromTo(el, { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: 'expo.out' }))
+
+      // Tags : scramble
       sd.fades.filter(el => el.classList.contains('scene-tag'))
-        .forEach(el => typeTag(el, 0.06))
-      sd.fades.filter(el => !el.classList.contains('gold-line') && !el.classList.contains('scene-tag'))
-        .forEach((el, i) => gsap.fromTo(el, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.88, ease: 'power2.out', delay: 0.88 + i * 0.1 }))
+        .forEach(el => scrambleText(el, 0.04))
+
+      // Stats : countUp
+      sd.fades.filter(el => el.classList.contains('stat-val'))
+        .forEach((el, i) => countUp(el, 0.7 + i * 0.12))
+
+      // Body text : word reveal
+      const bodyEls = sd.fades.filter(el =>
+        el.classList.contains('scene-body') && !el.classList.contains('gold-line') && !el.classList.contains('scene-tag'))
+      const allWords: HTMLElement[] = []
+      bodyEls.forEach((el, i) => {
+        gsap.set(el, { opacity: 1, y: 0 })   // parent visible; inner spans handle motion
+        const ws = wordReveal(el, 1.0 + i * 0.08)
+        allWords.push(...ws)
+      })
+      if (allWords.length) wordMap.set(idx, allWords)
+
+      // Reste des fade-in (proj-num, tags, cta, feat-list…)
+      sd.fades.filter(el =>
+        !el.classList.contains('gold-line') &&
+        !el.classList.contains('scene-tag') &&
+        !el.classList.contains('stat-val') &&
+        !el.classList.contains('scene-body')
+      ).forEach((el, i) =>
+        gsap.fromTo(el, { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.82, ease: 'power3.out', delay: 0.9 + i * 0.1 })
+      )
     }
 
     function hideText(sd: SD, idx: number) {
-      gsap.killTweensOf([...sd.lines, ...sd.fades, ...(charMap.current.get(idx) ?? [])])
-      sd.lines.forEach(li => { const t = li.textContent ?? ''; gsap.set(li, { y: '110%' }); li.textContent = t })
+      gsap.killTweensOf([...sd.lines, ...sd.fades, ...(charMap.current.get(idx) ?? []), ...(wordMap.get(idx) ?? [])])
+      sd.lines.forEach(li => {
+        gsap.killTweensOf(li)
+        const t = li.textContent ?? ''
+        li.textContent = t
+        gsap.set(li, { clearProps: 'transform' })
+      })
       charMap.current.delete(idx)
+      wordMap.delete(idx)
       sd.fades.forEach(el => {
         if (el.classList.contains('gold-line')) gsap.set(el, { scaleX: 0 })
         else gsap.set(el, { opacity: 0, y: 20 })
         if (el.classList.contains('scene-tag') && el.dataset.text) el.textContent = el.dataset.text
+        if (el.classList.contains('stat-val') && el.dataset.origText) { el.textContent = el.dataset.origText; delete el.dataset.origText }
+        if (el.classList.contains('scene-body') && el.dataset.origHtml) { el.innerHTML = el.dataset.origHtml; delete el.dataset.origHtml }
       })
       if (idx === 0) gsap.set(['.hero-eyebrow', '.hero-sub', '.scroll-hint'], { opacity: 0 })
     }
@@ -218,9 +312,17 @@ export function Portfolio() {
     const heroChars = buildChars(SD[0].lines)
     charMap.current.set(0, heroChars)
     const tl = gsap.timeline({ delay: 0.9 })
-    tl.to(eyebrow, { opacity: 1, duration: 0.85, ease: 'power2.out' })
-    tl.fromTo(heroChars, { y: '115%' }, { y: '0%', duration: 0.78, stagger: 0.038, ease: 'expo.out' }, '-=0.42')
-    tl.to(sub, { opacity: 1, duration: 0.85, ease: 'power2.out' }, '-=0.52')
+    tl.fromTo(eyebrow,
+      { opacity: 0, filter: 'blur(8px)', y: 8 },
+      { opacity: 1, filter: 'blur(0px)', y: 0, duration: 0.85, ease: 'power3.out' })
+    tl.fromTo(heroChars,
+      { y: '120%', filter: 'blur(14px)', opacity: 0 },
+      { y: '0%',   filter: 'blur(0px)',  opacity: 1, duration: 0.88, stagger: 0.022, ease: 'expo.out' },
+      '-=0.42')
+    tl.fromTo(sub,
+      { opacity: 0, filter: 'blur(8px)', y: 8 },
+      { opacity: 1, filter: 'blur(0px)', y: 0, duration: 0.85, ease: 'power3.out' },
+      '-=0.52')
     tl.to(hint, {
       opacity: 1, duration: 0.7, ease: 'power2.out',
       onComplete: () => gsap.to(hint, { opacity: 0.85, y: -5, repeat: -1, yoyo: true, duration: 1.2, ease: 'sine.inOut', delay: 2 }),
@@ -325,14 +427,14 @@ export function Portfolio() {
       {/* S2 VISION */}
       <section className="scene" id="s2">
         <div className="scene-inner">
-          <div className="scene-tag fade-in">Vision</div>
+          <div className="scene-tag fade-in">Manifeste · 01</div>
           <div className="gold-line fade-in" />
           <h2 className="scene-title">
             <span className="tl"><span className="ti">L'interface</span></span>
             <span className="tl"><span className="ti">est une</span></span>
-            <span className="tl"><span className="ti is-em">émotion.</span></span>
+            <span className="tl"><span className="ti is-em">mise en scène.</span></span>
           </h2>
-          <p className="scene-body fade-in">Je ne code pas des pages — je construis des <strong>expériences</strong>. Chaque animation, chaque transition, chaque micro-interaction est pensée pour créer un ressenti. Du back-end robuste à l'interface cinématique.</p>
+          <p className="scene-body fade-in">Je ne construis pas des pages — je <strong>choreographie des expériences</strong>. Chaque animation a un rythme, chaque transition raconte quelque chose. Du back-end rigoureux à l'interface cinématique, tout est conçu pour provoquer une réaction.</p>
         </div>
       </section>
 
@@ -340,16 +442,16 @@ export function Portfolio() {
       <section className="scene" id="s3">
         <SplineScene scene={SPLINE.about} className="spline-layer spline-right" />
         <div className="scene-inner">
-          <div className="scene-tag fade-in">BTS SIO SLAM · Promo 2025 · Normandie</div>
+          <div className="scene-tag fade-in">BTS SIO SLAM · Normandie · 2025</div>
           <h2 className="scene-title">
-            <span className="tl"><span className="ti">Code.</span></span>
-            <span className="tl"><span className="ti">Image.</span></span>
-            <span className="tl"><span className="ti is-em">Mouvement.</span></span>
+            <span className="tl"><span className="ti">Trois</span></span>
+            <span className="tl"><span className="ti">disciplines,</span></span>
+            <span className="tl"><span className="ti is-em">une signature.</span></span>
           </h2>
-          <p className="scene-body fade-in">Développeur full-stack passionné par l'intersection entre la technique et l'art. Java côté serveur, React côté client, After Effects côté créatif — je maîtrise toute la chaîne.</p>
+          <p className="scene-body fade-in">Java pour la rigueur architecturale. React pour l'interface vivante. Motion Design pour l'âme. Je pense en <strong>systèmes complets</strong> — de la base de données jusqu'à l'animation finale.</p>
           <div className="stat-row fade-in">
-            <div><div className="stat-val">5+</div><div className="stat-lbl">Projets</div></div>
-            <div><div className="stat-val">3</div><div className="stat-lbl">Langages</div></div>
+            <div><div className="stat-val">5+</div><div className="stat-lbl">Projets livrés</div></div>
+            <div><div className="stat-val">3</div><div className="stat-lbl">Disciplines</div></div>
             <div><div className="stat-val">∞</div><div className="stat-lbl">Curiosité</div></div>
           </div>
         </div>
@@ -364,12 +466,12 @@ export function Portfolio() {
             <span className="tl"><span className="ti">MT-</span></span>
             <span className="tl"><span className="ti is-em">Congés</span></span>
           </h2>
-          <p className="scene-body fade-in">Application RH complète — système de rôles hiérarchiques, workflow de validation multi-niveaux et audit trail intégral.</p>
+          <p className="scene-body fade-in">Système RH conçu pour la production — rôles hiérarchiques, workflow de validation multi-niveaux et <strong>traçabilité intégrale</strong> de chaque action. Architecture pensée pour durer.</p>
           <ul className="feat-list fade-in">
-            <li>Auth JWT — rôles admin · manager · employé</li>
-            <li>Workflow de validation avec notifications</li>
-            <li>Dashboard statistiques &amp; exports</li>
-            <li>Audit trail — traçabilité complète des actions</li>
+            <li>Authentification JWT — admin · manager · employé</li>
+            <li>Workflow de validation avec notifications email</li>
+            <li>Dashboard analytique — exports PDF &amp; CSV</li>
+            <li>Audit trail — historique immuable de chaque action</li>
           </ul>
           <div className="proj-tags fade-in">
             {['Java 17', 'MySQL', 'MVC / DAO', 'RBAC', 'JWT', 'Servlet'].map(t => <span key={t} className="proj-tag">{t}</span>)}
@@ -387,12 +489,12 @@ export function Portfolio() {
             <span className="tl"><span className="ti">Gym-</span></span>
             <span className="tl"><span className="ti is-em">nova</span></span>
           </h2>
-          <p className="scene-body fade-in">Plateforme e-commerce premium — catalogue 50+ articles, paiement Stripe, espace client et back-office admin complet.</p>
+          <p className="scene-body fade-in">Plateforme e-commerce premium pour équipements de sport — catalogue filtrable 50+ articles, <strong>paiement Stripe 3DS</strong> et back-office analytique complet.</p>
           <ul className="feat-list fade-in">
-            <li>Catalogue filtrable — 50+ produits</li>
-            <li>Panier temps réel · paiement Stripe sécurisé</li>
-            <li>Espace client · historique commandes</li>
-            <li>Back-office — stocks · analytics · gestion</li>
+            <li>Catalogue filtrable — 50+ produits avec gestion des stocks</li>
+            <li>Panier temps réel · paiement Stripe sécurisé 3DS</li>
+            <li>Espace client — historique, factures, suivi commandes</li>
+            <li>Back-office — analytics, gestion produits &amp; utilisateurs</li>
           </ul>
           <div className="proj-tags fade-in">
             {['React 18', 'Node.js', 'Express', 'Stripe', 'JWT', 'MySQL'].map(t => <span key={t} className="proj-tag">{t}</span>)}
@@ -407,8 +509,9 @@ export function Portfolio() {
         <div className="scene-inner">
           <div className="scene-tag fade-in">Stack Technique</div>
           <h2 className="scene-title" style={{ fontSize: 'clamp(3rem,6vw,6.5rem)' }}>
-            <span className="tl"><span className="ti">Maîtrise</span></span>
-            <span className="tl"><span className="ti is-em">totale.</span></span>
+            <span className="tl"><span className="ti">Du back-end</span></span>
+            <span className="tl"><span className="ti">au pixel —</span></span>
+            <span className="tl"><span className="ti is-em">sans compromis.</span></span>
           </h2>
           <div className="skills-row">
             <div className="skill-col fade-in">
@@ -449,10 +552,10 @@ export function Portfolio() {
           ))}
         </div>
         <div className="taste-header">
-          <div className="scene-tag fade-in">Goût · Esthétique · Direction Artistique</div>
+          <div className="scene-tag fade-in">Esthétique · Composition · Regard</div>
           <h2 className="taste-title">
-            <span className="tl"><span className="ti">L'œil avant</span></span>
-            <span className="tl"><span className="ti is-em">la technique.</span></span>
+            <span className="tl"><span className="ti">Ce que je crée,</span></span>
+            <span className="tl"><span className="ti is-em">ça se ressent.</span></span>
           </h2>
         </div>
       </section>
@@ -461,13 +564,13 @@ export function Portfolio() {
       <section className="scene" id="s8">
         <SplineScene scene={SPLINE.contact} className="spline-layer spline-contact" interactive />
         <div className="scene-inner">
-          <div className="scene-tag no-line fade-in" style={{ justifyContent: 'center' }}>Disponible · Stage · Alternance · Freelance</div>
+          <div className="scene-tag no-line fade-in" style={{ justifyContent: 'center' }}>Stage · Alternance · Freelance · Maintenant</div>
           <h2 className="scene-title" style={{ textAlign: 'center', fontSize: 'clamp(3rem,7.5vw,7.5rem)' }}>
-            <span className="tl"><span className="ti">On crée</span></span>
-            <span className="tl"><span className="ti is-em">quelque chose ?</span></span>
+            <span className="tl"><span className="ti">Le prochain projet,</span></span>
+            <span className="tl"><span className="ti is-em">c'est le vôtre.</span></span>
           </h2>
           <p className="scene-body fade-in" style={{ textAlign: 'center', margin: '1.5rem auto 0' }}>
-            Basé en <strong>Normandie</strong>, disponible immédiatement pour des projets ambitieux.
+            Basé en <strong>Normandie</strong>, disponible pour des projets qui méritent d'être remarqués.
           </p>
           <div style={{ textAlign: 'center' }} className="fade-in">
             <a href="mailto:zebi6073@gmail.com" className="contact-email">zebi6073@gmail.com</a>

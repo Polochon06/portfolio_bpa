@@ -149,9 +149,9 @@ html, body, #root {
   padding: 0 8vw; max-width: 920px;
 }
 
-/* Char-split animation */
+/* Char-split animation — .ti is the line container; inner spans handle all motion */
 .tl { display: block; overflow: hidden; line-height: 0.92; }
-.ti { display: block; transform: translateY(110%); }
+.ti { display: block; }
 .fade-in { opacity: 0; transform: translateY(18px); will-change: opacity, transform; }
 
 /* ── SCENE LABELS & LINES ────────────────────────────────────────── */
