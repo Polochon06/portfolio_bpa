@@ -142,11 +142,45 @@ html, body, #root {
   position: fixed; inset: 0; z-index: 10;
   display: flex; align-items: center; justify-content: flex-start;
   opacity: 0; visibility: hidden; pointer-events: none;
+  perspective: 1400px; perspective-origin: 50% 50%;
 }
 .scene.active { opacity: 1; visibility: visible; pointer-events: all; }
 .scene-inner {
   position: relative; z-index: 5;
-  padding: 0 8vw; max-width: 920px;
+  padding: 0 8vw;
+  transform-style: preserve-3d; will-change: transform;
+}
+
+/* ── GHOST NUMBER ─────────────────────────────────────────────────── */
+.ghost-num {
+  position: absolute; bottom: -0.05em; right: -0.02em; z-index: 0;
+  font-family: 'Bodoni Moda', serif;
+  font-size: clamp(14rem, 36vw, 42rem);
+  font-weight: 700; line-height: 0.85; letter-spacing: -0.06em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(201,168,76,0.06);
+  pointer-events: none; user-select: none;
+}
+
+/* ── MARQUEE ──────────────────────────────────────────────────────── */
+.marquee-wrap {
+  position: absolute; bottom: 5rem; left: 0; width: 100%;
+  overflow: hidden; z-index: 3; white-space: nowrap;
+}
+.marquee-track { display: inline-flex; }
+.marquee-track span {
+  display: inline-block;
+  font-family: 'Jost', sans-serif;
+  font-size: var(--micro); letter-spacing: 0.28em; text-transform: uppercase;
+  color: rgba(201,168,76,0.28);
+  animation: mq 32s linear infinite;
+  padding-right: 4rem;
+}
+.marquee-track span:nth-child(2) { animation-delay: -16s; }
+.marquee-reverse span { animation-direction: reverse; }
+@keyframes mq {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
 }
 
 /* Char-split animation — .ti is the line container; inner spans handle all motion */
@@ -175,11 +209,10 @@ html, body, #root {
 /* ── TITLES ──────────────────────────────────────────────────────── */
 .scene-title {
   font-family: 'Bodoni Moda', serif;
-  font-size: clamp(3.8rem, 8vw, 8.5rem);
+  font-size: clamp(3.5rem, 9vw, 11rem);
   font-weight: 400; margin-bottom: 2.2rem;
-  /* Tracking négatif = élégance Bodoni. Tracking positif = cheapness */
-  letter-spacing: -0.02em;
-  line-height: 1.05;
+  letter-spacing: -0.025em;
+  line-height: 0.96;
   font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
 }
@@ -209,10 +242,10 @@ html, body, #root {
 }
 .hero-title {
   font-family: 'Bodoni Moda', serif;
-  font-size: clamp(5.5rem, 15vw, 15rem);
-  font-weight: 300;           /* plus léger = plus élégant sur fond sombre */
-  line-height: 0.88;
-  letter-spacing: -0.03em;   /* tracking négatif fort = dramatic editorial */
+  font-size: clamp(5rem, 20vw, 22rem);
+  font-weight: 300;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
   margin-bottom: 2.4rem;
   font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;

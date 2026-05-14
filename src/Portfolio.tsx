@@ -4,6 +4,7 @@ import { Player } from '@remotion/player'
 import { CinematicFX } from '../remotion/compositions/CinematicFX'
 import { SplineScene } from './components/SplineScene'
 import { MjLayer, MjLayerHandle } from './components/MjLayer'
+import { HeroParticles } from './components/HeroParticles'
 
 const BASE = '/portfolio_bpa'
 const SCENE_COUNT = 8
@@ -275,6 +276,8 @@ export function Portfolio() {
       const [intro, loop] = VP[idx]
       intro.pause(); loop.pause()
       gsap.set([intro, loop], { opacity: 0, x: 0, y: 0 })
+      const si = SD[idx].el.querySelector<HTMLElement>('.scene-inner')
+      if (si) gsap.to(si, { rotationX: 0, rotationY: 0, duration: 0.4, ease: 'power2.out' })
     }
 
     function goTo(toIdx: number) {
@@ -374,6 +377,9 @@ export function Portfolio() {
       gsap.to('#cursor-ring',  { x: e.clientX, y: e.clientY, duration: 0.12, ease: 'power2.out', overwrite: 'auto' })
       const nx = (e.clientX / window.innerWidth  - 0.5) * 2
       const ny = (e.clientY / window.innerHeight - 0.5) * 2
+      // 3D perspective tilt on active scene content
+      const si = SD[activeRef.current].el.querySelector<HTMLElement>('.scene-inner')
+      if (si) gsap.to(si, { rotationX: -ny * 2.5, rotationY: nx * 2.5, duration: 2.2, ease: 'power2.out', overwrite: 'auto' })
       gsap.to(VP[activeRef.current][1], { x: nx * 24, y: ny * 24, duration: 1.8, ease: 'power2.out', overwrite: 'auto' })
     }
 
@@ -472,14 +478,16 @@ export function Portfolio() {
 
       {/* S1 HERO */}
       <section className="scene active" id="s1">
+        <HeroParticles />
         <SplineScene scene={SPLINE.hero} className="spline-layer spline-hero" />
+        <div className="ghost-num" aria-hidden="true">01</div>
         <div className="scene-inner">
-          <p className="hero-eyebrow">Normandie · France · 2025</p>
+          <p className="hero-eyebrow">Normandie · BTS SIO SLAM · Promo 2025</p>
           <h1 className="hero-title">
             <span className="tl"><span className="ti">Paul</span></span>
             <span className="tl"><span className="ti is-em">Blanc</span></span>
           </h1>
-          <p className="hero-sub">Développeur Créatif &amp; Motion Designer</p>
+          <p className="hero-sub">Développeur Créatif · Motion Designer</p>
         </div>
         <div className="scroll-hint" aria-hidden="true">
           <div className="scroll-hint-line" />Découvrir
@@ -488,21 +496,23 @@ export function Portfolio() {
 
       {/* S2 VISION */}
       <section className="scene" id="s2">
+        <div className="ghost-num" aria-hidden="true">02</div>
         <div className="scene-inner">
           <div className="scene-tag fade-in">Manifeste · 01</div>
           <div className="gold-line fade-in" />
           <h2 className="scene-title">
-            <span className="tl"><span className="ti">L'interface</span></span>
-            <span className="tl"><span className="ti">est une</span></span>
-            <span className="tl"><span className="ti is-em">mise en scène.</span></span>
+            <span className="tl"><span className="ti">Coder,</span></span>
+            <span className="tl"><span className="ti">c'est</span></span>
+            <span className="tl"><span className="ti is-em">diriger.</span></span>
           </h2>
-          <p className="scene-body fade-in">Je ne construis pas des pages — je <strong>choreographie des expériences</strong>. Chaque animation a un rythme, chaque transition raconte quelque chose. Du back-end rigoureux à l'interface cinématique, tout est conçu pour provoquer une réaction.</p>
+          <p className="scene-body fade-in">Je ne construis pas des pages — je <strong>choreographie des expériences</strong>. Chaque animation a un rythme, chaque transition raconte quelque chose. De l'architecture back-end jusqu'à l'interface cinématique.</p>
         </div>
       </section>
 
       {/* S3 À PROPOS */}
       <section className="scene" id="s3">
         <SplineScene scene={SPLINE.about} className="spline-layer spline-right" />
+        <div className="ghost-num" aria-hidden="true">03</div>
         <div className="scene-inner">
           <div className="scene-tag fade-in">BTS SIO SLAM · Normandie · 2025</div>
           <h2 className="scene-title">
@@ -521,14 +531,14 @@ export function Portfolio() {
 
       {/* S4 MT-CONGÉS */}
       <section className="scene" id="s4">
+        <div className="ghost-num" aria-hidden="true">04</div>
         <div className="scene-inner">
-          <div className="proj-num-bg fade-in">01</div>
           <div className="proj-meta fade-in">Java 17 · Architecture MVC · 2024</div>
           <h2 className="scene-title proj-title">
             <span className="tl"><span className="ti">MT-</span></span>
             <span className="tl"><span className="ti is-em">Congés</span></span>
           </h2>
-          <p className="scene-body fade-in">Système RH conçu pour la production — rôles hiérarchiques, workflow de validation multi-niveaux et <strong>traçabilité intégrale</strong> de chaque action. Architecture pensée pour durer.</p>
+          <p className="scene-body fade-in">Système RH conçu pour la production — rôles hiérarchiques, workflow de validation multi-niveaux et <strong>traçabilité intégrale</strong> de chaque action.</p>
           <ul className="feat-list fade-in">
             <li>Authentification JWT — admin · manager · employé</li>
             <li>Workflow de validation avec notifications email</li>
@@ -544,14 +554,14 @@ export function Portfolio() {
 
       {/* S5 GYMNOVA */}
       <section className="scene" id="s5">
+        <div className="ghost-num" aria-hidden="true">05</div>
         <div className="scene-inner">
-          <div className="proj-num-bg fade-in">02</div>
           <div className="proj-meta fade-in">React · Node.js · E-Commerce · 2024</div>
           <h2 className="scene-title proj-title">
             <span className="tl"><span className="ti">Gym-</span></span>
             <span className="tl"><span className="ti is-em">nova</span></span>
           </h2>
-          <p className="scene-body fade-in">Plateforme e-commerce premium pour équipements de sport — catalogue filtrable 50+ articles, <strong>paiement Stripe 3DS</strong> et back-office analytique complet.</p>
+          <p className="scene-body fade-in">Plateforme e-commerce premium — catalogue filtrable 50+ articles, <strong>paiement Stripe 3DS</strong> et back-office analytique complet.</p>
           <ul className="feat-list fade-in">
             <li>Catalogue filtrable — 50+ produits avec gestion des stocks</li>
             <li>Panier temps réel · paiement Stripe sécurisé 3DS</li>
@@ -568,12 +578,13 @@ export function Portfolio() {
       {/* S6 STACK */}
       <section className="scene" id="s6">
         <SplineScene scene={SPLINE.stack} className="spline-layer spline-ambient" />
+        <div className="ghost-num" aria-hidden="true">06</div>
         <div className="scene-inner">
           <div className="scene-tag fade-in">Stack Technique</div>
-          <h2 className="scene-title" style={{ fontSize: 'clamp(3rem,6vw,6.5rem)' }}>
-            <span className="tl"><span className="ti">Du back-end</span></span>
-            <span className="tl"><span className="ti">au pixel —</span></span>
-            <span className="tl"><span className="ti is-em">sans compromis.</span></span>
+          <h2 className="scene-title">
+            <span className="tl"><span className="ti">Back.</span></span>
+            <span className="tl"><span className="ti">Front.</span></span>
+            <span className="tl"><span className="ti is-em">Motion.</span></span>
           </h2>
           <div className="skills-row">
             <div className="skill-col fade-in">
@@ -582,7 +593,7 @@ export function Portfolio() {
             </div>
             <div className="skill-col fade-in">
               <div className="skill-col-title">Frontend</div>
-              {['React 19 · TypeScript', 'Three.js · R3F · Spline', 'GSAP · Remotion', 'TailwindCSS · SCSS', 'Next.js'].map(s => <div key={s} className="skill-item">{s}</div>)}
+              {['React 19 · TypeScript', 'Three.js · R3F · Spline', 'GSAP · Remotion', 'WebGL · Shaders', 'Next.js'].map(s => <div key={s} className="skill-item">{s}</div>)}
             </div>
             <div className="skill-col fade-in">
               <div className="skill-col-title">Créatif</div>
@@ -594,10 +605,17 @@ export function Portfolio() {
             </div>
           </div>
         </div>
+        <div className="marquee-wrap" aria-hidden="true">
+          <div className="marquee-track">
+            <span>Java 17 · React 19 · TypeScript · Node.js · WebGL · GSAP · Three.js · After Effects · Spline · MySQL · Spring Boot · Motion Design · Remotion · Figma · JWT ·&nbsp;&nbsp;</span>
+            <span>Java 17 · React 19 · TypeScript · Node.js · WebGL · GSAP · Three.js · After Effects · Spline · MySQL · Spring Boot · Motion Design · Remotion · Figma · JWT ·&nbsp;&nbsp;</span>
+          </div>
+        </div>
       </section>
 
       {/* S7 TASTE */}
       <section className="scene" id="s7">
+        <div className="ghost-num" style={{ fontSize: 'clamp(10rem,28vw,34rem)' }} aria-hidden="true">07</div>
         <div className="taste-grid fade-in">
           {([
             { n: 5, label: 'Motion Design' },
@@ -616,7 +634,8 @@ export function Portfolio() {
         <div className="taste-header">
           <div className="scene-tag fade-in">Esthétique · Composition · Regard</div>
           <h2 className="taste-title">
-            <span className="tl"><span className="ti">Ce que je crée,</span></span>
+            <span className="tl"><span className="ti">Ce que</span></span>
+            <span className="tl"><span className="ti">je crée,</span></span>
             <span className="tl"><span className="ti is-em">ça se ressent.</span></span>
           </h2>
         </div>
@@ -625,11 +644,13 @@ export function Portfolio() {
       {/* S8 CONTACT */}
       <section className="scene" id="s8">
         <SplineScene scene={SPLINE.contact} className="spline-layer spline-contact" interactive />
+        <div className="ghost-num" aria-hidden="true">08</div>
         <div className="scene-inner">
           <div className="scene-tag no-line fade-in" style={{ justifyContent: 'center' }}>Stage · Alternance · Freelance · Maintenant</div>
-          <h2 className="scene-title" style={{ textAlign: 'center', fontSize: 'clamp(3rem,7.5vw,7.5rem)' }}>
-            <span className="tl"><span className="ti">Le prochain projet,</span></span>
-            <span className="tl"><span className="ti is-em">c'est le vôtre.</span></span>
+          <h2 className="scene-title" style={{ textAlign: 'center' }}>
+            <span className="tl"><span className="ti">Votre</span></span>
+            <span className="tl"><span className="ti is-em">prochain</span></span>
+            <span className="tl"><span className="ti">projet.</span></span>
           </h2>
           <p className="scene-body fade-in" style={{ textAlign: 'center', margin: '1.5rem auto 0' }}>
             Basé en <strong>Normandie</strong>, disponible pour des projets qui méritent d'être remarqués.
@@ -641,6 +662,12 @@ export function Portfolio() {
             <a href="https://github.com/Polochon06" target="_blank" rel="noopener" className="contact-link">GitHub</a>
             <a href="https://linkedin.com"          target="_blank" rel="noopener" className="contact-link">LinkedIn</a>
             <a href="https://instagram.com"         target="_blank" rel="noopener" className="contact-link">Instagram</a>
+          </div>
+        </div>
+        <div className="marquee-wrap marquee-reverse" aria-hidden="true">
+          <div className="marquee-track">
+            <span>Stage · Alternance · Freelance · Disponible · Normandie · France · Remote OK · Projets ambitieux · Collaboration · Innovation ·&nbsp;&nbsp;</span>
+            <span>Stage · Alternance · Freelance · Disponible · Normandie · France · Remote OK · Projets ambitieux · Collaboration · Innovation ·&nbsp;&nbsp;</span>
           </div>
         </div>
       </section>
