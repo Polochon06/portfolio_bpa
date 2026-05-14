@@ -49,6 +49,16 @@ html, body, #root {
   pointer-events: none;
 }
 
+/* ── REMOTION FX OVERLAY ─────────────────────────────────────────── */
+#remotion-fx {
+  position: fixed; inset: 0; z-index: 4;
+  pointer-events: none;
+}
+#remotion-fx > * {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 /* ── SCENE TINT ──────────────────────────────────────────────────── */
 #scene-tint {
   position: fixed; inset: 0; z-index: 1;

@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { gsap } from 'gsap'
+import { Player } from '@remotion/player'
+import { CinematicFX } from '../remotion/compositions/CinematicFX'
 
 const BASE = '/portfolio_bpa'
-
 const SCENE_COUNT = 8
 
 const TINTS = [
@@ -16,17 +17,11 @@ const TINTS = [
   'rgba(201,168,76,0.06)',
 ]
 
-const NAV_LABELS = ['Accueil', 'Approche', 'À Propos', 'MT-Congés', 'Gymnova', 'Stack', 'Motion', 'Contact']
-
-const STATUSES = [
-  'Développeur Créatif',
-  "L'Approche",
-  'À Propos',
-  'Projet 01 — MT-Congés',
-  'Projet 02 — Gymnova',
-  'Stack Technique',
-  'Motion Design · VFX',
-  'Contact',
+const NAV_LABELS  = ['Accueil', 'Approche', 'À Propos', 'MT-Congés', 'Gymnova', 'Stack', 'Motion', 'Contact']
+const STATUSES    = [
+  'Développeur Créatif', "L'Approche", 'À Propos',
+  'Projet 01 — MT-Congés', 'Projet 02 — Gymnova',
+  'Stack Technique', 'Motion Design · VFX', 'Contact',
 ]
 
 export function Portfolio() {
@@ -36,6 +31,24 @@ export function Portfolio() {
   const charMap      = useRef(new Map<number, HTMLElement[]>())
   const wVelRef      = useRef(0)
   const wRafRef      = useRef(0)
+  const abObj        = useRef({ val: 0 })
+
+  // Aberration value fed into Remotion Player
+  const [aberration, setAberration] = useState(0)
+  const setAbRef = useRef(setAberration)
+  setAbRef.current = setAberration
+
+  // Spike aberration on scene transition, GSAP animates it back to 0
+  const triggerAberration = useCallback(() => {
+    abObj.current.val = 1
+    setAbRef.current(1)
+    gsap.to(abObj.current, {
+      val: 0, duration: 0.55, ease: 'power2.out',
+      onUpdate: () => setAbRef.current(abObj.current.val),
+    })
+  }, [])
+  const triggerAbRef = useRef(triggerAberration)
+  triggerAbRef.current = triggerAberration
 
   useEffect(() => {
     const scenes    = Array.from(document.querySelectorAll<HTMLElement>('.scene'))
@@ -59,7 +72,6 @@ export function Portfolio() {
       fades: Array.from(el.querySelectorAll<HTMLElement>('.fade-in')),
     }))
 
-    // ── CHAR SPLIT ──────────────────────────────────────────────────
     function buildChars(lines: HTMLElement[]): HTMLElement[] {
       const all: HTMLElement[] = []
       lines.forEach(li => {
@@ -73,10 +85,8 @@ export function Portfolio() {
           const inner = document.createElement('span')
           inner.style.display = 'inline-block'
           if (isEm) { inner.style.fontStyle = 'italic'; inner.style.color = 'rgba(240,235,224,0.6)' }
-          inner.textContent = ch === ' ' ? ' ' : ch
-          clip.appendChild(inner)
-          li.appendChild(clip)
-          all.push(inner)
+          inner.textContent = ch === ' ' ? ' ' : ch
+          clip.appendChild(inner); li.appendChild(clip); all.push(inner)
         }
       })
       return all
@@ -88,7 +98,7 @@ export function Portfolio() {
       el.dataset.text.split('').forEach((ch, i) => {
         const s = document.createElement('span')
         s.style.cssText = 'display:inline-block;opacity:0'
-        s.textContent = ch === ' ' ? ' ' : ch
+        s.textContent = ch === ' ' ? ' ' : ch
         el.appendChild(s)
         gsap.to(s, { opacity: 1, duration: 0.12, delay: delay + i * 0.038, ease: 'power1.out' })
       })
@@ -98,29 +108,22 @@ export function Portfolio() {
       const chars = buildChars(sd.lines)
       charMap.current.set(idx, chars)
       gsap.fromTo(chars, { y: '115%' }, { y: '0%', duration: 0.74, stagger: 0.028, ease: 'expo.out', delay: 0.22 })
-
       if (idx === 0) {
         gsap.fromTo(['.hero-eyebrow', '.hero-sub'], { opacity: 0 }, { opacity: 1, duration: 0.7, stagger: 0.18, ease: 'power2.out', delay: 0.65 })
         gsap.to('.scroll-hint', { opacity: 0.85, duration: 0.7, ease: 'power2.out', delay: 1.1 })
         return
       }
-
-      const goldLines = sd.fades.filter(el => el.classList.contains('gold-line'))
-      const tags      = sd.fades.filter(el => el.classList.contains('scene-tag'))
-      const rest      = sd.fades.filter(el => !el.classList.contains('gold-line') && !el.classList.contains('scene-tag'))
-
-      goldLines.forEach(el => gsap.fromTo(el, { scaleX: 0 }, { scaleX: 1, duration: 0.65, ease: 'power2.inOut', delay: 0 }))
-      tags.forEach(el => typeTag(el, 0.06))
-      rest.forEach((el, i) => gsap.fromTo(el, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.88, ease: 'power2.out', delay: 0.88 + i * 0.1 }))
+      sd.fades.filter(el => el.classList.contains('gold-line'))
+        .forEach(el => gsap.fromTo(el, { scaleX: 0 }, { scaleX: 1, duration: 0.65, ease: 'power2.inOut' }))
+      sd.fades.filter(el => el.classList.contains('scene-tag'))
+        .forEach(el => typeTag(el, 0.06))
+      sd.fades.filter(el => !el.classList.contains('gold-line') && !el.classList.contains('scene-tag'))
+        .forEach((el, i) => gsap.fromTo(el, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.88, ease: 'power2.out', delay: 0.88 + i * 0.1 }))
     }
 
     function hideText(sd: SD, idx: number) {
       gsap.killTweensOf([...sd.lines, ...sd.fades, ...(charMap.current.get(idx) ?? [])])
-      sd.lines.forEach(li => {
-        const txt = li.textContent ?? ''
-        gsap.set(li, { y: '110%' })
-        li.textContent = txt
-      })
+      sd.lines.forEach(li => { const t = li.textContent ?? ''; gsap.set(li, { y: '110%' }); li.textContent = t })
       charMap.current.delete(idx)
       sd.fades.forEach(el => {
         if (el.classList.contains('gold-line')) gsap.set(el, { scaleX: 0 })
@@ -134,7 +137,6 @@ export function Portfolio() {
       gsap.to(tintEl, { backgroundColor: TINTS[idx] ?? 'transparent', duration: 1.4, ease: 'power2.out' })
     }
 
-    // ── VIDEO ───────────────────────────────────────────────────────
     function enterScene(idx: number) {
       const [intro, loop] = VP[idx]
       gsap.set([intro, loop], { opacity: 0 })
@@ -147,7 +149,7 @@ export function Portfolio() {
       }
       gsap.to(intro, { opacity: 1, duration: 0.5, ease: 'power1.out' })
       intro.play().catch(() => {})
-      intro.addEventListener('ended', function onEnd() {
+      intro.addEventListener('ended', function () {
         if (activeRef.current !== idx) return
         gsap.to(intro, { opacity: 0, duration: 0.9, ease: 'power1.out' })
         gsap.fromTo(loop, { opacity: 0 }, { opacity: 1, duration: 1.1, ease: 'power1.out' })
@@ -163,7 +165,6 @@ export function Portfolio() {
       gsap.set([intro, loop], { opacity: 0, x: 0, y: 0 })
     }
 
-    // ── NAVIGATION ─────────────────────────────────────────────────
     function goTo(toIdx: number) {
       if (Date.now() - lastNavRef.current < 900) return
       if (toIdx === activeRef.current || toIdx < 0 || toIdx >= SCENE_COUNT) return
@@ -176,6 +177,7 @@ export function Portfolio() {
       progBar.style.width = `${(toIdx / (SCENE_COUNT - 1)) * 100}%`
       sfCur.textContent = String(toIdx + 1).padStart(2, '0')
       setTint(toIdx)
+      triggerAbRef.current()  // ← Remotion aberration spike
       gsap.to(overlay, {
         opacity: 1, duration: 0.3, ease: 'power2.inOut',
         onComplete() {
@@ -188,15 +190,13 @@ export function Portfolio() {
       })
     }
 
-    // ── INIT ────────────────────────────────────────────────────────
     const eyebrow = document.querySelector<HTMLElement>('.hero-eyebrow')!
     const sub     = document.querySelector<HTMLElement>('.hero-sub')!
     const hint    = document.querySelector<HTMLElement>('.scroll-hint')!
     gsap.set([eyebrow, sub, hint], { opacity: 0 })
     navDots[0]?.classList.add('active')
     barStatus.textContent = STATUSES[0]
-    enterScene(0)
-    setTint(0)
+    enterScene(0); setTint(0)
     gsap.to(fracEl, { opacity: 1, duration: 1, delay: 2 })
 
     const heroChars = buildChars(SD[0].lines)
@@ -207,50 +207,31 @@ export function Portfolio() {
     tl.to(sub, { opacity: 1, duration: 0.85, ease: 'power2.out' }, '-=0.52')
     tl.to(hint, {
       opacity: 1, duration: 0.7, ease: 'power2.out',
-      onComplete: () => {
-        gsap.to(hint, { opacity: 0.85, y: -5, repeat: -1, yoyo: true, duration: 1.2, ease: 'sine.inOut', delay: 2 })
-      },
+      onComplete: () => gsap.to(hint, { opacity: 0.85, y: -5, repeat: -1, yoyo: true, duration: 1.2, ease: 'sine.inOut', delay: 2 }),
     }, '-=0.48')
 
-    // ── WHEEL ───────────────────────────────────────────────────────
     function wheelTick() {
-      if (Math.abs(wVelRef.current) > 8) {
-        goTo(activeRef.current + (wVelRef.current > 0 ? 1 : -1))
-        wVelRef.current = 0; wRafRef.current = 0; return
-      }
+      if (Math.abs(wVelRef.current) > 8) { goTo(activeRef.current + (wVelRef.current > 0 ? 1 : -1)); wVelRef.current = 0; wRafRef.current = 0; return }
       wVelRef.current *= 0.78
       if (Math.abs(wVelRef.current) > 0.4) wRafRef.current = requestAnimationFrame(wheelTick)
       else { wVelRef.current = 0; wRafRef.current = 0 }
     }
-    const onWheel = (e: WheelEvent) => {
-      wVelRef.current += e.deltaY * 0.45
-      if (!wRafRef.current) wRafRef.current = requestAnimationFrame(wheelTick)
-    }
-
+    const onWheel      = (e: WheelEvent)      => { wVelRef.current += e.deltaY * 0.45; if (!wRafRef.current) wRafRef.current = requestAnimationFrame(wheelTick) }
     let ty0 = 0
-    const onTouchStart = (e: TouchEvent) => { ty0 = e.touches[0].clientY }
-    const onTouchEnd   = (e: TouchEvent) => {
-      const d = ty0 - e.changedTouches[0].clientY
-      if (Math.abs(d) > 40) goTo(activeRef.current + (d > 0 ? 1 : -1))
-    }
-    const onKeyDown = (e: KeyboardEvent) => {
+    const onTouchStart = (e: TouchEvent)      => { ty0 = e.touches[0].clientY }
+    const onTouchEnd   = (e: TouchEvent)      => { const d = ty0 - e.changedTouches[0].clientY; if (Math.abs(d) > 40) goTo(activeRef.current + (d > 0 ? 1 : -1)) }
+    const onKeyDown    = (e: KeyboardEvent)   => {
       if (e.key === 'ArrowDown' || e.key === 'PageDown') goTo(activeRef.current + 1)
       if (e.key === 'ArrowUp'   || e.key === 'PageUp')   goTo(activeRef.current - 1)
     }
-
-    // ── MOUSE PARALLAX ──────────────────────────────────────────────
-    const onMouseMove = (e: MouseEvent) => {
+    const onMouseMove  = (e: MouseEvent)      => {
       const nx = (e.clientX / window.innerWidth  - 0.5) * 2
       const ny = (e.clientY / window.innerHeight - 0.5) * 2
-      gsap.to(VP[activeRef.current][1], {
-        x: nx * 24, y: ny * 24,
-        duration: 1.8, ease: 'power2.out', overwrite: 'auto',
-      })
+      gsap.to(VP[activeRef.current][1], { x: nx * 24, y: ny * 24, duration: 1.8, ease: 'power2.out', overwrite: 'auto' })
     }
 
     navDots.forEach((d, i) => d.addEventListener('click', () => goTo(i)))
     document.getElementById('logo-btn')?.addEventListener('click', () => goTo(0))
-
     window.addEventListener('wheel', onWheel, { passive: true })
     document.addEventListener('touchstart', onTouchStart, { passive: true })
     document.addEventListener('touchend', onTouchEnd, { passive: true })
@@ -268,22 +249,33 @@ export function Portfolio() {
 
   return (
     <>
-      {/* ── BG VIDEOS ────────────────────────────────────────────── */}
       <div id="cinematic-bg">
-        {Array.from({ length: SCENE_COUNT }, (_, i) => (
-          <VideoGroup key={i} idx={i + 1} base={BASE} />
-        ))}
+        {Array.from({ length: SCENE_COUNT }, (_, i) => <VideoGroup key={i} idx={i + 1} base={BASE} />)}
       </div>
 
       <div id="scene-tint" aria-hidden="true" />
 
-      {/* ── TOP BAR ──────────────────────────────────────────────── */}
+      {/* Remotion CinematicFX — animated grain + aberration */}
+      <div id="remotion-fx" aria-hidden="true">
+        <Player
+          component={CinematicFX}
+          inputProps={{ aberration }}
+          durationInFrames={200}
+          fps={30}
+          compositionWidth={1920}
+          compositionHeight={1080}
+          loop
+          autoPlay
+          style={{ width: '100%', height: '100%' }}
+          acknowledgeRemotionLicense
+        />
+      </div>
+
       <div id="top-bar">
         <button className="bar-logo" id="logo-btn">Paul Blanc</button>
         <span id="bar-status" />
       </div>
 
-      {/* ── SIDE NAV ─────────────────────────────────────────────── */}
       <nav id="scene-nav">
         {NAV_LABELS.map((label, i) => (
           <button key={i} className="nav-dot" data-scene={i} data-label={label} aria-label={label} />
@@ -292,14 +284,11 @@ export function Portfolio() {
 
       <div id="progress-bar" />
 
-      {/* ── SCENE FRACTION ───────────────────────────────────────── */}
       <div id="scene-fraction" aria-hidden="true">
         <span className="sf-cur" id="sf-cur">01</span>
         <span className="sf-dash" />
         <span>08</span>
       </div>
-
-      {/* ── SCENES ───────────────────────────────────────────────── */}
 
       {/* S1 HERO */}
       <section className="scene active" id="s1">
@@ -312,8 +301,7 @@ export function Portfolio() {
           <p className="hero-sub">Développeur Créatif</p>
         </div>
         <div className="scroll-hint" aria-hidden="true">
-          <div className="scroll-hint-line" />
-          Défiler
+          <div className="scroll-hint-line" />Défiler
         </div>
       </section>
 
@@ -327,9 +315,7 @@ export function Portfolio() {
             <span className="tl"><span className="ti">projet</span></span>
             <span className="tl"><span className="ti is-em">compte.</span></span>
           </h2>
-          <p className="scene-body fade-in">
-            Je construis des expériences numériques qui ont du sens. Du back-end sécurisé aux interfaces cinématiques — chaque décision est au service de l'expérience utilisateur.
-          </p>
+          <p className="scene-body fade-in">Je construis des expériences numériques qui ont du sens. Du back-end sécurisé aux interfaces cinématiques — chaque décision est au service de l'expérience utilisateur.</p>
         </div>
       </section>
 
@@ -341,9 +327,7 @@ export function Portfolio() {
             <span className="tl"><span className="ti">Code</span></span>
             <span className="tl"><span className="ti is-em">&amp; Art.</span></span>
           </h2>
-          <p className="scene-body fade-in">
-            Basé en <strong>Normandie</strong>, développeur depuis 2020. Je mélange rigueur technique et sensibilité artistique — Java, React, et motion design 3D.
-          </p>
+          <p className="scene-body fade-in">Basé en <strong>Normandie</strong>, développeur depuis 2020. Je mélange rigueur technique et sensibilité artistique — Java, React, et motion design 3D.</p>
           <div className="stat-row fade-in">
             <div><div className="stat-val">2+</div><div className="stat-lbl">Années</div></div>
             <div><div className="stat-val">4</div><div className="stat-lbl">Projets</div></div>
@@ -413,7 +397,7 @@ export function Portfolio() {
             </div>
             <div className="skill-col fade-in">
               <div className="skill-col-title">Frontend</div>
-              {['React 18 · Next.js', 'Three.js · R3F', 'GSAP · Remotion', 'SCSS · TailwindCSS', 'TypeScript'].map(s => <div key={s} className="skill-item">{s}</div>)}
+              {['React 19 · Next.js', 'Three.js · R3F', 'GSAP · Remotion', 'SCSS · TailwindCSS', 'TypeScript'].map(s => <div key={s} className="skill-item">{s}</div>)}
             </div>
             <div className="skill-col fade-in">
               <div className="skill-col-title">Créatif</div>
@@ -426,16 +410,12 @@ export function Portfolio() {
       {/* S7 MOTION VFX */}
       <section className="scene" id="s7">
         <div className="scene-inner">
-          <div className="scene-tag no-line fade-in" style={{ justifyContent: 'center' }}>
-            Motion Design · VFX · After Effects
-          </div>
+          <div className="scene-tag no-line fade-in" style={{ justifyContent: 'center' }}>Motion Design · VFX · After Effects</div>
           <h2 className="scene-title" style={{ textAlign: 'center', fontSize: 'clamp(2.8rem,6vw,6rem)' }}>
             <span className="tl"><span className="ti">Créations</span></span>
             <span className="tl"><span className="ti is-em">visuelles.</span></span>
           </h2>
-          <p className="scene-body fade-in" style={{ textAlign: 'center', margin: '1.2rem auto 0' }}>
-            Typographies animées, effets particules 3D, compositing VFX.
-          </p>
+          <p className="scene-body fade-in" style={{ textAlign: 'center', margin: '1.2rem auto 0' }}>Typographies animées, effets particules 3D, compositing VFX.</p>
           <div className="vfx-grid fade-in">
             {[5, 6, 7, 8].map(n => (
               <div key={n} className="vfx-item">
@@ -450,9 +430,7 @@ export function Portfolio() {
       {/* S8 CONTACT */}
       <section className="scene" id="s8">
         <div className="scene-inner">
-          <div className="scene-tag no-line fade-in" style={{ justifyContent: 'center' }}>
-            Fin de parcours · Début d'une collaboration
-          </div>
+          <div className="scene-tag no-line fade-in" style={{ justifyContent: 'center' }}>Fin de parcours · Début d'une collaboration</div>
           <h2 className="scene-title" style={{ textAlign: 'center', fontSize: 'clamp(3rem,7.5vw,7.5rem)' }}>
             <span className="tl"><span className="ti">Travaillons</span></span>
             <span className="tl"><span className="ti is-em">ensemble.</span></span>
@@ -471,21 +449,18 @@ export function Portfolio() {
         </div>
       </section>
 
-      {/* ── OVERLAY ──────────────────────────────────────────────── */}
       <div id="scene-overlay" />
     </>
   )
 }
 
 function VideoGroup({ idx, base }: { idx: number; base: string }) {
-  const preloadIntro = idx === 1 ? 'auto'     : 'none'
-  const preloadLoop  = idx === 1 ? 'metadata' : 'none'
   return (
     <>
-      <video className="bg-vid" id={`v${idx}i`} muted playsInline preload={preloadIntro}>
+      <video className="bg-vid" id={`v${idx}i`} muted playsInline preload={idx === 1 ? 'auto' : 'none'}>
         <source src={`${base}/footage/video-${idx}.mp4`} type="video/mp4" />
       </video>
-      <video className="bg-vid" id={`v${idx}l`} muted playsInline preload={preloadLoop} loop>
+      <video className="bg-vid" id={`v${idx}l`} muted playsInline preload={idx === 1 ? 'metadata' : 'none'} loop>
         <source src={`${base}/footage/video-${idx}-1.mp4`} type="video/mp4" />
       </video>
     </>
