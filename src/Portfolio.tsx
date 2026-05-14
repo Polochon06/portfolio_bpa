@@ -288,6 +288,15 @@ export function Portfolio() {
       sfCur.textContent = String(toIdx + 1).padStart(2, '0')
       setTint(toIdx)
       triggerAbRef.current()  // ← Remotion aberration spike
+      // MJ atmospheric layer crossfade
+      const mjEl = document.getElementById('mj-bg') as HTMLImageElement | null
+      if (mjEl) gsap.to(mjEl, {
+        opacity: 0, duration: 0.35,
+        onComplete: () => {
+          mjEl.onload = () => gsap.to(mjEl, { opacity: 0.28, duration: 1.5 })
+          mjEl.src = `${BASE}/footage/mj-${toIdx + 1}.png`
+        },
+      })
       gsap.to(overlay, {
         opacity: 1, duration: 0.3, ease: 'power2.inOut',
         onComplete() {
@@ -304,29 +313,56 @@ export function Portfolio() {
     const sub     = document.querySelector<HTMLElement>('.hero-sub')!
     const hint    = document.querySelector<HTMLElement>('.scroll-hint')!
     gsap.set([eyebrow, sub, hint], { opacity: 0 })
-    navDots[0]?.classList.add('active')
-    barStatus.textContent = STATUSES[0]
-    enterScene(0); setTint(0)
-    gsap.to(fracEl, { opacity: 1, duration: 1, delay: 2 })
 
-    const heroChars = buildChars(SD[0].lines)
-    charMap.current.set(0, heroChars)
-    const tl = gsap.timeline({ delay: 0.9 })
-    tl.fromTo(eyebrow,
-      { opacity: 0, filter: 'blur(8px)', y: 8 },
-      { opacity: 1, filter: 'blur(0px)', y: 0, duration: 0.85, ease: 'power3.out' })
-    tl.fromTo(heroChars,
-      { y: '120%', filter: 'blur(14px)', opacity: 0 },
-      { y: '0%',   filter: 'blur(0px)',  opacity: 1, duration: 0.88, stagger: 0.022, ease: 'expo.out' },
-      '-=0.42')
-    tl.fromTo(sub,
-      { opacity: 0, filter: 'blur(8px)', y: 8 },
-      { opacity: 1, filter: 'blur(0px)', y: 0, duration: 0.85, ease: 'power3.out' },
-      '-=0.52')
-    tl.to(hint, {
-      opacity: 1, duration: 0.7, ease: 'power2.out',
-      onComplete: () => gsap.to(hint, { opacity: 0.85, y: -5, repeat: -1, yoyo: true, duration: 1.2, ease: 'sine.inOut', delay: 2 }),
-    }, '-=0.48')
+    function startSite() {
+      navDots[0]?.classList.add('active')
+      barStatus.textContent = STATUSES[0]
+      enterScene(0); setTint(0)
+      gsap.to(fracEl, { opacity: 1, duration: 1, delay: 0.6 })
+
+      const mjEl = document.getElementById('mj-bg') as HTMLImageElement | null
+      if (mjEl) {
+        mjEl.onload = () => gsap.to(mjEl, { opacity: 0.28, duration: 1.8, delay: 0.4 })
+        mjEl.src = `${BASE}/footage/mj-1.png`
+      }
+
+      const heroChars = buildChars(SD[0].lines)
+      charMap.current.set(0, heroChars)
+      const siteTl = gsap.timeline({ delay: 0.4 })
+      siteTl.fromTo(eyebrow,
+        { opacity: 0, filter: 'blur(8px)', y: 8 },
+        { opacity: 1, filter: 'blur(0px)', y: 0, duration: 0.85, ease: 'power3.out' })
+      siteTl.fromTo(heroChars,
+        { y: '120%', filter: 'blur(14px)', opacity: 0 },
+        { y: '0%',   filter: 'blur(0px)',  opacity: 1, duration: 0.88, stagger: 0.022, ease: 'expo.out' },
+        '-=0.42')
+      siteTl.fromTo(sub,
+        { opacity: 0, filter: 'blur(8px)', y: 8 },
+        { opacity: 1, filter: 'blur(0px)', y: 0, duration: 0.85, ease: 'power3.out' },
+        '-=0.52')
+      siteTl.to(hint, {
+        opacity: 1, duration: 0.7, ease: 'power2.out',
+        onComplete: () => gsap.to(hint, { opacity: 0.85, y: -5, repeat: -1, yoyo: true, duration: 1.2, ease: 'sine.inOut', delay: 2 }),
+      }, '-=0.48')
+    }
+
+    // ── LOADER ─────────────────────────────────────────────────────────
+    const loaderEl   = document.getElementById('loader')!
+    const loaderBar  = document.getElementById('loader-bar-fill')!
+    const loaderEye  = document.getElementById('loader-eyebrow-lbl')!
+    const loaderName = document.querySelectorAll<HTMLElement>('#loader-name > *')
+
+    gsap.timeline({
+      onComplete: () =>
+        gsap.to(loaderEl, {
+          opacity: 0, duration: 0.65, ease: 'power2.inOut',
+          onComplete: () => { loaderEl.style.display = 'none'; startSite() },
+        }),
+    })
+      .to(loaderEye,  { opacity: 1, y: 0, duration: 0.7,  ease: 'power3.out' }, 0.15)
+      .to(loaderName, { opacity: 1, y: 0, duration: 0.85, stagger: 0.16, ease: 'power3.out' }, 0.35)
+      .to(loaderBar,  { width: '100%', duration: 1.9, ease: 'power1.inOut' }, 0.25)
+      .to({}, { duration: 0.35 })
 
     function wheelTick() {
       if (Math.abs(wVelRef.current) > 8) { goTo(activeRef.current + (wVelRef.current > 0 ? 1 : -1)); wVelRef.current = 0; wRafRef.current = 0; return }
@@ -343,6 +379,8 @@ export function Portfolio() {
       if (e.key === 'ArrowUp'   || e.key === 'PageUp')   goTo(activeRef.current - 1)
     }
     const onMouseMove  = (e: MouseEvent)      => {
+      gsap.set('#cursor-dot',  { x: e.clientX, y: e.clientY })
+      gsap.to('#cursor-ring',  { x: e.clientX, y: e.clientY, duration: 0.12, ease: 'power2.out', overwrite: 'auto' })
       const nx = (e.clientX / window.innerWidth  - 0.5) * 2
       const ny = (e.clientY / window.innerHeight - 0.5) * 2
       gsap.to(VP[activeRef.current][1], { x: nx * 24, y: ny * 24, duration: 1.8, ease: 'power2.out', overwrite: 'auto' })
@@ -356,17 +394,50 @@ export function Portfolio() {
     document.addEventListener('keydown', onKeyDown)
     window.addEventListener('mousemove', onMouseMove, { passive: true })
 
+    // Cursor hover expand on interactive elements
+    Array.from(document.querySelectorAll<HTMLElement>('a, button, .nav-dot')).forEach(el => {
+      el.addEventListener('mouseenter', () => gsap.to('#cursor-ring', { scale: 1.7, duration: 0.22 }))
+      el.addEventListener('mouseleave', () => gsap.to('#cursor-ring', { scale: 1,   duration: 0.22 }))
+    })
+    const onCursorShow = () => gsap.to(['#cursor-dot', '#cursor-ring'], { opacity: 1, duration: 0.3 })
+    const onCursorHide = () => gsap.to(['#cursor-dot', '#cursor-ring'], { opacity: 0, duration: 0.3 })
+    document.addEventListener('mouseenter', onCursorShow)
+    document.addEventListener('mouseleave', onCursorHide)
+
     return () => {
       window.removeEventListener('wheel', onWheel)
       document.removeEventListener('touchstart', onTouchStart)
       document.removeEventListener('touchend', onTouchEnd)
       document.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseenter', onCursorShow)
+      document.removeEventListener('mouseleave', onCursorHide)
     }
   }, [])
 
   return (
     <>
+      {/* LOADER */}
+      <div id="loader">
+        <div className="loader-inner">
+          <p id="loader-eyebrow-lbl">Développeur Créatif</p>
+          <h1 id="loader-name">
+            <span>Paul</span>
+            <em>Blanc</em>
+          </h1>
+          <div id="loader-bar-track">
+            <div id="loader-bar-fill" />
+          </div>
+        </div>
+      </div>
+
+      {/* CURSOR */}
+      <div id="cursor-dot"  aria-hidden="true" />
+      <div id="cursor-ring" aria-hidden="true" />
+
+      {/* MIDJOURNEY ATMOSPHERIC LAYER */}
+      <img id="mj-bg" src="" alt="" aria-hidden="true" />
+
       <div id="cinematic-bg">
         {Array.from({ length: SCENE_COUNT }, (_, i) => <VideoGroup key={i} idx={i + 1} base={BASE} />)}
       </div>

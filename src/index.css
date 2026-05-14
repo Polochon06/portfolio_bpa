@@ -470,6 +470,63 @@ html, body, #root {
   background: var(--dark); opacity: 0; pointer-events: none;
 }
 
+/* ── LOADER ──────────────────────────────────────────────────────────── */
+#loader {
+  position: fixed; inset: 0; z-index: 999;
+  background: var(--dark);
+  display: flex; align-items: center; justify-content: center;
+}
+.loader-inner { text-align: center; }
+#loader-eyebrow-lbl {
+  font-family: 'Jost', sans-serif;
+  font-size: var(--label); letter-spacing: 0.35em; text-transform: uppercase;
+  color: rgba(201,168,76,0.65);
+  margin-bottom: 1.6rem;
+  opacity: 0; transform: translateY(12px);
+}
+#loader-name {
+  font-family: 'Bodoni Moda', serif;
+  font-size: clamp(4rem, 13vw, 13rem);
+  font-weight: 300; letter-spacing: -0.03em; line-height: 0.88;
+  font-optical-sizing: auto;
+}
+#loader-name > * { display: block; opacity: 0; transform: translateY(30px); }
+#loader-name em  { font-style: italic; color: rgba(240,235,224,0.42); }
+#loader-bar-track {
+  width: clamp(100px, 18vw, 200px);
+  height: 1px; background: rgba(201,168,76,0.15);
+  margin: 3rem auto 0; overflow: hidden;
+}
+#loader-bar-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+}
+
+/* ── CUSTOM CURSOR ────────────────────────────────────────────────────── */
+@media (pointer: fine) { * { cursor: none !important; } }
+#cursor-dot {
+  position: fixed; z-index: 9999;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--gold);
+  transform: translate(-50%, -50%);
+  pointer-events: none; will-change: transform; opacity: 0;
+}
+#cursor-ring {
+  position: fixed; z-index: 9998;
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid rgba(201,168,76,0.5);
+  transform: translate(-50%, -50%);
+  pointer-events: none; will-change: transform; opacity: 0;
+}
+
+/* ── MIDJOURNEY ATMOSPHERIC LAYER ─────────────────────────────────────── */
+#mj-bg {
+  position: fixed; inset: 0; z-index: 2;
+  width: 100%; height: 100%;
+  object-fit: cover; mix-blend-mode: screen;
+  opacity: 0; pointer-events: none; will-change: opacity;
+}
+
 /* ── RESPONSIVE ──────────────────────────────────────────────────── */
 @media (max-width: 900px) {
   .skills-row { grid-template-columns: repeat(2, 1fr); }
