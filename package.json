@@ -3,6 +3,9 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "studio": "remotion studio remotion/index.tsx",
     "render": "remotion render remotion/index.tsx Intro out/intro.mp4",
     "render:card": "remotion render remotion/index.tsx SceneCard out/scene-card.mp4"
@@ -12,9 +15,12 @@
     "@remotion/cli": "^4.0.461",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "gsap": "^3.15.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "remotion": "^4.0.461",
+    "vite": "^8.0.13",
     "zod": "4.3.6"
   }
 }
