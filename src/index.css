@@ -270,6 +270,55 @@ html, body, #root {
 }
 .contact-link:hover { color: var(--gold); border-color: var(--gold); }
 
+/* ── SPLINE 3D LAYERS ─────────────────────────────────────────────── */
+/*
+ * mix-blend-mode: screen supprime le fond noir de Spline sur fond sombre
+ * — seuls les éléments 3D lumineux restent visibles.
+ * Chaque variante positionne la scène différemment dans son .scene parent.
+ */
+.spline-layer {
+  position: absolute; inset: 0; z-index: 2;
+  pointer-events: none;
+}
+.spline-layer canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* Hero — plein écran, derrière le titre, blend screen */
+.spline-hero {
+  mix-blend-mode: screen;
+  opacity: 0.92;
+}
+
+/* À propos — demi-écran droit, derrière le texte gauche */
+.spline-right {
+  left: auto;
+  right: -4%;
+  width: 58%;
+  mix-blend-mode: screen;
+  opacity: 0.78;
+}
+
+/* Stack — plein fond, très discret */
+.spline-ambient {
+  mix-blend-mode: screen;
+  opacity: 0.45;
+}
+
+/* Contact — plein écran, interactif (pointer-events: auto via JS prop) */
+.spline-contact {
+  mix-blend-mode: screen;
+  opacity: 0.88;
+}
+.spline-contact canvas {
+  cursor: grab;
+}
+.spline-contact canvas:active {
+  cursor: grabbing;
+}
+
 /* ── CINEMATIC OVERLAY ───────────────────────────────────────────── */
 #scene-overlay {
   position: fixed; inset: 0; z-index: 150;

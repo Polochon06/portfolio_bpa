@@ -2,9 +2,20 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { gsap } from 'gsap'
 import { Player } from '@remotion/player'
 import { CinematicFX } from '../remotion/compositions/CinematicFX'
+import { SplineScene } from './components/SplineScene'
 
 const BASE = '/portfolio_bpa'
 const SCENE_COUNT = 8
+
+// ── SPLINE 3D SCENES ───────────────────────────────────────────────────────
+// Crée tes scènes sur spline.design → Exporter → "Viewer Link" →
+// copie l'URL prod.spline.design/.../scene.splinecode
+const SPLINE = {
+  hero:    '',   // S1 — ex: particules 3D / titre holographique
+  about:   '',   // S3 — ex: sphère flottante / géométrie abstraite
+  stack:   '',   // S6 — ex: orbite tech / cubes 3D
+  contact: '',   // S8 — ex: géométrie interactive (pointer-events actifs)
+}
 
 const TINTS = [
   'rgba(201,168,76,0.07)',
@@ -292,6 +303,7 @@ export function Portfolio() {
 
       {/* S1 HERO */}
       <section className="scene active" id="s1">
+        <SplineScene scene={SPLINE.hero} className="spline-layer spline-hero" />
         <div className="scene-inner">
           <p className="hero-eyebrow">Normandie · France · 2025</p>
           <h1 className="hero-title">
@@ -321,6 +333,7 @@ export function Portfolio() {
 
       {/* S3 À PROPOS */}
       <section className="scene" id="s3">
+        <SplineScene scene={SPLINE.about} className="spline-layer spline-right" />
         <div className="scene-inner">
           <div className="scene-tag fade-in">À Propos · BTS SIO SLAM · Promo 2025</div>
           <h2 className="scene-title">
@@ -384,6 +397,7 @@ export function Portfolio() {
 
       {/* S6 STACK */}
       <section className="scene" id="s6">
+        <SplineScene scene={SPLINE.stack} className="spline-layer spline-ambient" />
         <div className="scene-inner">
           <div className="scene-tag fade-in">Stack Technique</div>
           <h2 className="scene-title" style={{ fontSize: 'clamp(3rem,6vw,6.5rem)' }}>
@@ -429,6 +443,7 @@ export function Portfolio() {
 
       {/* S8 CONTACT */}
       <section className="scene" id="s8">
+        <SplineScene scene={SPLINE.contact} className="spline-layer spline-contact" interactive />
         <div className="scene-inner">
           <div className="scene-tag no-line fade-in" style={{ justifyContent: 'center' }}>Fin de parcours · Début d'une collaboration</div>
           <h2 className="scene-title" style={{ textAlign: 'center', fontSize: 'clamp(3rem,7.5vw,7.5rem)' }}>

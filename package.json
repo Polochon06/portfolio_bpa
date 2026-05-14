@@ -14,6 +14,8 @@
     "@babel/parser": "^7.29.3",
     "@remotion/cli": "^4.0.461",
     "@remotion/player": "^4.0.461",
+    "@splinetool/react-spline": "^4.1.0",
+    "@splinetool/runtime": "^1.12.92",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
