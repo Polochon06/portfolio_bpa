@@ -5,8 +5,9 @@
 // License text available at https://opensource.org/licenses/MIT
 
 import React, { MutableRefObject, useEffect, useRef, useState } from "react";
-import { MENULINKS, PROJECTS } from "../../constants";
+import { IProject, MENULINKS, PROJECTS } from "../../constants";
 import ProjectTile from "../common/project-tile";
+import ProjectModal from "../common/project-modal";
 import { gsap, Linear } from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { IDesktop, NO_MOTION_PREFERENCE_QUERY } from "pages";
@@ -25,6 +26,7 @@ const ProjectsSection = ({ isDesktop }: IDesktop) => {
   const [willChange, setwillChange] = useState(false);
   const [horizontalAnimationEnabled, sethorizontalAnimationEnabled] =
     useState(false);
+  const [selectedProject, setSelectedProject] = useState<IProject | null>(null);
 
   const initRevealAnimation = (
     targetSectionRef: MutableRefObject<HTMLDivElement>
@@ -128,11 +130,11 @@ const ProjectsSection = ({ isDesktop }: IDesktop) => {
       }`}
       ref={sectionTitleElementRef}
     >
-      <p className="section-title-sm seq">PROJECTS</p>
-      <h1 className="section-heading seq mt-2">My Works</h1>
+      <p className="section-title-sm seq">PROJETS</p>
+      <h1 className="section-heading seq mt-2">Mes Projets</h1>
       <h2 className="text-2xl md:max-w-3xl w-full seq max-w-sm mt-2">
-        I have contributed in over 20+ projects ranging from Frontend
-        development, UI/UX design, Open Source, and Motion Graphics
+        Applications fullstack, e-commerce et outils métier développés dans le
+        cadre du BTS SIO SLAM.
       </h2>
     </div>
   );
@@ -143,22 +145,32 @@ const ProjectsSection = ({ isDesktop }: IDesktop) => {
         project={project}
         key={project.name}
         animationEnabled={horizontalAnimationEnabled}
-      ></ProjectTile>
+        onOpenDetails={
+          project.details ? () => setSelectedProject(project) : undefined
+        }
+      />
     ));
 
   const { ref: projectsSectionRef } = MENULINKS[1];
 
   return (
-    <section
-      ref={targetSectionRef}
-      className={`${isDesktop && "min-h-screen"} ${PROJECT_STYLES.SECTION}`}
-      id={projectsSectionRef}
-    >
-      {renderSectionTitle()}
-      <div className={PROJECT_STYLES.PROJECTS_WRAPPER}>
-        {renderProjectTiles()}
-      </div>
-    </section>
+    <>
+      <section
+        ref={targetSectionRef}
+        className={`${isDesktop && "min-h-screen"} ${PROJECT_STYLES.SECTION}`}
+        id={projectsSectionRef}
+      >
+        {renderSectionTitle()}
+        <div className={PROJECT_STYLES.PROJECTS_WRAPPER}>
+          {renderProjectTiles()}
+        </div>
+      </section>
+
+      <ProjectModal
+        project={selectedProject}
+        onClose={() => setSelectedProject(null)}
+      />
+    </>
   );
 };
 

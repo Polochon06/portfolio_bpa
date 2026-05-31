@@ -48,11 +48,11 @@ const SkillsSection = () => {
 
   const renderSectionTitle = (): React.ReactNode => (
     <div className="flex flex-col">
-      <p className="section-title-sm seq">SKILLS</p>
-      <h1 className="section-heading seq mt-2">My Skills</h1>
+      <p className="section-title-sm seq">STACK</p>
+      <h1 className="section-heading seq mt-2">Ma Stack</h1>
       <h2 className="text-2xl md:max-w-2xl w-full seq mt-2">
-        I like to take responsibility to craft aesthetic user experience using
-        modern frontend architecture.{" "}
+        Du backend Java/Spring au frontend React/WebGL, en passant par After
+        Effects et Figma.
       </h2>
     </div>
   );
@@ -116,16 +116,13 @@ const SkillsSection = () => {
         <div className="flex flex-col skills-wrapper">
           {renderSectionTitle()}
           <div className="mt-10">
-            {renderSkillColumn("FRONTEND DEVELOPMENT", SKILLS.frontend)}
+            {renderSkillColumn("DÉVELOPPEMENT WEB", SKILLS.frontend)}
           </div>
           <div className="flex flex-wrap mt-10">
             <div className="mr-6 mb-6">
-              {renderSkillColumn(
-                "User Interface, User Experience Design",
-                SKILLS.userInterface
-              )}
+              {renderSkillColumn("UI / UX & Design", SKILLS.userInterface)}
             </div>
-            <div>{renderSkillColumn("Other Skills", SKILLS.other)}</div>
+            <div>{renderSkillColumn("Autres", SKILLS.other)}</div>
           </div>
         </div>
       </div>

@@ -69,16 +69,16 @@ const AboutSection = () => {
           willChange ? "will-change-opacity" : ""
         }`}
       >
-        I am a passionate UI Engineer who bridges the gap between development
-        and design.{" "}
+        Développeur full-stack & motion designer basé en Normandie, je conçois
+        des expériences web modernes qui allient code et créativité.{" "}
       </span>
       <span
         className={`about-2 leading-tight ${
           willChange ? "will-change-opacity" : ""
         }`}
       >
-        I take responsibility to craft a good user experience using modern
-        frontend architecture.
+        Du backend Java/Spring au frontend React/WebGL, en passant par l'After
+        Effects — je couvre l'ensemble de la chaîne de production.
       </span>
     </h1>
   );

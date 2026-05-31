@@ -13,9 +13,11 @@ import { IProject } from "../../constants";
 const ProjectTile = ({
   project,
   animationEnabled,
+  onOpenDetails,
 }: {
   project: IProject;
   animationEnabled: boolean;
+  onOpenDetails?: () => void;
 }) => {
   const projectCard: MutableRefObject<HTMLDivElement> = useRef(null);
   const {
@@ -109,42 +111,76 @@ const ProjectTile = ({
     />
   );
 
+  const renderDetailsHint = (): React.ReactNode =>
+    onOpenDetails ? (
+      <div
+        className="absolute bottom-4 right-4 z-10 text-xs text-white opacity-60 flex items-center gap-1"
+        style={{ transform: "translateZ(1rem)" }}
+      >
+        <span>Voir détails</span>
+        <span>›</span>
+      </div>
+    ) : null;
+
+  const containerStyle = {
+    maxWidth: animationEnabled
+      ? "calc(100vw - 2rem)"
+      : "calc(100vw - 4rem)",
+    flex: "1 0 auto",
+    WebkitMaskImage: "-webkit-radial-gradient(white, black)",
+  };
+
+  const cardContent = (
+    <div
+      ref={projectCard}
+      className={`
+        ${styles.ProjectTile}
+         rounded-3xl relative p-6 flex-col flex justify-between max-w-full
+      `}
+      style={{
+        background: `linear-gradient(90deg, ${stop1} 0%, ${stop2} 100%)`,
+      }}
+    >
+      <Image
+        src="/project-bg.svg"
+        alt="Project"
+        layout="fill"
+        className="absolute w-full h-full top-0 left-0 opacity-20"
+      />
+      {renderProjectImage(image, blurImage, name)}
+      {renderTopBottomGradient(stop1)}
+      {renderProjectName(name)}
+      {renderTechIcons(tech)}
+      {renderDescription(description)}
+      {renderDetailsHint()}
+    </div>
+  );
+
+  if (onOpenDetails) {
+    return (
+      <div
+        className="link overflow-hidden rounded-3xl snap-start cursor-pointer"
+        style={containerStyle}
+        onClick={onOpenDetails}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && onOpenDetails()}
+        aria-label={`Voir les détails du projet ${name}`}
+      >
+        {cardContent}
+      </div>
+    );
+  }
+
   return (
     <a
       href={project.url}
       target="_blank"
       rel="noreferrer"
       className="link overflow-hidden rounded-3xl snap-start"
-      style={{
-        maxWidth: animationEnabled
-          ? "calc(100vw - 2rem)"
-          : "calc(100vw - 4rem)",
-        flex: "1 0 auto",
-        WebkitMaskImage: "-webkit-radial-gradient(white, black)",
-      }}
+      style={containerStyle}
     >
-      <div
-        ref={projectCard}
-        className={`
-          ${styles.ProjectTile}
-           rounded-3xl relative p-6 flex-col flex justify-between max-w-full
-        `}
-        style={{
-          background: `linear-gradient(90deg, ${stop1} 0%, ${stop2} 100%)`,
-        }}
-      >
-        <Image
-          src="/project-bg.svg"
-          alt="Project"
-          layout="fill"
-          className="absolute w-full h-full top-0 left-0 opacity-20"
-        />
-        {renderProjectImage(image, blurImage, name)}
-        {renderTopBottomGradient(stop1)}
-        {renderProjectName(name)}
-        {renderTechIcons(tech)}
-        {renderDescription(description)}
-      </div>
+      {cardContent}
     </a>
   );
 };

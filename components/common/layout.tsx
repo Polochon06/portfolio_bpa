@@ -27,7 +27,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         <meta property="og:site_name" content={METADATA.title} />
         <meta
           property="og:image"
-          content="https://www.ayushsingh.net/preview.jpg"
+          content={METADATA.siteUrl}
         />
         <meta property="og:image:secure_url" content={METADATA.siteUrl} />
         <meta property="og:image:width" content="1440" />

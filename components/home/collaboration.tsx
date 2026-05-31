@@ -98,7 +98,7 @@ const CollaborationSection = () => {
         willChange ? "will-change-opacity" : ""
       }`}
     >
-      Interested in <span className="text-strong font-bold">Collaboration</span>
+      Intéressé par une <span className="text-strong font-bold">collaboration</span>
       ?
     </h1>
   );
@@ -106,14 +106,14 @@ const CollaborationSection = () => {
   return (
     <section className={COLLABORATION_STYLE.SECTION} ref={targetSection}>
       {renderSlidingText(
-        " User Interface Design  User Experience Design ",
+        " Développement Web  Motion Design ",
         "ui-left"
       )}
 
       {renderTitle()}
 
       {renderSlidingText(
-        " Frontend Development  Motion Graphics ",
+        " Backend Java/Spring  Frontend React/WebGL ",
         "mt-6 md:mt-8 ui-right"
       )}
     </section>

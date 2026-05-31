@@ -26,25 +26,22 @@ const Footer = () => {
   const renderFooterContent = (): React.ReactNode => (
     <>
       <h1 className="font-medium text-3xl md:text-4xl text-center">
-        Connect with me on social media.
+        Retrouvez-moi sur les réseaux.
       </h1>
       <div className="flex mt-8">{renderSocialIcons()}</div>
       <div className="flex mt-8">
         <Button
           classes="mr-3"
           type={ButtonTypes.OUTLINE}
-          name="Resume"
-          otherProps={{
-            target: "_blank",
-            rel: "noreferrer",
-          }}
-          href="/Ayush_Resume.pdf"
+          name="Me contacter"
+          otherProps={{}}
+          href={`mailto:${EMAIL}`}
         ></Button>
         <Button
           classes="ml-3"
           type={ButtonTypes.WHITE}
-          name="Let's Talk"
-          href={SOCIAL_LINKS.topmate}
+          name="GitHub"
+          href={SOCIAL_LINKS.github}
           otherProps={{
             target: "_blank",
             rel: "noreferrer",
@@ -52,7 +49,7 @@ const Footer = () => {
         ></Button>
       </div>
       <h2 className="text-center text-sm sm:text-base mt-8">
-        Designed and Developed with ❤️ by Ayush
+        Conçu et développé avec ❤️ par Paul Blanc
       </h2>
     </>
   );
