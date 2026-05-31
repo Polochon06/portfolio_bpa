@@ -82,25 +82,50 @@ const CollaborationSection = () => {
   );
 
   const renderTitle = () => (
-    <h1
+    <div
       ref={quoteRef}
-      className={`${COLLABORATION_STYLE.TITLE} ${
+      className={`flex flex-col items-center ${
         willChange ? "will-change-opacity" : ""
       }`}
     >
-      Intéressé par une{" "}
-      <span className="text-strong font-bold">collaboration</span>&nbsp;?
-      <p className="text-gray-400 text-lg md:text-xl font-normal mt-4">
-        Vous pouvez contacter Paul{" "}
+      <h1 className={COLLABORATION_STYLE.TITLE}>
+        Intéressé par une{" "}
+        <span className="text-strong font-bold">collaboration</span>&nbsp;?
+      </h1>
+
+      {/* Chat bubble */}
+      <div className="mt-8 flex flex-col gap-3 w-full max-w-sm">
+        <div className="flex items-end gap-2">
+          <div
+            className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold"
+            style={{ background: "linear-gradient(135deg,#6366f1,#8b5cf6)" }}
+          >
+            P
+          </div>
+          <div
+            className="rounded-2xl rounded-bl-sm px-4 py-3 text-sm text-white max-w-xs"
+            style={{ background: "#1f2937" }}
+          >
+            Bonjour&nbsp;! Je suis disponible pour un stage ou une alternance.
+          </div>
+        </div>
+        <div className="flex items-end gap-2 flex-row-reverse">
+          <div
+            className="rounded-2xl rounded-br-sm px-4 py-3 text-sm text-white max-w-xs"
+            style={{ background: "#6366f1" }}
+          >
+            Vous pouvez me contacter directement 👇
+          </div>
+        </div>
         <a
           href={`mailto:${EMAIL}`}
-          className="underline hover:text-white transition-colors"
+          className="mt-2 self-center rounded-full px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-80"
+          style={{ background: "linear-gradient(90deg,#6366f1,#8b5cf6)" }}
         >
-          par e-mail
+          ✉ Envoyer un message à Paul
         </a>
-        .
-      </p>
-    </h1>
+      </div>
+    </div>
   );
 
   return (
