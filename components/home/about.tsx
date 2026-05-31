@@ -77,8 +77,9 @@ const AboutSection = () => {
           willChange ? "will-change-opacity" : ""
         }`}
       >
-        Du backend Java/Spring au frontend React/WebGL, en passant par l'After
-        Effects — je couvre l'ensemble de la chaîne de production.
+        Du backend Java/Spring au frontend React/WebGL, en passant par
+        l&rsquo;After Effects — je couvre l&rsquo;ensemble de la chaîne de
+        production.
       </span>
     </h1>
   );

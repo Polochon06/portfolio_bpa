@@ -61,14 +61,13 @@ const Footer = () => {
       className="w-full relative select-none bg-cover flex flex-col items-stretch"
       id={footerRef}
     >
-      <img
-        src={`${process.env.NEXT_PUBLIC_BASE_PATH}/footer-curve.svg`}
+      <Image
+        src="/footer-curve.svg"
         alt="Footer"
         className="w-full"
-        loading="lazy"
-        height={290}
-        role="presentation"
         width={1440}
+        height={290}
+        layout="responsive"
       />
       <div className="h-full w-full">
         <div className="section-container flex-col flex h-full justify-end z-10 items-center py-12">
