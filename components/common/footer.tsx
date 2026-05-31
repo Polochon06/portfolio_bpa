@@ -5,7 +5,7 @@
 // License text available at https://opensource.org/licenses/MIT
 
 import { EMAIL, MENULINKS, SOCIAL_LINKS } from "../../constants";
-import Image from "next/image";
+import Image from "./img";
 import Button, { ButtonTypes } from "./button";
 
 const Footer = () => {

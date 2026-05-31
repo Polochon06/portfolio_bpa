@@ -15,7 +15,7 @@ import {
   TIMELINE,
   TimelineNodeV2,
 } from "../../constants";
-import Image from "next/image";
+import Image from "../common/img";
 import { gsap, Linear } from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { IDesktop, isSmallScreen } from "pages";

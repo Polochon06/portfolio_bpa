@@ -5,7 +5,7 @@
 // License text available at https://opensource.org/licenses/MIT
 
 import styles from "./ProjectTile.module.scss";
-import Image from "next/image";
+import Image from "./img";
 import React, { MutableRefObject, useEffect, useRef } from "react";
 import VanillaTilt from "vanilla-tilt";
 import { IProject } from "../../constants";

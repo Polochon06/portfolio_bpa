@@ -5,7 +5,7 @@
 // License text available at https://opensource.org/licenses/MIT
 
 import { MENULINKS, SKILLS } from "../../constants";
-import Image from "next/image";
+import Image from "../common/img";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { gsap, Linear } from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";

@@ -4,7 +4,7 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import Image from "next/image";
+import Image from "./img";
 import { useState } from "react";
 import Menu from "@/components/common/menu";
 
