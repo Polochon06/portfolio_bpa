@@ -2,10 +2,9 @@ import { gsap, Linear } from "gsap";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { isSmallScreen, NO_MOTION_PREFERENCE_QUERY } from "pages";
-import { EMAIL, SOCIAL_LINKS } from "../../constants";
-import Button, { ButtonTypes } from "../common/button";
+import { EMAIL } from "../../constants";
 
-const CONTACT_STYLE = {
+const COLLABORATION_STYLE = {
   SLIDING_TEXT: "opacity-20 text-5xl md:text-7xl font-bold whitespace-nowrap",
   SECTION:
     "w-full relative select-none tall:py-36 py-48 section-container flex flex-col",
@@ -75,7 +74,7 @@ const CollaborationSection = () => {
   }, [quoteRef, targetSection]);
 
   const renderSlidingText = (text: string, layoutClasses: string) => (
-    <p className={`${layoutClasses} ${CONTACT_STYLE.SLIDING_TEXT}`}>
+    <p className={`${layoutClasses} ${COLLABORATION_STYLE.SLIDING_TEXT}`}>
       {Array(5)
         .fill(text)
         .reduce((str, el) => str.concat(el), "")}
@@ -83,54 +82,36 @@ const CollaborationSection = () => {
   );
 
   const renderTitle = () => (
-    <div
+    <h1
       ref={quoteRef}
-      className={`flex flex-col items-center ${
+      className={`${COLLABORATION_STYLE.TITLE} ${
         willChange ? "will-change-opacity" : ""
       }`}
     >
-      <h1 className={CONTACT_STYLE.TITLE}>
-        On travaille{" "}
-        <span className="text-strong font-bold">ensemble</span>&nbsp;?
-      </h1>
-      <p className="text-gray-400 text-lg mt-3 text-center">
-        Disponible pour stage / alternance &mdash; contactez-moi directement.
-      </p>
-      <div className="flex gap-4 mt-8 flex-wrap justify-center">
-        <Button
-          type={ButtonTypes.PRIMARY}
-          name="Envoyer un mail"
+      Intéressé par une{" "}
+      <span className="text-strong font-bold">collaboration</span>&nbsp;?
+      <p className="text-gray-400 text-lg md:text-xl font-normal mt-4">
+        Vous pouvez contacter Paul{" "}
+        <a
           href={`mailto:${EMAIL}`}
-          otherProps={{}}
-          classes=""
-        />
-        <Button
-          type={ButtonTypes.OUTLINE}
-          name="GitHub"
-          href={SOCIAL_LINKS.github}
-          otherProps={{ target: "_blank", rel: "noreferrer" }}
-          classes=""
-        />
-        <Button
-          type={ButtonTypes.OUTLINE}
-          name="LinkedIn"
-          href={SOCIAL_LINKS.linkedin}
-          otherProps={{ target: "_blank", rel: "noreferrer" }}
-          classes=""
-        />
-      </div>
-    </div>
+          className="underline hover:text-white transition-colors"
+        >
+          par e-mail
+        </a>
+        .
+      </p>
+    </h1>
   );
 
   return (
-    <section className={CONTACT_STYLE.SECTION} ref={targetSection}>
+    <section className={COLLABORATION_STYLE.SECTION} ref={targetSection}>
       {renderSlidingText(
-        " Développement Web  Motion Design  BTS SIO SLAM ",
+        " Développement Web  Motion Design ",
         "ui-left"
       )}
       {renderTitle()}
       {renderSlidingText(
-        " Backend Java/Spring  Frontend React  After Effects ",
+        " Backend Java/Spring  Frontend React/WebGL ",
         "mt-6 md:mt-8 ui-right"
       )}
     </section>
