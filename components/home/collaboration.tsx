@@ -1,15 +1,11 @@
-// Copyright Ayush Singh 2021,2022. All Rights Reserved.
-// Project: folio
-// Author contact: https://www.linkedin.com/in/alphaayush/
-// This file is licensed under the MIT License.
-// License text available at https://opensource.org/licenses/MIT
-
 import { gsap, Linear } from "gsap";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { isSmallScreen, NO_MOTION_PREFERENCE_QUERY } from "pages";
+import { EMAIL, SOCIAL_LINKS } from "../../constants";
+import Button, { ButtonTypes } from "../common/button";
 
-const COLLABORATION_STYLE = {
+const CONTACT_STYLE = {
   SLIDING_TEXT: "opacity-20 text-5xl md:text-7xl font-bold whitespace-nowrap",
   SECTION:
     "w-full relative select-none tall:py-36 py-48 section-container flex flex-col",
@@ -19,7 +15,6 @@ const COLLABORATION_STYLE = {
 const CollaborationSection = () => {
   const quoteRef: MutableRefObject<HTMLDivElement> = useRef(null);
   const targetSection: MutableRefObject<HTMLDivElement> = useRef(null);
-
   const [willChange, setwillChange] = useState(false);
 
   const initTextGradientAnimation = (
@@ -47,7 +42,6 @@ const CollaborationSection = () => {
     targetSection: MutableRefObject<HTMLDivElement>
   ) => {
     const slidingTl = gsap.timeline({ defaults: { ease: Linear.easeNone } });
-
     slidingTl
       .to(targetSection.current.querySelector(".ui-left"), {
         xPercent: isSmallScreen() ? -500 : -150,
@@ -70,13 +64,10 @@ const CollaborationSection = () => {
   useEffect(() => {
     const textBgAnimation = initTextGradientAnimation(targetSection);
     let slidingAnimation: ScrollTrigger | undefined;
-
     const { matches } = window.matchMedia(NO_MOTION_PREFERENCE_QUERY);
-
     if (matches) {
       slidingAnimation = initSlidingTextAnimation(targetSection);
     }
-
     return () => {
       textBgAnimation.kill();
       slidingAnimation?.kill();
@@ -84,7 +75,7 @@ const CollaborationSection = () => {
   }, [quoteRef, targetSection]);
 
   const renderSlidingText = (text: string, layoutClasses: string) => (
-    <p className={`${layoutClasses} ${COLLABORATION_STYLE.SLIDING_TEXT}`}>
+    <p className={`${layoutClasses} ${CONTACT_STYLE.SLIDING_TEXT}`}>
       {Array(5)
         .fill(text)
         .reduce((str, el) => str.concat(el), "")}
@@ -92,28 +83,54 @@ const CollaborationSection = () => {
   );
 
   const renderTitle = () => (
-    <h1
+    <div
       ref={quoteRef}
-      className={`${COLLABORATION_STYLE.TITLE} ${
+      className={`flex flex-col items-center ${
         willChange ? "will-change-opacity" : ""
       }`}
     >
-      Intéressé par une <span className="text-strong font-bold">collaboration</span>
-      ?
-    </h1>
+      <h1 className={CONTACT_STYLE.TITLE}>
+        On travaille{" "}
+        <span className="text-strong font-bold">ensemble</span>&nbsp;?
+      </h1>
+      <p className="text-gray-400 text-lg mt-3 text-center">
+        Disponible pour stage / alternance &mdash; contactez-moi directement.
+      </p>
+      <div className="flex gap-4 mt-8 flex-wrap justify-center">
+        <Button
+          type={ButtonTypes.PRIMARY}
+          name="Envoyer un mail"
+          href={`mailto:${EMAIL}`}
+          otherProps={{}}
+          classes=""
+        />
+        <Button
+          type={ButtonTypes.OUTLINE}
+          name="GitHub"
+          href={SOCIAL_LINKS.github}
+          otherProps={{ target: "_blank", rel: "noreferrer" }}
+          classes=""
+        />
+        <Button
+          type={ButtonTypes.OUTLINE}
+          name="LinkedIn"
+          href={SOCIAL_LINKS.linkedin}
+          otherProps={{ target: "_blank", rel: "noreferrer" }}
+          classes=""
+        />
+      </div>
+    </div>
   );
 
   return (
-    <section className={COLLABORATION_STYLE.SECTION} ref={targetSection}>
+    <section className={CONTACT_STYLE.SECTION} ref={targetSection}>
       {renderSlidingText(
-        " Développement Web  Motion Design ",
+        " Développement Web  Motion Design  BTS SIO SLAM ",
         "ui-left"
       )}
-
       {renderTitle()}
-
       {renderSlidingText(
-        " Backend Java/Spring  Frontend React/WebGL ",
+        " Backend Java/Spring  Frontend React  After Effects ",
         "mt-6 md:mt-8 ui-right"
       )}
     </section>
