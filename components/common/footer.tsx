@@ -62,7 +62,7 @@ const Footer = () => {
       id={footerRef}
     >
       <img
-        src="/footer-curve.svg"
+        src={`${process.env.NEXT_PUBLIC_BASE_PATH}/footer-curve.svg`}
         alt="Footer"
         className="w-full"
         loading="lazy"
