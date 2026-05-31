@@ -12,4 +12,7 @@ module.exports = {
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
   },
+  sassOptions: {
+    prependData: `$base-path: "${basePath}";`,
+  },
 };
