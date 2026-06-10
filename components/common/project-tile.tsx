@@ -8,6 +8,7 @@ import styles from "./ProjectTile.module.scss";
 import Image from "./img";
 import React, { MutableRefObject, useEffect, useRef } from "react";
 import VanillaTilt from "vanilla-tilt";
+import Link from "next/link";
 import { IProject } from "../../constants";
 
 const ProjectTile = ({
@@ -112,12 +113,12 @@ const ProjectTile = ({
   );
 
   const renderDetailsHint = (): React.ReactNode =>
-    onOpenDetails ? (
+    (onOpenDetails || project.pageUrl) ? (
       <div
         className="absolute bottom-4 right-4 z-10 text-xs text-white opacity-60 flex items-center gap-1"
         style={{ transform: "translateZ(1rem)" }}
       >
-        <span>Voir détails</span>
+        <span>Voir le projet</span>
         <span>›</span>
       </div>
     ) : null;
@@ -155,6 +156,16 @@ const ProjectTile = ({
       {renderDetailsHint()}
     </div>
   );
+
+  if (project.pageUrl) {
+    return (
+      <Link href={project.pageUrl}>
+        <a className="link overflow-hidden rounded-3xl snap-start" style={containerStyle}>
+          {cardContent}
+        </a>
+      </Link>
+    );
+  }
 
   if (onOpenDetails) {
     return (

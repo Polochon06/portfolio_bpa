@@ -34,6 +34,7 @@ export interface IProject {
   description: string;
   gradient: [string, string];
   url: string;
+  pageUrl?: string;
   tech: string[];
   details?: {
     period: string;
@@ -51,6 +52,7 @@ export const PROJECTS: IProject[] = [
       "Système RH Java 17 — authentification RBAC admin / manager / employé, workflow de validation multi-niveaux, dashboard avec exports PDF & CSV.",
     gradient: ["#7B2D00", "#FF5F3F"],
     url: "#",
+    pageUrl: "/projects/mt-conges",
     tech: ["javascript", "html", "css", "git"],
     details: {
       period: "2024 — Projet BTS SIO SLAM",
@@ -72,6 +74,7 @@ export const PROJECTS: IProject[] = [
       "Plateforme e-commerce premium — catalogue filtrable 50+ articles, paiement Stripe 3DS, back-office analytique complet.",
     gradient: ["#1e1b4b", "#6366F1"],
     url: "#",
+    pageUrl: "/projects/gymnova",
     tech: ["react", "next", "tailwind", "javascript"],
     details: {
       period: "2024 — Projet BTS SIO SLAM",
